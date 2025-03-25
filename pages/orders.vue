@@ -349,86 +349,276 @@
               </div>
             </div>
 
-            <!-- Product Selection -->
+            <!-- Product Items Section -->
             <div>
               <h2 class="text-lg font-medium text-gray-900 border-b pb-2">
-                Product Details
+                Order Items
               </h2>
-              <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <UFormGroup label="Product Type">
-                  <USelect
-                    v-model="order.productType"
-                    :options="productTypes"
-                    placeholder="Select product type"
-                  />
-                </UFormGroup>
-                <UFormGroup label="Material">
-                  <USelect
-                    v-model="order.material"
-                    :options="materials[order.productType] || []"
-                    placeholder="Select material"
-                  />
-                </UFormGroup>
+
+              <!-- List of products -->
+              <div v-if="order.items.length > 0" class="mt-4 space-y-4">
+                <UCard 
+                  v-for="(item, index) in order.items" 
+                  :key="index"
+                  class="relative p-4"
+                  :ui="{
+                    base: 'relative overflow-hidden',
+                    ring: '',
+                    divide: '',
+                    header: { padding: 'p-3' },
+                    body: { padding: 'p-3' },
+                    footer: { padding: 'p-3' }
+                  }"
+                >
+                  <!-- Product header with delete button -->
+                  <div class="flex justify-between items-center mb-3">
+                    <h3 class="text-md font-semibold">
+                      Item #{{ index + 1 }}: {{ item.productType || 'Product' }}
+                      <span class="ml-2 text-sm font-normal text-gray-500">
+                        {{ item.material || 'No material selected' }}
+                      </span>
+                    </h3>
+                    <UButton
+                      color="red"
+                      variant="ghost"
+                      icon="i-heroicons-trash"
+                      size="xs"
+                      @click="removeItem(index)"
+                      title="Remove item"
+                    />
+                  </div>
+                  
+                  <!-- Product details in grid layout -->
+                  <div class="grid grid-cols-2 gap-2 text-sm">
+                    <div>
+                      <span class="text-gray-500">Dimensions:</span> 
+                      {{ item.width || 0 }}mm × {{ item.drop || 0 }}mm
+                    </div>
+                    <div>
+                      <span class="text-gray-500">Quantity:</span> 
+                      {{ item.quantity || 1 }}
+                    </div>
+                    <div>
+                      <span class="text-gray-500">Control:</span> 
+                      {{ item.controlSide || 'Left' }} side
+                    </div>
+                    <div v-if="item.chainType">
+                      <span class="text-gray-500">Chain:</span> 
+                      {{ item.chainType }}
+                    </div>
+                  </div>
+                  
+                  <!-- Notes if present -->
+                  <div v-if="item.notes" class="mt-2 text-sm text-gray-600">
+                    <span class="text-gray-500">Notes:</span> {{ item.notes }}
+                  </div>
+                  
+                  <!-- Edit button -->
+                  <div class="mt-3 flex justify-end">
+                    <UButton
+                      color="blue"
+                      variant="soft"
+                      size="sm"
+                      @click="editItem(index)"
+                    >
+                      Edit
+                    </UButton>
+                  </div>
+                </UCard>
+              </div>
+              
+              <!-- Empty state -->
+              <div v-else class="mt-4 p-8 text-center bg-gray-50 rounded-lg border border-dashed border-gray-300">
+                <UIcon name="i-heroicons-shopping-bag" class="mx-auto h-12 w-12 text-gray-400" />
+                <h3 class="mt-2 text-sm font-semibold text-gray-900">No items in order</h3>
+                <p class="mt-1 text-sm text-gray-500">Get started by adding your first product below.</p>
+              </div>
+              
+              <!-- Add Item button -->
+              <div class="mt-4 flex justify-center">
+                <UButton
+                  color="primary"
+                  @click="openNewItemForm"
+                  icon="i-heroicons-plus"
+                >
+                  Add Product
+                </UButton>
               </div>
             </div>
 
-            <!-- Measurements -->
-            <div>
-              <h2 class="text-lg font-medium text-gray-900 border-b pb-2">
-                Measurements
-              </h2>
-              <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
-                <UFormGroup label="Width (mm)">
-                  <UInput
-                    v-model="order.width"
-                    type="number"
-                    placeholder="Enter width"
-                    min="0"
+            <!-- Product Form (only shown when adding/editing) -->
+            <template v-if="showProductForm">
+              <div class="mt-4 p-4 bg-gray-900 rounded-lg border border-gray-800 shadow-md">
+                <div class="flex justify-between items-center mb-4">
+                  <h3 class="text-md font-semibold text-white">
+                    {{ editingItemIndex === -1 ? 'Add New Product' : 'Edit Product' }}
+                  </h3>
+                  <UButton
+                    icon="i-heroicons-x-mark"
+                    color="gray"
+                    variant="ghost"
+                    class="text-gray-400 hover:text-white"
+                    size="sm"
+                    @click="cancelItemEdit"
                   />
-                </UFormGroup>
-                <UFormGroup label="Drop (mm)">
-                  <UInput
-                    v-model="order.drop"
-                    type="number"
-                    placeholder="Enter drop"
-                    min="0"
-                  />
-                </UFormGroup>
-                <UFormGroup label="Quantity">
-                  <UInput
-                    v-model="order.quantity"
-                    type="number"
-                    placeholder="Enter quantity"
-                    min="1"
-                  />
-                </UFormGroup>
-              </div>
-            </div>
+                </div>
+                
+                <!-- Product Selection -->
+                <div class="bg-gray-800 p-3 rounded-md border border-gray-700 mb-4">
+                  <h4 class="text-sm font-medium text-gray-300 mb-2">
+                    Product Details
+                  </h4>
+                  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <UFormGroup label="Product Type" class="text-gray-300">
+                      <USelect
+                        v-model="currentItem.productType"
+                        :options="productTypes"
+                        placeholder="Select product type"
+                        :ui="{
+                          base: 'relative',
+                          form: 'form-select',
+                          input: 'bg-gray-900 text-gray-100 border-gray-700 focus:border-gray-600 focus:ring-gray-600'
+                        }"
+                      />
+                    </UFormGroup>
+                    <UFormGroup label="Material" class="text-gray-300">
+                      <USelect
+                        v-model="currentItem.material"
+                        :options="materials[currentItem.productType] || []"
+                        placeholder="Select material"
+                        :ui="{
+                          base: 'relative',
+                          form: 'form-select',
+                          input: 'bg-gray-900 text-gray-100 border-gray-700 focus:border-gray-600 focus:ring-gray-600'
+                        }"
+                      />
+                    </UFormGroup>
+                  </div>
+                </div>
 
-            <!-- Additional Options -->
-            <div>
-              <h2 class="text-lg font-medium text-gray-900 border-b pb-2">
-                Additional Options
-              </h2>
-              <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <UFormGroup label="Control Side">
-                  <URadioGroup v-model="order.controlSide" :options="['Left', 'Right']" />
-                </UFormGroup>
-                <UFormGroup label="Chain Type" v-if="order.productType !== 'Roman Shade'">
-                  <USelect
-                    v-model="order.chainType"
-                    :options="chainTypes"
-                    placeholder="Select chain type"
-                  />
-                </UFormGroup>
-              </div>
-            </div>
+                <!-- Measurements -->
+                <div class="bg-gray-800 p-3 rounded-md border border-gray-700 mb-4">
+                  <h4 class="text-sm font-medium text-gray-300 mb-2">
+                    Measurements
+                  </h4>
+                  <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                    <UFormGroup label="Width (mm)" class="text-gray-300">
+                      <UInput
+                        v-model="currentItem.width"
+                        type="number"
+                        placeholder="Enter width"
+                        min="0"
+                        :ui="{
+                          base: 'relative',
+                          form: 'form-input',
+                          input: 'bg-gray-900 text-gray-100 border-gray-700 focus:border-gray-600 focus:ring-gray-600'
+                        }"
+                      />
+                    </UFormGroup>
+                    <UFormGroup label="Drop (mm)" class="text-gray-300">
+                      <UInput
+                        v-model="currentItem.drop"
+                        type="number"
+                        placeholder="Enter drop"
+                        min="0"
+                        :ui="{
+                          base: 'relative',
+                          form: 'form-input',
+                          input: 'bg-gray-900 text-gray-100 border-gray-700 focus:border-gray-600 focus:ring-gray-600'
+                        }"
+                      />
+                    </UFormGroup>
+                    <UFormGroup label="Quantity" class="text-gray-300">
+                      <UInput
+                        v-model="currentItem.quantity"
+                        type="number"
+                        placeholder="Enter quantity"
+                        min="1"
+                        :ui="{
+                          base: 'relative',
+                          form: 'form-input',
+                          input: 'bg-gray-900 text-gray-100 border-gray-700 focus:border-gray-600 focus:ring-gray-600'
+                        }"
+                      />
+                    </UFormGroup>
+                  </div>
+                </div>
 
-            <!-- Notes -->
-            <UFormGroup label="Additional Notes">
+                <!-- Additional Options -->
+                <div class="bg-gray-800 p-3 rounded-md border border-gray-700 mb-4">
+                  <h4 class="text-sm font-medium text-gray-300 mb-2">
+                    Additional Options
+                  </h4>
+                  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <UFormGroup label="Control Side" class="text-gray-300">
+                      <URadioGroup 
+                        v-model="currentItem.controlSide" 
+                        :options="['Left', 'Right']"
+                        orientation="horizontal"
+                        :ui="{ 
+                          wrapper: 'flex flex-wrap gap-2',
+                          container: 'bg-gray-700 border border-gray-600 rounded-lg p-2 cursor-pointer transition-colors duration-200 hover:bg-gray-600 text-gray-300',
+                          containerActive: 'ring-2 ring-green-500 bg-gray-600 border-green-500 text-white'
+                        }"
+                      />
+                    </UFormGroup>
+                    <UFormGroup label="Chain Type" v-if="currentItem.productType !== 'Roman Shade'" class="text-gray-300">
+                      <USelect
+                        v-model="currentItem.chainType"
+                        :options="chainTypes"
+                        placeholder="Select chain type"
+                        :ui="{
+                          base: 'relative',
+                          form: 'form-select',
+                          input: 'bg-gray-900 text-gray-100 border-gray-700 focus:border-gray-600 focus:ring-gray-600'
+                        }"
+                      />
+                    </UFormGroup>
+                  </div>
+                </div>
+
+                <!-- Notes -->
+                <div class="bg-gray-800 p-3 rounded-md border border-gray-700 mb-4">
+                  <UFormGroup label="Item Notes" class="mb-0 text-gray-300">
+                    <UTextarea
+                      v-model="currentItem.notes"
+                      placeholder="Enter any special instructions for this item"
+                      :rows="2"
+                      :ui="{
+                        base: 'relative',
+                        form: 'form-textarea',
+                        input: 'bg-gray-900 text-gray-100 border-gray-700 focus:border-gray-600 focus:ring-gray-600'
+                      }"
+                    />
+                  </UFormGroup>
+                </div>
+                
+                <!-- Item Form Buttons -->
+                <div class="mt-4 flex justify-end space-x-2">
+                  <UButton
+                    color="gray"
+                    variant="solid"
+                    @click="cancelItemEdit"
+                    class="bg-gray-700 hover:bg-gray-600 text-white"
+                  >
+                    Cancel
+                  </UButton>
+                  <UButton
+                    color="green"
+                    @click="saveCurrentItem"
+                    variant="solid"
+                  >
+                    {{ editingItemIndex === -1 ? 'Add to Order' : 'Save Changes' }}
+                  </UButton>
+                </div>
+              </div>
+            </template>
+
+            <!-- Order Notes -->
+            <UFormGroup label="Order Notes">
               <UTextarea
                 v-model="order.notes"
-                placeholder="Enter any special instructions or notes"
+                placeholder="Enter any special instructions for the entire order"
                 :rows="3"
               />
             </UFormGroup>
@@ -447,6 +637,7 @@
               type="submit"
               color="primary"
               :loading="isSubmitting"
+              :disabled="order.items.length === 0"
             >
               Submit Order
             </UButton>
@@ -632,12 +823,26 @@ const notification = ref({
   color: 'green'
 })
 
-// Form data
+// Form data - updated for multiple items
 const order = ref({
   firstName: '',
   lastName: '',
   phoneNumber: '',
   email: '',
+  clientId: null,
+  company: '',
+  address: '',
+  city: '',
+  state: '',
+  postalCode: '',
+  notes: '',
+  items: []  // Array of items in the order
+})
+
+// Item form management
+const showProductForm = ref(false)
+const editingItemIndex = ref(-1)
+const currentItem = ref({
   productType: '',
   material: '',
   width: null,
@@ -645,22 +850,97 @@ const order = ref({
   quantity: 1,
   controlSide: 'Left',
   chainType: '',
-  notes: '',
-  clientId: null,
-  company: '',
-  address: '',
-  city: '',
-  state: '',
-  postalCode: ''
+  notes: ''
 })
 
-// Form validation
+// Open form to add a new item
+function openNewItemForm() {
+  // Reset the current item form
+  currentItem.value = {
+    productType: '',
+    material: '',
+    width: null,
+    drop: null,
+    quantity: 1,
+    controlSide: 'Left',
+    chainType: '',
+    notes: ''
+  }
+  editingItemIndex.value = -1
+  showProductForm.value = true
+}
+
+// Open form to edit an existing item
+function editItem(index) {
+  editingItemIndex.value = index
+  currentItem.value = { ...order.value.items[index] }
+  showProductForm.value = true
+}
+
+// Remove an item from the order
+function removeItem(index) {
+  order.value.items.splice(index, 1)
+}
+
+// Cancel item editing
+function cancelItemEdit() {
+  showProductForm.value = false
+  editingItemIndex.value = -1
+}
+
+// Save the current item being edited/added
+function saveCurrentItem() {
+  // Validate item first
+  if (!isItemValid.value) {
+    showError(itemValidationErrors.value.join(', '))
+    return
+  }
+  
+  if (editingItemIndex.value === -1) {
+    // Add new item
+    order.value.items.push({ ...currentItem.value })
+  } else {
+    // Update existing item
+    order.value.items[editingItemIndex.value] = { ...currentItem.value }
+  }
+  
+  // Close the form
+  showProductForm.value = false
+  editingItemIndex.value = -1
+}
+
+// Item validation
+const itemValidationErrors = ref([])
+
+const isItemValid = computed(() => {
+  itemValidationErrors.value = []
+  
+  if (!currentItem.value.productType) {
+    itemValidationErrors.value.push('Product type is required')
+  }
+  
+  if (!currentItem.value.material) {
+    itemValidationErrors.value.push('Material is required')
+  }
+  
+  if (!currentItem.value.width) {
+    itemValidationErrors.value.push('Width is required')
+  }
+  
+  if (!currentItem.value.drop) {
+    itemValidationErrors.value.push('Drop is required')
+  }
+  
+  return itemValidationErrors.value.length === 0
+})
+
+// Form validation for the whole order
 const validationErrors = ref([])
 
 const isValid = computed(() => {
   validationErrors.value = []
   
-  // Update name validation
+  // Customer information validation
   if (!order.value.firstName) {
     validationErrors.value.push('First name is required')
   }
@@ -679,32 +959,113 @@ const isValid = computed(() => {
     validationErrors.value.push('Email format is invalid')
   }
   
-  if (!order.value.productType) {
-    validationErrors.value.push('Product type is required')
-  }
-  
-  if (!order.value.material) {
-    validationErrors.value.push('Material is required')
-  }
-  
-  if (!order.value.width) {
-    validationErrors.value.push('Width is required')
-  }
-  
-  if (!order.value.drop) {
-    validationErrors.value.push('Drop is required')
+  // Order items validation
+  if (order.value.items.length === 0) {
+    validationErrors.value.push('At least one product is required')
   }
   
   return validationErrors.value.length === 0
 })
 
-// Email validation helper
-function isValidEmail(email: string): boolean {
-  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  return re.test(email)
+// Reset the entire form
+const resetForm = () => {
+  order.value = {
+    firstName: '',
+    lastName: '',
+    phoneNumber: '',
+    email: '',
+    clientId: null,
+    company: '',
+    address: '',
+    city: '',
+    state: '',
+    postalCode: '',
+    notes: '',
+    items: []
+  }
+  selectedClient.value = null
+  validationErrors.value = []
+  showProductForm.value = false
+  editingItemIndex.value = -1
+  clientRegistrationStatus.value = 'existing'
 }
 
-const isSubmitting = ref(false)
+// Submit order - updated for multiple items
+const submitOrder = async () => {
+  // Validate form first
+  if (!isValid.value) {
+    showError(validationErrors.value.join(', '))
+    return
+  }
+  
+  isSubmitting.value = true
+  try {
+    // Create a payload that includes client registration status and combined name
+    const payload = {
+      ...order.value,
+      customerName: `${order.value.firstName} ${order.value.lastName}`.trim(),
+      isNewClient: clientRegistrationStatus.value === 'new'
+    }
+    
+    const response = await fetch('/api/ninox/orders', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    })
+    
+    const result = await response.json()
+    
+    if (result.success) {
+      showSuccess(result.message || 'Order submitted successfully!')
+      resetForm()
+    } else {
+      showError(result.error || 'Failed to submit order')
+    }
+  } catch (error: any) {
+    showError(error.message || 'An unexpected error occurred')
+  } finally {
+    isSubmitting.value = false
+  }
+}
+
+// Add these to your script setup section
+const pagination = ref({
+  total: 0,
+  page: 1,
+  limit: 20,
+  totalPages: 1
+})
+
+// Add a function to change page
+function changePage(newPage) {
+  pagination.value.page = newPage
+  triggerClientSearch()
+}
+
+// Add this computed property to determine if we have any address info to display
+const hasAddressInfo = computed(() => {
+  if (!selectedClient.value) return false
+  
+  return selectedClient.value.fields['Address'] ||
+         selectedClient.value.fields['Street'] ||
+         selectedClient.value.fields['City'] ||
+         selectedClient.value.fields['State'] ||
+         selectedClient.value.fields['Zip'] ||
+         selectedClient.value.fields['Postal Code']
+})
+
+// Add a watch to clear the selected client when switching to "new client"
+watch(clientRegistrationStatus, (newValue) => {
+  if (newValue === 'new') {
+    // Clear selected client when switching to "new client"
+    selectedClient.value = null
+    order.value.clientId = null
+    
+    // But don't clear the form fields so the user can keep editing them
+  }
+})
 
 // Product options
 const productTypes = [
@@ -769,109 +1130,13 @@ const showError = (message: string) => {
   }, 5000)
 }
 
-const resetForm = () => {
-  order.value = {
-    firstName: '',
-    lastName: '',
-    phoneNumber: '',
-    email: '',
-    productType: '',
-    material: '',
-    width: null,
-    drop: null,
-    quantity: 1,
-    controlSide: 'Left',
-    chainType: '',
-    notes: '',
-    clientId: null,
-    company: '',
-    address: '',
-    city: '',
-    state: '',
-    postalCode: ''
-  }
-  selectedClient.value = null
-  validationErrors.value = []
-  // Reset client registration status to default
-  clientRegistrationStatus.value = 'existing'
+// Email validation helper
+function isValidEmail(email: string): boolean {
+  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  return re.test(email)
 }
 
-// Submit order
-const submitOrder = async () => {
-  // Validate form first
-  if (!isValid.value) {
-    showError(validationErrors.value.join(', '))
-    return
-  }
-  
-  isSubmitting.value = true
-  try {
-    // Create a payload that includes client registration status and combined name
-    const payload = {
-      ...order.value,
-      customerName: `${order.value.firstName} ${order.value.lastName}`.trim(), // Include combined name for backwards compatibility
-      isNewClient: clientRegistrationStatus.value === 'new'
-    }
-    
-    const response = await fetch('/api/ninox/orders', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(payload)
-    })
-    
-    const result = await response.json()
-    
-    if (result.success) {
-      showSuccess(result.message || 'Order submitted successfully!')
-      resetForm()
-    } else {
-      showError(result.error || 'Failed to submit order')
-    }
-  } catch (error: any) {
-    showError(error.message || 'An unexpected error occurred')
-  } finally {
-    isSubmitting.value = false
-  }
-}
-
-// Add these to your script setup section
-const pagination = ref({
-  total: 0,
-  page: 1,
-  limit: 20,
-  totalPages: 1
-})
-
-// Add a function to change page
-function changePage(newPage) {
-  pagination.value.page = newPage
-  triggerClientSearch()
-}
-
-// Add this computed property to determine if we have any address info to display
-const hasAddressInfo = computed(() => {
-  if (!selectedClient.value) return false
-  
-  return selectedClient.value.fields['Address'] ||
-         selectedClient.value.fields['Street'] ||
-         selectedClient.value.fields['City'] ||
-         selectedClient.value.fields['State'] ||
-         selectedClient.value.fields['Zip'] ||
-         selectedClient.value.fields['Postal Code']
-})
-
-// Add a watch to clear the selected client when switching to "new client"
-watch(clientRegistrationStatus, (newValue) => {
-  if (newValue === 'new') {
-    // Clear selected client when switching to "new client"
-    selectedClient.value = null
-    order.value.clientId = null
-    
-    // But don't clear the form fields so the user can keep editing them
-  }
-})
+const isSubmitting = ref(false)
 </script>
 
 <style>
