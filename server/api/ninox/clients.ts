@@ -65,15 +65,14 @@ export default defineEventHandler(async (event) => {
     if (clientIds.length > 0) {
       const clientsData = [];
       
-      // Fetch each client record using the correct endpoint format
+      // Fetch each client record using the correct field ID 'K'
       for (const clientId of clientIds) {
         try {
-          // Get the client record using the POST /record endpoint
           const recordResponse = await axios.post(
             `https://api.ninox.com/v1/teams/${NINOX_TEAM_ID}/databases/${NINOX_DATABASE_ID}/tables/Customers/record`,
             { 
               filters: { 
-                "Customer ID": clientId  // Use the field name as it appears in Ninox
+                "K": clientId  // Using the correct field ID from the start
               } 
             },
             {
@@ -90,103 +89,29 @@ export default defineEventHandler(async (event) => {
           );
           
           if (recordResponse.data) {
-            // Create a complete client object
+            // Log the first client's field names to help identify where email is stored
+            if (clientsData.length === 0) {
+              console.log('First client fields:', Object.keys(recordResponse.data.fields || {}))
+              console.log('Sample client data (first 3 fields):', 
+                Object.entries(recordResponse.data.fields || {})
+                  .slice(0, 3)
+                  .map(([key, value]) => `${key}: ${value}`)
+                  .join(', ')
+              )
+            }
+            
             clientsData.push({
               id: recordResponse.data.id || '',
               fields: recordResponse.data.fields || {}
             });
-            console.log(`Successfully fetched client with Customer ID: ${clientId}`);
+            console.log(`Successfully fetched client with ID: ${clientId}`);
           }
         } catch (err) {
-          console.error(`Error fetching record for Customer ID ${clientId}:`, err.message);
-          
-          // Log detailed error information if available
-          if (err.response) {
-            console.error('Status:', err.response.status);
-            console.error('Response data:', err.response.data);
-          }
+          console.error(`Error fetching record for ID ${clientId}:`, err.message);
         }
       }
       
       console.log(`Successfully fetched data for ${clientsData.length} clients`);
-      
-      // If we couldn't find any clients with the detailed approach, try a different field ID
-      if (clientsData.length === 0) {
-        console.log("No clients found with 'Customer ID' field, trying alternative field names...");
-        
-        // Try with different field IDs based on schema
-        const possibleFieldNames = ['K', 'Customer ID', 'CustomerID', 'ID', 'customer_id'];
-        
-        for (const fieldName of possibleFieldNames) {
-          for (const clientId of clientIds) {
-            try {
-              console.log(`Trying with field name: ${fieldName} = ${clientId}`);
-              
-              const recordResponse = await axios.post(
-                `https://api.ninox.com/v1/teams/${NINOX_TEAM_ID}/databases/${NINOX_DATABASE_ID}/tables/Customers/record`,
-                { 
-                  filters: { 
-                    [fieldName]: clientId
-                  } 
-                },
-                {
-                  headers: {
-                    'Authorization': `Bearer ${NINOX_API_TOKEN}`,
-                    'Content-Type': 'application/json',
-                  }
-                }
-              );
-              
-              if (recordResponse.data) {
-                clientsData.push({
-                  id: recordResponse.data.id || '',
-                  fields: recordResponse.data.fields || {}
-                });
-                console.log(`Success with field name: ${fieldName}`);
-                
-                // If we found a working field name, use it for all remaining records
-                for (let j = clientIds.indexOf(clientId) + 1; j < clientIds.length; j++) {
-                  try {
-                    const nextResponse = await axios.post(
-                      `https://api.ninox.com/v1/teams/${NINOX_TEAM_ID}/databases/${NINOX_DATABASE_ID}/tables/Customers/record`,
-                      { 
-                        filters: { 
-                          [fieldName]: clientIds[j]
-                        } 
-                      },
-                      {
-                        headers: {
-                          'Authorization': `Bearer ${NINOX_API_TOKEN}`,
-                          'Content-Type': 'application/json',
-                        }
-                      }
-                    );
-                    
-                    if (nextResponse.data) {
-                      clientsData.push({
-                        id: nextResponse.data.id || '',
-                        fields: nextResponse.data.fields || {}
-                      });
-                    }
-                  } catch (innerErr) {
-                    console.error(`Error with field name ${fieldName} for ID ${clientIds[j]}:`, innerErr.message);
-                  }
-                }
-                
-                // Break out of both loops since we found a working field name
-                break;
-              }
-            } catch (fieldErr) {
-              console.error(`Failed with field name ${fieldName}:`, fieldErr.message);
-            }
-          }
-          
-          // If we found clients with this field name, stop trying others
-          if (clientsData.length > 0) {
-            break;
-          }
-        }
-      }
       
       // Sort clients by name
       const sortedResults = clientsData.sort((a, b) => {

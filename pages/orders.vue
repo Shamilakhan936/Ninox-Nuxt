@@ -174,8 +174,28 @@
                 Customer Information
               </h2>
               
-              <!-- Client selection and display -->
-              <div class="mb-6">
+              <!-- Client Registration Status -->
+              <div class="mb-6 mt-4">
+                <UFormGroup label="Client Status">
+                  <URadioGroup 
+                    v-model="clientRegistrationStatus" 
+                    :options="[
+                      { label: 'Existing Client', value: 'existing' },
+                      { label: 'New Client', value: 'new' }
+                    ]"
+                    orientation="horizontal"
+                    class="mb-2"
+                    :ui="{ 
+                      wrapper: 'flex flex-wrap gap-4',
+                      container: 'bg-white border border-gray-300 rounded-lg p-3 cursor-pointer transition-colors duration-200 hover:bg-gray-50',
+                      containerActive: 'ring-2 ring-primary-500 bg-primary-50 border-primary-500'
+                    }"
+                  />
+                </UFormGroup>
+              </div>
+              
+              <!-- Client search/selection section - only shown for existing clients -->
+              <div v-if="clientRegistrationStatus === 'existing'" class="mb-6">
                 <div class="flex items-center space-x-4 mb-4">
                   <UButton
                     icon="i-heroicons-user"
@@ -185,50 +205,147 @@
                   >
                     Find Client
                   </UButton>
-                  
-                  <UButton
-                    v-if="selectedClient"
-                    icon="i-heroicons-user-minus"
-                    color="gray"
-                    variant="soft"
-                    @click="clearSelectedClient"
-                  >
-                    Clear Selection
-                  </UButton>
                 </div>
                 
                 <!-- Selected client display -->
-                <UAlert
-                  v-if="selectedClient"
-                  color="blue"
-                  variant="soft"
-                  icon="i-heroicons-user-circle"
-                  class="mb-4"
-                >
-                  <div class="flex justify-between items-center">
-                    <div>
-                      <strong>Selected Client:</strong> {{ selectedClient.fields['First Name'] }} {{ selectedClient.fields['Last Name'] }}<br>
-                      <span class="text-sm">
-                        {{ selectedClient.fields['Email'] || 'No email' }} 
-                        <template v-if="selectedClient.fields['Phone Number']">
-                          | {{ selectedClient.fields['Phone Number'] }}
-                        </template>
-                      </span>
+                <div v-if="selectedClient" class="mb-6">
+                  <UCard 
+                    :ui="{ 
+                      base: 'relative overflow-hidden',
+                      ring: '', 
+                      divide: 'divide-y divide-gray-100',
+                      body: { padding: 'p-0' }
+                    }"
+                  >
+                    <div class="flex bg-blue-50 p-4">
+                      <div class="mr-4 flex-shrink-0">
+                        <div class="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
+                          <UIcon name="i-heroicons-user" class="h-6 w-6 text-blue-600" />
+                        </div>
+                      </div>
+                      <div class="flex-grow">
+                        <h3 class="text-lg font-medium text-gray-900">
+                          {{ selectedClient.fields['First Name'] }} {{ selectedClient.fields['Last Name'] }}
+                        </h3>
+                        <div class="mt-1 flex flex-col sm:flex-row sm:flex-wrap sm:space-x-6">
+                          <div v-if="selectedClient.fields['Company']" class="mt-1 flex items-center text-sm text-gray-600">
+                            <UIcon name="i-heroicons-building-office-2" class="mr-1.5 h-4 w-4 flex-shrink-0 text-gray-500" />
+                            {{ selectedClient.fields['Company'] }}
+                          </div>
+                          <div v-if="selectedClient.fields['Email']" class="mt-1 flex items-center text-sm text-gray-600">
+                            <UIcon name="i-heroicons-envelope" class="mr-1.5 h-4 w-4 flex-shrink-0 text-gray-500" />
+                            {{ selectedClient.fields['Email'] }}
+                          </div>
+                          <div v-if="selectedClient.fields['Phone Number']" class="mt-1 flex items-center text-sm text-gray-600">
+                            <UIcon name="i-heroicons-phone" class="mr-1.5 h-4 w-4 flex-shrink-0 text-gray-500" />
+                            {{ selectedClient.fields['Phone Number'] }}
+                          </div>
+                        </div>
+                      </div>
+                      <div class="ml-2 flex-shrink-0">
+                        <UButton
+                          icon="i-heroicons-x-mark"
+                          color="gray"
+                          variant="ghost"
+                          @click="clearSelectedClient"
+                          title="Clear selected client"
+                        />
+                      </div>
                     </div>
-                  </div>
-                </UAlert>
+                    
+                    <!-- Optional address information if available -->
+                    <div v-if="hasAddressInfo" class="border-t border-gray-100 px-4 py-3">
+                      <div class="flex items-center text-sm text-gray-600">
+                        <UIcon name="i-heroicons-map-pin" class="mr-1.5 h-4 w-4 flex-shrink-0 text-gray-500" />
+                        <span>
+                          <template v-if="selectedClient.fields['Address']">{{ selectedClient.fields['Address'] }}</template>
+                          <template v-else>
+                            <template v-if="selectedClient.fields['Street']">{{ selectedClient.fields['Street'] }}</template>
+                            <template v-if="selectedClient.fields['City']">
+                              <template v-if="selectedClient.fields['Street']">, </template>
+                              {{ selectedClient.fields['City'] }}
+                            </template>
+                            <template v-if="selectedClient.fields['State']">
+                              <template v-if="selectedClient.fields['City'] || selectedClient.fields['Street']">, </template>
+                              {{ selectedClient.fields['State'] }}
+                            </template>
+                            <template v-if="selectedClient.fields['Zip'] || selectedClient.fields['Postal Code']">
+                              <template v-if="selectedClient.fields['State'] || selectedClient.fields['City'] || selectedClient.fields['Street']">, </template>
+                              {{ selectedClient.fields['Zip'] || selectedClient.fields['Postal Code'] }}
+                            </template>
+                          </template>
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <!-- Optional notes section if available -->
+                    <div v-if="selectedClient.fields['Notes']" class="border-t border-gray-100 px-4 py-3">
+                      <h4 class="text-xs uppercase tracking-wide text-gray-500">Notes</h4>
+                      <p class="mt-1 text-sm text-gray-600">{{ selectedClient.fields['Notes'] }}</p>
+                    </div>
+                  </UCard>
+                </div>
               </div>
               
+              <!-- Client form fields -->
               <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <UFormGroup label="Customer Name">
-                  <UInput v-model="order.customerName" placeholder="Enter customer name" />
+                <!-- Split customer name into first and last name -->
+                <UFormGroup 
+                  label="First Name"
+                >
+                  <UInput 
+                    v-model="order.firstName" 
+                    placeholder="Enter first name" 
+                    :disabled="clientRegistrationStatus === 'existing' && selectedClient"
+                  />
                 </UFormGroup>
-                <UFormGroup label="Phone Number">
-                  <UInput v-model="order.phoneNumber" placeholder="Enter phone number" />
+                
+                <UFormGroup 
+                  label="Last Name"
+                >
+                  <UInput 
+                    v-model="order.lastName" 
+                    placeholder="Enter last name" 
+                    :disabled="clientRegistrationStatus === 'existing' && selectedClient"
+                  />
                 </UFormGroup>
-                <UFormGroup label="Email" class="sm:col-span-2">
-                  <UInput v-model="order.email" type="email" placeholder="Enter email address" />
+                
+                <UFormGroup 
+                  label="Phone Number"
+                >
+                  <UInput 
+                    v-model="order.phoneNumber" 
+                    placeholder="Enter phone number" 
+                    :disabled="clientRegistrationStatus === 'existing' && selectedClient"
+                  />
                 </UFormGroup>
+                
+                <UFormGroup 
+                  label="Email"
+                >
+                  <UInput 
+                    v-model="order.email" 
+                    type="email" 
+                    placeholder="Enter email address" 
+                    :disabled="clientRegistrationStatus === 'existing' && selectedClient"
+                  />
+                </UFormGroup>
+                
+                <!-- Additional fields for new clients only -->
+                <template v-if="clientRegistrationStatus === 'new'">
+                  <UFormGroup label="Company (Optional)" class="sm:col-span-2">
+                    <UInput v-model="order.company" placeholder="Enter company name if applicable" />
+                  </UFormGroup>
+                  
+                  <UFormGroup label="Address (Optional)" class="sm:col-span-2">
+                    <UInput v-model="order.address" placeholder="Enter street address" class="mb-2" />
+                    <div class="grid grid-cols-2 gap-2">
+                      <UInput v-model="order.city" placeholder="City" />
+                      <UInput v-model="order.state" placeholder="State/Province" />
+                    </div>
+                    <UInput v-model="order.postalCode" placeholder="Postal/ZIP Code" class="mt-2" />
+                  </UFormGroup>
+                </template>
               </div>
             </div>
 
@@ -350,7 +467,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 
 // Client search modal
 const showClientModal = ref(false)
@@ -360,6 +477,9 @@ const clientsError = ref('')
 const clientSearchTerm = ref('')
 const selectedClient = ref(null)
 const showClientResults = ref(false)
+
+// Client registration status
+const clientRegistrationStatus = ref('existing') // Default to existing client
 
 // Format clients for display in the table
 const formattedClients = computed(() => {
@@ -446,16 +566,45 @@ function selectClientAndCloseModal(client) {
 function selectClient(client) {
   selectedClient.value = client
   
+  // Debug log to see the exact structure of the client data
+  console.log('Client data received:', JSON.stringify(client, null, 2))
+  
   // Populate form with client data
-  order.value.customerName = `${client.fields['First Name'] || ''} ${client.fields['Last Name'] || ''}`.trim()
+  order.value.firstName = client.fields['First Name'] || ''
+  order.value.lastName = client.fields['Last Name'] || ''
   order.value.phoneNumber = client.fields['Phone Number'] || ''
   
-  // Check for email field with different possible field names
-  order.value.email = client.fields['Email'] || client.fields['email'] || client.fields['E-mail'] || ''
+  // Try all possible variations of the email field name
+  const possibleEmailFields = ['Email', 'email', 'E-mail', 'e-mail', 'EMAIL', 'EmailAddress', 'Email Address']
+  let emailFound = false
   
-  // Log what we found to help debugging
-  console.log('Selected client fields:', client.fields)
-  console.log('Populated email:', order.value.email)
+  for (const fieldName of possibleEmailFields) {
+    if (client.fields[fieldName] !== undefined && client.fields[fieldName] !== null) {
+      order.value.email = client.fields[fieldName]
+      console.log(`Found email in field: ${fieldName} = ${order.value.email}`)
+      emailFound = true
+      break
+    }
+  }
+  
+  // If no email field was found, check all fields for anything that looks like an email
+  if (!emailFound) {
+    console.log('Email field not found by name, searching all fields...')
+    
+    for (const [key, value] of Object.entries(client.fields)) {
+      if (typeof value === 'string' && value.includes('@') && value.includes('.')) {
+        order.value.email = value
+        console.log(`Found email-like value in field: ${key} = ${value}`)
+        emailFound = true
+        break
+      }
+    }
+  }
+  
+  if (!emailFound) {
+    console.log('No email field found in client data:', client.fields)
+    order.value.email = '' // Clear the email if none found
+  }
   
   // Store the client ID for later use
   order.value.clientId = client.id
@@ -465,7 +614,14 @@ function selectClient(client) {
 function clearSelectedClient() {
   selectedClient.value = null
   order.value.clientId = null
-  // We don't clear the form fields to allow for manual edits
+  
+  // Only clear the form fields if we're switching back to a new client
+  if (clientRegistrationStatus.value === 'new') {
+    order.value.firstName = ''
+    order.value.lastName = ''
+    order.value.phoneNumber = ''
+    order.value.email = ''
+  }
 }
 
 // Notification system
@@ -478,7 +634,8 @@ const notification = ref({
 
 // Form data
 const order = ref({
-  customerName: '',
+  firstName: '',
+  lastName: '',
   phoneNumber: '',
   email: '',
   productType: '',
@@ -489,7 +646,12 @@ const order = ref({
   controlSide: 'Left',
   chainType: '',
   notes: '',
-  clientId: null
+  clientId: null,
+  company: '',
+  address: '',
+  city: '',
+  state: '',
+  postalCode: ''
 })
 
 // Form validation
@@ -498,8 +660,13 @@ const validationErrors = ref([])
 const isValid = computed(() => {
   validationErrors.value = []
   
-  if (!order.value.customerName) {
-    validationErrors.value.push('Customer name is required')
+  // Update name validation
+  if (!order.value.firstName) {
+    validationErrors.value.push('First name is required')
+  }
+  
+  if (!order.value.lastName) {
+    validationErrors.value.push('Last name is required')
   }
   
   if (!order.value.phoneNumber) {
@@ -604,7 +771,8 @@ const showError = (message: string) => {
 
 const resetForm = () => {
   order.value = {
-    customerName: '',
+    firstName: '',
+    lastName: '',
     phoneNumber: '',
     email: '',
     productType: '',
@@ -615,10 +783,17 @@ const resetForm = () => {
     controlSide: 'Left',
     chainType: '',
     notes: '',
-    clientId: null
+    clientId: null,
+    company: '',
+    address: '',
+    city: '',
+    state: '',
+    postalCode: ''
   }
   selectedClient.value = null
   validationErrors.value = []
+  // Reset client registration status to default
+  clientRegistrationStatus.value = 'existing'
 }
 
 // Submit order
@@ -631,12 +806,19 @@ const submitOrder = async () => {
   
   isSubmitting.value = true
   try {
+    // Create a payload that includes client registration status and combined name
+    const payload = {
+      ...order.value,
+      customerName: `${order.value.firstName} ${order.value.lastName}`.trim(), // Include combined name for backwards compatibility
+      isNewClient: clientRegistrationStatus.value === 'new'
+    }
+    
     const response = await fetch('/api/ninox/orders', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(order.value)
+      body: JSON.stringify(payload)
     })
     
     const result = await response.json()
@@ -667,6 +849,29 @@ function changePage(newPage) {
   pagination.value.page = newPage
   triggerClientSearch()
 }
+
+// Add this computed property to determine if we have any address info to display
+const hasAddressInfo = computed(() => {
+  if (!selectedClient.value) return false
+  
+  return selectedClient.value.fields['Address'] ||
+         selectedClient.value.fields['Street'] ||
+         selectedClient.value.fields['City'] ||
+         selectedClient.value.fields['State'] ||
+         selectedClient.value.fields['Zip'] ||
+         selectedClient.value.fields['Postal Code']
+})
+
+// Add a watch to clear the selected client when switching to "new client"
+watch(clientRegistrationStatus, (newValue) => {
+  if (newValue === 'new') {
+    // Clear selected client when switching to "new client"
+    selectedClient.value = null
+    order.value.clientId = null
+    
+    // But don't clear the form fields so the user can keep editing them
+  }
+})
 </script>
 
 <style>
