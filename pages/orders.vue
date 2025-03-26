@@ -213,31 +213,31 @@
                     :ui="{ 
                       base: 'relative overflow-hidden',
                       ring: '', 
-                      divide: 'divide-y divide-gray-100',
+                      divide: 'divide-y divide-gray-800',
                       body: { padding: 'p-0' }
                     }"
                   >
-                    <div class="flex bg-blue-50 p-4">
+                    <div class="flex bg-gray-900 p-4">
                       <div class="mr-4 flex-shrink-0">
-                        <div class="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
-                          <UIcon name="i-heroicons-user" class="h-6 w-6 text-blue-600" />
+                        <div class="h-12 w-12 rounded-full bg-blue-900 flex items-center justify-center">
+                          <UIcon name="i-heroicons-user" class="h-6 w-6 text-blue-400" />
                         </div>
                       </div>
                       <div class="flex-grow">
-                        <h3 class="text-lg font-medium text-gray-900">
+                        <h3 class="text-lg font-medium text-white">
                           {{ selectedClient.fields['First Name'] }} {{ selectedClient.fields['Last Name'] }}
                         </h3>
                         <div class="mt-1 flex flex-col sm:flex-row sm:flex-wrap sm:space-x-6">
-                          <div v-if="selectedClient.fields['Company']" class="mt-1 flex items-center text-sm text-gray-600">
-                            <UIcon name="i-heroicons-building-office-2" class="mr-1.5 h-4 w-4 flex-shrink-0 text-gray-500" />
+                          <div v-if="selectedClient.fields['Company']" class="mt-1 flex items-center text-sm text-gray-300">
+                            <UIcon name="i-heroicons-building-office-2" class="mr-1.5 h-4 w-4 flex-shrink-0 text-gray-400" />
                             {{ selectedClient.fields['Company'] }}
                           </div>
-                          <div v-if="selectedClient.fields['Email']" class="mt-1 flex items-center text-sm text-gray-600">
-                            <UIcon name="i-heroicons-envelope" class="mr-1.5 h-4 w-4 flex-shrink-0 text-gray-500" />
+                          <div v-if="selectedClient.fields['Email']" class="mt-1 flex items-center text-sm text-gray-300">
+                            <UIcon name="i-heroicons-envelope" class="mr-1.5 h-4 w-4 flex-shrink-0 text-gray-400" />
                             {{ selectedClient.fields['Email'] }}
                           </div>
-                          <div v-if="selectedClient.fields['Phone Number']" class="mt-1 flex items-center text-sm text-gray-600">
-                            <UIcon name="i-heroicons-phone" class="mr-1.5 h-4 w-4 flex-shrink-0 text-gray-500" />
+                          <div v-if="selectedClient.fields['Phone Number']" class="mt-1 flex items-center text-sm text-gray-300">
+                            <UIcon name="i-heroicons-phone" class="mr-1.5 h-4 w-4 flex-shrink-0 text-gray-400" />
                             {{ selectedClient.fields['Phone Number'] }}
                           </div>
                         </div>
@@ -247,6 +247,7 @@
                           icon="i-heroicons-x-mark"
                           color="gray"
                           variant="ghost"
+                          class="text-gray-400 hover:text-white"
                           @click="clearSelectedClient"
                           title="Clear selected client"
                         />
@@ -254,9 +255,9 @@
                     </div>
                     
                     <!-- Optional address information if available -->
-                    <div v-if="hasAddressInfo" class="border-t border-gray-100 px-4 py-3">
-                      <div class="flex items-center text-sm text-gray-600">
-                        <UIcon name="i-heroicons-map-pin" class="mr-1.5 h-4 w-4 flex-shrink-0 text-gray-500" />
+                    <div v-if="hasAddressInfo" class="border-t border-gray-800 bg-gray-800 px-4 py-3">
+                      <div class="flex items-center text-sm text-gray-300">
+                        <UIcon name="i-heroicons-map-pin" class="mr-1.5 h-4 w-4 flex-shrink-0 text-gray-400" />
                         <span>
                           <template v-if="selectedClient.fields['Address']">{{ selectedClient.fields['Address'] }}</template>
                           <template v-else>
@@ -279,9 +280,9 @@
                     </div>
                     
                     <!-- Optional notes section if available -->
-                    <div v-if="selectedClient.fields['Notes']" class="border-t border-gray-100 px-4 py-3">
-                      <h4 class="text-xs uppercase tracking-wide text-gray-500">Notes</h4>
-                      <p class="mt-1 text-sm text-gray-600">{{ selectedClient.fields['Notes'] }}</p>
+                    <div v-if="selectedClient.fields['Notes']" class="border-t border-gray-800 bg-gray-800 px-4 py-3">
+                      <h4 class="text-xs uppercase tracking-wide text-gray-400">Notes</h4>
+                      <p class="mt-1 text-sm text-gray-300">{{ selectedClient.fields['Notes'] }}</p>
                     </div>
                   </UCard>
                 </div>
@@ -375,31 +376,31 @@
                       :ui="{ 
                         base: 'relative overflow-hidden',
                         ring: '', 
-                        divide: 'divide-y divide-gray-100',
+                        divide: 'divide-y divide-gray-800',
                         body: { padding: 'p-0' }
                       }"
                     >
-                      <div class="flex bg-green-50 p-4">
+                      <div class="flex bg-gray-900 p-4">
                         <div class="mr-4 flex-shrink-0">
-                          <div class="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center">
-                            <UIcon name="i-heroicons-user-circle" class="h-6 w-6 text-green-600" />
+                          <div class="h-12 w-12 rounded-full bg-green-900 flex items-center justify-center">
+                            <UIcon name="i-heroicons-user-circle" class="h-6 w-6 text-green-400" />
                           </div>
                         </div>
                         <div class="flex-grow">
-                          <h3 class="text-lg font-medium text-gray-900">
+                          <h3 class="text-lg font-medium text-white">
                             {{ selectedSalesperson.fields['First Name'] }} {{ selectedSalesperson.fields['Last Name'] }}
                           </h3>
                           <div class="mt-1 flex flex-col sm:flex-row sm:flex-wrap sm:space-x-6">
-                            <div v-if="selectedSalesperson.fields['Position']" class="mt-1 flex items-center text-sm text-gray-600">
-                              <UIcon name="i-heroicons-briefcase" class="mr-1.5 h-4 w-4 flex-shrink-0 text-gray-500" />
+                            <div v-if="selectedSalesperson.fields['Position']" class="mt-1 flex items-center text-sm text-gray-300">
+                              <UIcon name="i-heroicons-briefcase" class="mr-1.5 h-4 w-4 flex-shrink-0 text-gray-400" />
                               {{ selectedSalesperson.fields['Position'] }}
                             </div>
-                            <div v-if="selectedSalesperson.fields['Email']" class="mt-1 flex items-center text-sm text-gray-600">
-                              <UIcon name="i-heroicons-envelope" class="mr-1.5 h-4 w-4 flex-shrink-0 text-gray-500" />
+                            <div v-if="selectedSalesperson.fields['Email']" class="mt-1 flex items-center text-sm text-gray-300">
+                              <UIcon name="i-heroicons-envelope" class="mr-1.5 h-4 w-4 flex-shrink-0 text-gray-400" />
                               {{ selectedSalesperson.fields['Email'] }}
                             </div>
-                            <div v-if="selectedSalesperson.fields['Phone']" class="mt-1 flex items-center text-sm text-gray-600">
-                              <UIcon name="i-heroicons-phone" class="mr-1.5 h-4 w-4 flex-shrink-0 text-gray-500" />
+                            <div v-if="selectedSalesperson.fields['Phone']" class="mt-1 flex items-center text-sm text-gray-300">
+                              <UIcon name="i-heroicons-phone" class="mr-1.5 h-4 w-4 flex-shrink-0 text-gray-400" />
                               {{ selectedSalesperson.fields['Phone'] }}
                             </div>
                           </div>
@@ -409,6 +410,7 @@
                             icon="i-heroicons-x-mark"
                             color="gray"
                             variant="ghost"
+                            class="text-gray-400 hover:text-white"
                             @click="clearSelectedSalesperson"
                             title="Clear selected salesperson"
                           />
@@ -431,21 +433,24 @@
                 <UCard 
                   v-for="(item, index) in order.items" 
                   :key="index"
-                  class="relative p-4"
+                  class="relative"
                   :ui="{
                     base: 'relative overflow-hidden',
                     ring: '',
                     divide: '',
-                    header: { padding: 'p-3' },
-                    body: { padding: 'p-3' },
-                    footer: { padding: 'p-3' }
+                    header: { padding: 'p-0' },
+                    body: { padding: 'p-0' },
+                    footer: { padding: 'p-0' },
+                    background: 'bg-gray-900',
+                    rounded: 'rounded-lg',
+                    shadow: 'shadow-md'
                   }"
                 >
                   <!-- Product header with delete button -->
-                  <div class="flex justify-between items-center mb-3">
-                    <h3 class="text-md font-semibold">
+                  <div class="flex justify-between items-center p-4 border-b border-gray-800">
+                    <h3 class="text-md font-semibold text-white">
                       Item #{{ index + 1 }}: {{ item.productType || 'Product' }}
-                      <span class="ml-2 text-sm font-normal text-gray-500">
+                      <span class="ml-2 text-sm font-normal text-gray-400">
                         {{ item.material || 'No material selected' }}
                       </span>
                     </h3>
@@ -454,27 +459,28 @@
                       variant="ghost"
                       icon="i-heroicons-trash"
                       size="xs"
+                      class="text-gray-400 hover:text-red-400"
                       @click="removeItem(index)"
                       title="Remove item"
                     />
                   </div>
                   
                   <!-- Product details in grid layout -->
-                  <div class="grid grid-cols-2 gap-2 text-sm">
-                    <div>
-                      <span class="text-gray-500">Dimensions:</span> 
+                  <div class="grid grid-cols-2 gap-2 text-sm p-4 bg-gray-800">
+                    <div class="text-gray-300">
+                      <span class="text-gray-400">Dimensions:</span> 
                       {{ item.width || 0 }}mm × {{ item.height || 0 }}mm
                     </div>
-                    <div>
-                      <span class="text-gray-500">Quantity:</span> 
+                    <div class="text-gray-300">
+                      <span class="text-gray-400">Quantity:</span> 
                       {{ item.quantity || 1 }}
                     </div>
-                    <div v-if="item.isMotorized">
-                      <span class="text-gray-500">Motor Type:</span> 
+                    <div v-if="item.isMotorized" class="text-gray-300">
+                      <span class="text-gray-400">Motor Type:</span> 
                       {{ item.motorType }}
                     </div>
-                    <div v-else>
-                      <span class="text-gray-500">Control:</span> 
+                    <div v-else class="text-gray-300">
+                      <span class="text-gray-400">Control:</span> 
                       {{ item.controlSide || 'Left' }} side
                       <template v-if="item.chainType">
                         ({{ item.chainType }})
@@ -483,16 +489,17 @@
                   </div>
                   
                   <!-- Notes if present -->
-                  <div v-if="item.notes" class="mt-2 text-sm text-gray-600">
-                    <span class="text-gray-500">Notes:</span> {{ item.notes }}
+                  <div v-if="item.notes" class="p-4 text-sm text-gray-300 border-t border-gray-800 bg-gray-800">
+                    <span class="text-gray-400">Notes:</span> {{ item.notes }}
                   </div>
                   
                   <!-- Edit button -->
-                  <div class="mt-3 flex justify-end">
+                  <div class="p-3 flex justify-end bg-gray-900 border-t border-gray-800">
                     <UButton
                       color="blue"
-                      variant="soft"
+                      variant="solid"
                       size="sm"
+                      class="bg-blue-700 hover:bg-blue-600"
                       @click="editItem(index)"
                     >
                       Edit
@@ -502,10 +509,10 @@
               </div>
               
               <!-- Empty state -->
-              <div v-else class="mt-4 p-8 text-center bg-gray-50 rounded-lg border border-dashed border-gray-300">
-                <UIcon name="i-heroicons-shopping-bag" class="mx-auto h-12 w-12 text-gray-400" />
-                <h3 class="mt-2 text-sm font-semibold text-gray-900">No items in order</h3>
-                <p class="mt-1 text-sm text-gray-500">Get started by adding your first product below.</p>
+              <div v-else class="mt-4 p-8 text-center bg-gray-900 rounded-lg border border-dashed border-gray-700">
+                <UIcon name="i-heroicons-shopping-bag" class="mx-auto h-12 w-12 text-gray-600" />
+                <h3 class="mt-2 text-sm font-semibold text-white">No items in order</h3>
+                <p class="mt-1 text-sm text-gray-400">Get started by adding your first product below.</p>
               </div>
               
               <!-- Add Item button -->
