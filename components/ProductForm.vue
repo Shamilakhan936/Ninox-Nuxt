@@ -19,7 +19,7 @@
       <h4 class="text-sm font-medium text-gray-300 mb-2">
         Product Details
       </h4>
-      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-1">
         <UFormGroup label="Product Type" class="text-gray-300">
           <USelect
             v-model="formData.productType"
@@ -32,18 +32,73 @@
             }"
           />
         </UFormGroup>
-        <UFormGroup label="Material" class="text-gray-300">
-          <USelect
-            v-model="formData.material"
-            :options="materials[formData.productType] || []"
-            placeholder="Select material"
-            :ui="{
-              base: 'relative',
-              form: 'form-select',
-              input: 'bg-gray-900 text-gray-100 border-gray-700 focus:border-gray-600 focus:ring-gray-600'
-            }"
-          />
-        </UFormGroup>
+        
+        <!-- Fabric Selection -->
+        <div v-if="formData.productType">
+          <UFormGroup label="Fabric" class="text-gray-300">
+            <div class="flex flex-col space-y-2">
+              <!-- Selected fabric display -->
+              <div 
+                v-if="selectedFabric" 
+                class="bg-gray-700 p-2 rounded-md border border-gray-600 flex items-center"
+              >
+                <!-- Fabric preview -->
+                <div class="w-10 h-10 rounded-md overflow-hidden mr-3">
+                  <img 
+                    v-if="selectedFabric.fields['Image URL']" 
+                    :src="selectedFabric.fields['Image URL']" 
+                    :alt="selectedFabric.fields['Fabric Name']" 
+                    class="w-full h-full object-cover"
+                  />
+                  <div 
+                    v-else 
+                    class="w-full h-full flex items-center justify-center"
+                    :style="{ backgroundColor: selectedFabric.fields['Color Hex'] || '#64748b' }"
+                  >
+                    <UIcon name="i-heroicons-swatch" class="h-6 w-6 text-white opacity-75" />
+                  </div>
+                </div>
+                
+                <!-- Fabric details -->
+                <div class="flex-grow">
+                  <div class="text-sm text-white font-medium">
+                    {{ selectedFabric.fields['Fabric Name'] }}
+                  </div>
+                  <div class="flex items-center text-xs text-gray-300">
+                    <UBadge color="blue" variant="subtle" size="xs" class="mr-2">
+                      {{ selectedFabric.fields['Fabric Type'] }}
+                    </UBadge>
+                    <span 
+                      class="w-3 h-3 rounded-full mr-1"
+                      :style="{ backgroundColor: selectedFabric.fields['Color Hex'] || '#64748b' }"
+                    ></span>
+                    {{ selectedFabric.fields['Fabric Color'] }}
+                  </div>
+                </div>
+                
+                <!-- Clear button -->
+                <UButton
+                  color="gray"
+                  variant="ghost"
+                  icon="i-heroicons-x-mark"
+                  size="xs"
+                  class="text-gray-400 hover:text-white"
+                  @click="clearSelectedFabric"
+                />
+              </div>
+              
+              <!-- Button to open fabric selection modal -->
+              <UButton
+                color="primary"
+                variant="soft"
+                @click="openFabricModal"
+                icon="i-heroicons-swatch"
+              >
+                {{ selectedFabric ? 'Change Fabric' : 'Select Fabric' }}
+              </UButton>
+            </div>
+          </UFormGroup>
+        </div>
       </div>
     </div>
 
@@ -202,22 +257,34 @@
         color="green"
         @click="saveItem"
         variant="solid"
+        :disabled="!isValid"
       >
         {{ isNewItem ? 'Add to Order' : 'Save Changes' }}
       </UButton>
     </div>
+    
+    <!-- Fabric Search Modal -->
+    <FabricSearchModal
+      v-model="showFabricModal"
+      :product-type="formData.productType"
+      @select="selectFabric"
+      @notification="$emit('notification', $event)"
+      ref="fabricSearchModal"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref, computed, watch, toRefs } from 'vue'
+import FabricSearchModal from './FabricSearchModal.vue'
 
 const props = defineProps({
   item: {
     type: Object,
     default: () => ({
       productType: '',
-      material: '',
+      fabricId: null,
+      fabricDetails: null,
       width: null,
       height: null,
       quantity: 1,
@@ -234,7 +301,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['save', 'cancel'])
+const emit = defineEmits(['save', 'cancel', 'validation-error', 'notification'])
 
 // Product options
 const productTypes = [
@@ -242,27 +309,6 @@ const productTypes = [
   'Roman Shade',
   'Curtains'
 ]
-
-const materials = {
-  'Roller Blind': [
-    'Blockout',
-    'Light Filter',
-    'Sunscreen',
-    'Double Roller'
-  ],
-  'Roman Shade': [
-    'Linen',
-    'Cotton',
-    'Polyester',
-    'Silk Blend'
-  ],
-  'Curtains': [
-    'Sheer',
-    'Blockout',
-    'Linen',
-    'Velvet'
-  ]
-}
 
 const chainTypes = [
   'Metal',
@@ -289,6 +335,16 @@ const motorTypes = {
 const { item, isNew } = toRefs(props)
 const formData = ref({ ...item.value })
 
+// Fabric selection
+const showFabricModal = ref(false)
+const selectedFabric = ref(null)
+const fabricSearchModalRef = ref(null)
+
+// Initialize selectedFabric from item if it exists
+if (formData.value.fabricDetails) {
+  selectedFabric.value = formData.value.fabricDetails
+}
+
 // Computed properties
 const isNewItem = computed(() => isNew.value)
 const validationErrors = ref([])
@@ -300,8 +356,8 @@ const isValid = computed(() => {
     validationErrors.value.push('Product type is required')
   }
   
-  if (!formData.value.material) {
-    validationErrors.value.push('Material is required')
+  if (!selectedFabric.value) {
+    validationErrors.value.push('Fabric is required')
   }
   
   if (!formData.value.width) {
@@ -322,10 +378,59 @@ const isValid = computed(() => {
   return validationErrors.value.length === 0
 })
 
+// Watch for product type changes
+watch(() => formData.value.productType, (newType) => {
+  // Reset fabric when product type changes
+  if (selectedFabric.value && selectedFabric.value.fields['Product Type'] !== newType) {
+    selectedFabric.value = null
+    formData.value.fabricId = null
+  }
+})
+
 // Watch for prop changes
 watch(item, (newValue) => {
   formData.value = { ...newValue }
+  
+  // Update selectedFabric from item if it exists
+  if (newValue.fabricDetails) {
+    selectedFabric.value = newValue.fabricDetails
+  } else {
+    selectedFabric.value = null
+  }
 })
+
+// Fabric modal methods
+function openFabricModal() {
+  if (!formData.value.productType) {
+    emit('notification', {
+      title: 'Select Product Type',
+      description: 'Please select a product type before choosing a fabric.',
+      color: 'yellow'
+    })
+    return
+  }
+  
+  if (fabricSearchModalRef.value) {
+    fabricSearchModalRef.value.reset()
+  }
+  showFabricModal.value = true
+}
+
+function selectFabric(fabric) {
+  selectedFabric.value = fabric
+  formData.value.fabricId = fabric.id
+  
+  emit('notification', {
+    title: 'Fabric Selected',
+    description: `${fabric.fields['Fabric Name']} has been selected.`,
+    color: 'blue'
+  })
+}
+
+function clearSelectedFabric() {
+  selectedFabric.value = null
+  formData.value.fabricId = null
+}
 
 // Save item
 function saveItem() {
@@ -334,6 +439,12 @@ function saveItem() {
     return
   }
   
-  emit('save', { ...formData.value })
+  // Add fabric details to the saved item
+  const itemToSave = { 
+    ...formData.value,
+    fabricDetails: selectedFabric.value
+  }
+  
+  emit('save', itemToSave)
 }
 </script>
