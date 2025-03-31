@@ -156,8 +156,8 @@
         Additional Options
       </h4>
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <!-- Show motorization option for Roller Blinds and Roman Shades -->
-        <template v-if="['Roller Blind', 'Roman Shade'].includes(formData.productType)">
+        <!-- Show motorization option for Roller Shadess and Roman Shadess -->
+        <template v-if="['Roller Shades', 'Roman Shades'].includes(formData.productType)">
           <UFormGroup label="Motorized" class="text-gray-300">
             <URadioGroup 
               v-model="formData.isMotorized" 
@@ -209,7 +209,7 @@
           </UFormGroup>
           <UFormGroup 
             label="Chain Type" 
-            v-if="formData.productType === 'Roller Blind'" 
+            v-if="formData.productType === 'Roller Shades'" 
             class="text-gray-300"
           >
             <USelect
@@ -305,8 +305,8 @@ const emit = defineEmits(['save', 'cancel', 'validation-error', 'notification'])
 
 // Product options
 const productTypes = [
-  'Roller Blind',
-  'Roman Shade',
+  'Roller Shades',
+  'Roman Shades',
   'Curtains'
 ]
 
@@ -317,13 +317,13 @@ const chainTypes = [
 ]
 
 const motorTypes = {
-  'Roller Blind': [
+  'Roller Shades': [
     'RF Motor',
     'WiFi Motor',
     'Battery Motor',
     'Hard-Wired Motor'
   ],
-  'Roman Shade': [
+  'Roman Shades': [
     'RF Motor',
     'WiFi Motor',
     'Battery Motor',
@@ -369,7 +369,7 @@ const isValid = computed(() => {
   }
   
   // Validate motorization options
-  if (['Roller Blind', 'Roman Shade'].includes(formData.value.productType)) {
+  if (['Roller Shades', 'Roman Shades'].includes(formData.value.productType)) {
     if (formData.value.isMotorized && !formData.value.motorType) {
       validationErrors.value.push('Motor type is required for motorized options')
     }

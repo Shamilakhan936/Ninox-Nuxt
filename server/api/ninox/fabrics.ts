@@ -28,24 +28,25 @@ export default defineEventHandler(async (event) => {
     if (productType) {
       // Filter fabrics based on product type and search term
       fabricsQuery = `
-        let searchTerm := "${searchTerm}"; 
-        let fabrics := (select Fabrics)[
-                contains(upper('Public Name'), upper(searchTerm))
-            
-        ];
-        fabrics.'Fabric ID'
+         let searchTerm := "${searchTerm}";
+    let fabrics := (select Fabrics)[
+      contains(upper('Public Name'), upper(searchTerm))
+    ];
+    fabrics.'Fabric ID'
       `;
+      
+      console.log('Filtering by product type:', productType);
     } else if (searchTerm) {
       // Filter fabrics based on search term only
       fabricsQuery = `
-        let searchTerm := "${searchTerm}"; 
+        let searchTerm := "${searchTerm}";
         let fabrics := (select Fabrics)[
-            contains(upper('Public Name'), upper(searchTerm))
+          contains(upper('Public Name'), upper(searchTerm))
         ];
         fabrics.'Fabric ID'
       `;
     } else {
-
+      // Get all fabrics
       fabricsQuery = `
         let fabrics := (select Fabrics);
         fabrics.'Fabric ID'
@@ -155,16 +156,36 @@ export default defineEventHandler(async (event) => {
       const endIndex = page * limit;
       const paginatedResults = sortedResults.slice(startIndex, endIndex);
       
-      return { 
-        success: true, 
-        fabrics: paginatedResults,
-        pagination: {
-          total: sortedResults.length,
-          page,
-          limit,
-          totalPages: Math.ceil(sortedResults.length / limit)
-        }
-      };
+      // After fetching the records, add an additional filter to ensure exact matches
+      if (productType) {
+        const filteredData = paginatedResults.filter(fabric => {
+          const productTypes = fabric.fields['Product Type'].split(',').map(type => type.trim());
+          return productTypes.includes(productType);
+        });
+        
+        console.log(`Filtered to ${filteredData.length} fabrics matching product type: ${productType}`);
+        return { 
+          success: true, 
+          fabrics: filteredData,
+          pagination: {
+            total: sortedResults.length,
+            page,
+            limit,
+            totalPages: Math.ceil(sortedResults.length / limit)
+          }
+        };
+      } else {
+        return { 
+          success: true, 
+          fabrics: paginatedResults,
+          pagination: {
+            total: sortedResults.length,
+            page,
+            limit,
+            totalPages: Math.ceil(sortedResults.length / limit)
+          }
+        };
+      }
     } else {
       // No fabrics found
       return { 
