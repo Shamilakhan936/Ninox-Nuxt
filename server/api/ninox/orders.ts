@@ -100,7 +100,7 @@ export default defineEventHandler(async (event) => {
             'Order Item Id': Math.floor(Math.random() * 900000000 + 100000000).toString(),
             // 'Is Motorized': item.isMotorized ? 2 : 1, // 1 for No, 2 for Yes
             // 'Control Side': item.controlSide || null, // Make sure this matches your Ninox field name exactly
-            // 'Fabric': item.fabricId || null, // Make sure this matches your Ninox field name for fabric selection
+            'Fabric': item.fabricId || null, // Make sure this matches your Ninox field name for fabric selection
             // 'Chain Type': item.chainType || null,
             // 'Motor Type': item.motorType || null,
             // 'Notes': item.notes || ''
