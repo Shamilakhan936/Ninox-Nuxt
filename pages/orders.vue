@@ -1,8 +1,8 @@
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div class="min-h-screen bg-gray-50 dark:bg-gray-900">
     <!-- Top Navigation -->
-    <div class="border-b border-gray-200 p-4 bg-white">
-      <h1 class="text-xl font-semibold text-gray-900">Window Treatment Order Entry</h1>
+    <div class="border-b border-gray-200 dark:border-gray-800 p-4 bg-white dark:bg-gray-800">
+      <h1 class="text-xl font-semibold text-gray-900 dark:text-white">Window Treatment Order Entry</h1>
     </div>
 
     <div class="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
@@ -27,15 +27,15 @@
         v-model="showClientModal" 
         @select="selectClient" 
         @notification="showNotification"
-        ref="clientSearchModal"
+        ref="clientSearchModalRef"
       />
-
+      
       <!-- Salesperson Search Modal -->
       <SalespersonSearchModal 
         v-model="showSalespersonModal" 
         @select="selectSalesperson" 
         @notification="showNotification"
-        ref="salespersonSearchModal"
+        ref="salespersonSearchModalRef"
       />
 
       <!-- Notification System -->
@@ -71,7 +71,7 @@ const notification = ref({
   color: 'green'
 })
 
-// Modal control
+// Modal controls
 function openClientModal() {
   if (clientSearchModalRef.value) {
     clientSearchModalRef.value.reset()
@@ -86,7 +86,7 @@ function openSalespersonModal() {
   showSalespersonModal.value = true
 }
 
-// Client and salesperson selection
+// Selection handlers
 function selectClient(client) {
   selectedClient.value = client
   showNotification({
@@ -101,7 +101,7 @@ function selectSalesperson(salesperson) {
   showNotification({
     title: 'Salesperson Selected',
     description: `${salesperson.fields['First Name']} ${salesperson.fields['Last Name']} has been selected.`,
-    color: 'green'
+    color: 'blue'
   })
 }
 
@@ -131,12 +131,14 @@ async function submitOrder(orderData) {
       selectedClient.value = null
       selectedSalesperson.value = null
       validationErrors.value = []
+      
+      // If we have a form reset method on our refs, call it
+      if (clientSearchModalRef.value && clientSearchModalRef.value.reset) {
+        clientSearchModalRef.value.reset()
+      }
+      
     } else {
-      showNotification({
-        title: 'Error',
-        description: result.error || 'Failed to submit order',
-        color: 'red'
-      })
+      throw new Error(result.error || 'Failed to submit order')
     }
   } catch (error) {
     showNotification({
@@ -154,8 +156,8 @@ function handleValidationError(errors) {
   validationErrors.value = errors
   showNotification({
     title: 'Validation Error',
-    description: errors.join(', '),
-    color: 'red'
+    description: Array.isArray(errors) ? errors.join('\n') : errors,
+    color: 'yellow'
   })
 }
 

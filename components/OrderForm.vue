@@ -3,96 +3,232 @@
     <form @submit.prevent="submitOrder">
       <!-- Customer Information Section -->
       <div class="space-y-6">
-        <CustomerForm
-          :customer-data="order"
-          :selected-client="selectedClientLocal"
-          :client-status="clientRegistrationStatus"
-          @update:customer-data="updateCustomerData"
-          @update:selected-client="$emit('update:selectedClient', $event)"
-          @update:client-status="clientRegistrationStatus = $event"
-          @open-client-search="$emit('open-client-search')"
-        />
-
-        <!-- Salesperson Section -->
-        <div class="space-y-6 mb-6">
-          <div>
-            <h2 class="text-lg font-medium text-gray-900 border-b pb-2">
-              Sales Information
-            </h2>
-            
-            <!-- Salesperson search/selection section -->
-            <div class="mt-4">
-              <div class="flex items-center space-x-4 mb-4">
-                <UButton
-                  icon="i-heroicons-user-group"
-                  color="primary"
-                  variant="soft"
-                  @click="$emit('open-salesperson-search')"
-                >
-                  Select Salesperson
-                </UButton>
+        <div class="bg-gray-900 p-4 rounded-lg border border-gray-800">
+          <h3 class="text-lg font-medium text-white mb-4">Customer Information</h3>
+          
+          <div class="mb-4">
+            <UFormGroup label="Customer Type" class="text-gray-300">
+              <URadioGroup 
+                v-model="isExistingCustomer" 
+                :options="[
+                  { label: 'Existing Customer', value: true },
+                  { label: 'New Customer', value: false }
+                ]"
+                orientation="horizontal"
+                :ui="{ 
+                  wrapper: 'flex flex-wrap gap-2',
+                  container: 'bg-gray-700 border border-gray-600 rounded-lg p-2 cursor-pointer transition-colors duration-200 hover:bg-gray-600 text-gray-300',
+                  containerActive: 'ring-2 ring-green-500 bg-gray-600 border-green-500 text-white'
+                }"
+              />
+            </UFormGroup>
+          </div>
+          
+          <!-- Existing Customer Selection -->
+          <div v-if="isExistingCustomer" class="mb-4">
+            <div class="flex flex-wrap items-center gap-4">
+              <div class="flex-grow">
+                <ClientCard v-if="selectedClient" :client="selectedClient" @remove="selectedClient = null" />
+                <div v-else class="p-4 rounded bg-gray-800 border border-gray-700">
+                  <p class="text-gray-400">No customer selected</p>
+                </div>
               </div>
               
-              <!-- Selected salesperson display -->
-              <SalespersonCard
-                :salesperson="selectedSalespersonLocal"
-                @clear="$emit('update:selectedSalesperson', null)"
-              />
+              <UButton 
+                :disabled="isSubmitting"
+                color="primary" 
+                variant="soft" 
+                @click="$emit('open-client-search')"
+              >
+                {{ selectedClient ? 'Change Customer' : 'Select Customer' }}
+              </UButton>
             </div>
+          </div>
+          
+          <!-- New Customer Form -->
+          <div v-else class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <UFormGroup label="First Name" class="text-gray-300">
+              <UInput 
+                v-model="customerData.firstName" 
+                placeholder="Enter first name"
+                :ui="{
+                  base: 'relative',
+                  form: 'form-input',
+                  input: 'bg-gray-900 text-gray-100 border-gray-700 focus:border-gray-600 focus:ring-gray-600'
+                }"
+              />
+            </UFormGroup>
+            
+            <UFormGroup label="Last Name" class="text-gray-300">
+              <UInput 
+                v-model="customerData.lastName" 
+                placeholder="Enter last name"
+                :ui="{
+                  base: 'relative',
+                  form: 'form-input',
+                  input: 'bg-gray-900 text-gray-100 border-gray-700 focus:border-gray-600 focus:ring-gray-600'
+                }"
+              />
+            </UFormGroup>
+            
+            <UFormGroup label="Email" class="text-gray-300">
+              <UInput 
+                v-model="customerData.email" 
+                placeholder="Enter email address"
+                :ui="{
+                  base: 'relative',
+                  form: 'form-input',
+                  input: 'bg-gray-900 text-gray-100 border-gray-700 focus:border-gray-600 focus:ring-gray-600'
+                }"
+              />
+            </UFormGroup>
+            
+            <UFormGroup label="Phone" class="text-gray-300">
+              <UInput 
+                v-model="customerData.phone" 
+                placeholder="Enter phone number"
+                :ui="{
+                  base: 'relative',
+                  form: 'form-input',
+                  input: 'bg-gray-900 text-gray-100 border-gray-700 focus:border-gray-600 focus:ring-gray-600'
+                }"
+              />
+            </UFormGroup>
+            
+            <UFormGroup label="Company (Optional)" class="text-gray-300 sm:col-span-2">
+              <UInput 
+                v-model="customerData.company" 
+                placeholder="Enter company name"
+                :ui="{
+                  base: 'relative',
+                  form: 'form-input',
+                  input: 'bg-gray-900 text-gray-100 border-gray-700 focus:border-gray-600 focus:ring-gray-600'
+                }"
+              />
+            </UFormGroup>
           </div>
         </div>
 
-        <!-- Product Items Section -->
-        <div>
-          <h2 class="text-lg font-medium text-gray-900 border-b pb-2">
-            Order Items
-          </h2>
-
-          <!-- List of products -->
-          <div v-if="order.items.length > 0" class="mt-4 space-y-4">
-            <ProductCard
-              v-for="(item, index) in order.items"
-              :key="index"
-              :item="item"
-              :index="index"
-              @edit="editItem(index)"
-              @remove="removeItem(index)"
-            />
-          </div>
+        <!-- Salesperson Selection -->
+        <div class="bg-gray-900 p-4 rounded-lg border border-gray-800">
+          <h3 class="text-lg font-medium text-white mb-4">Salesperson Information</h3>
           
-          <!-- Empty state -->
-          <EmptyItemsState v-else />
-          
-          <!-- Add Item button -->
-          <div class="mt-4 flex justify-center">
-            <UButton
-              color="primary"
-              @click="openNewItemForm"
-              icon="i-heroicons-plus"
+          <div class="flex flex-wrap items-center gap-4">
+            <div class="flex-grow">
+              <SalespersonCard v-if="selectedSalesperson" :salesperson="selectedSalesperson" @remove="selectedSalesperson = null" />
+              <div v-else class="p-4 rounded bg-gray-800 border border-gray-700">
+                <p class="text-gray-400">No salesperson selected</p>
+              </div>
+            </div>
+            
+            <UButton 
+              :disabled="isSubmitting"
+              color="primary" 
+              variant="soft" 
+              @click="$emit('open-salesperson-search')"
             >
-              Add Product
+              {{ selectedSalesperson ? 'Change Salesperson' : 'Select Salesperson' }}
             </UButton>
           </div>
         </div>
 
-        <!-- Product Form (only shown when adding/editing) -->
-        <ProductForm
-          v-if="showProductForm"
-          :item="currentItem"
-          :is-new="editingItemIndex === -1"
-          @save="saveItem"
-          @cancel="cancelItemEdit"
-          @validation-error="handleItemValidationError"
-        />
+        <!-- Installation Details -->
+        <div class="bg-gray-900 p-4 rounded-lg border border-gray-800">
+          <h3 class="text-lg font-medium text-white mb-4">Installation Details</h3>
+          
+          <div class="space-y-4">
+            <UFormGroup label="Installation Required?" class="text-gray-300">
+              <URadioGroup
+                v-model="installationRequired"
+                :options="[
+                  { label: 'Yes', value: true },
+                  { label: 'No', value: false }
+                ]"
+                orientation="horizontal"
+                :ui="{
+                  wrapper: 'flex flex-wrap gap-2',
+                  container: 'bg-gray-700 border border-gray-600 rounded-lg p-2 cursor-pointer transition-colors duration-200 hover:bg-gray-600 text-gray-300',
+                  containerActive: 'ring-2 ring-green-500 bg-gray-600 border-green-500 text-white'
+                }"
+              />
+            </UFormGroup>
 
-        <!-- Order Notes -->
-        <UFormGroup label="Order Notes">
-          <UTextarea
-            v-model="order.notes"
-            placeholder="Enter any special instructions for the entire order"
-            :rows="3"
-          />
-        </UFormGroup>
+            <template v-if="installationRequired">
+              <UFormGroup label="Installation Address" class="text-gray-300">
+                <UTextarea
+                  v-model="installationAddress"
+                  :rows="3"
+                  placeholder="Enter installation address"
+                  :ui="{
+                    base: 'relative',
+                    form: 'form-textarea',
+                    input: 'bg-gray-900 text-gray-100 border-gray-700 focus:border-gray-600 focus:ring-gray-600'
+                  }"
+                />
+              </UFormGroup>
+            </template>
+            
+            <template v-else>
+              <UFormGroup label="Country" class="text-gray-300">
+                <USelect
+                  v-model="country"
+                  :options="countries"
+                  placeholder="Select country"
+                  :ui="{
+                    base: 'relative',
+                    form: 'form-select',
+                    input: 'bg-gray-900 text-gray-100 border-gray-700 focus:border-gray-600 focus:ring-gray-600'
+                  }"
+                />
+              </UFormGroup>
+            </template>
+          </div>
+        </div>
+
+        <!-- Order Items -->
+        <div class="bg-gray-900 p-4 rounded-lg border border-gray-800">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-medium text-white">Order Items</h3>
+            <UButton
+              color="green"
+              variant="solid"
+              icon="i-heroicons-plus"
+              @click="showProductForm = true"
+            >
+              Add Item
+            </UButton>
+          </div>
+
+          <div v-if="orderItems.length === 0" class="text-center py-8">
+            <p class="text-gray-400">No items added to the order yet</p>
+          </div>
+
+          <div v-else class="space-y-4">
+            <ProductCard
+              v-for="(item, index) in orderItems"
+              :key="index"
+              :item="item"
+              @edit="editItem(index)"
+              @remove="removeItem(index)"
+            />
+          </div>
+        </div>
+
+        <!-- Special Instructions -->
+        <div class="bg-gray-900 p-4 rounded-lg border border-gray-800">
+          <UFormGroup label="Special Instructions" class="mb-0 text-gray-300">
+            <UTextarea
+              v-model="specialInstructions"
+              placeholder="Enter any special instructions for this order"
+              :rows="3"
+              :ui="{
+                base: 'relative',
+                form: 'form-textarea',
+                input: 'bg-gray-900 text-gray-100 border-gray-700 focus:border-gray-600 focus:ring-gray-600'
+              }"
+            />
+          </UFormGroup>
+        </div>
       </div>
 
       <!-- Submit Button -->
@@ -108,22 +244,32 @@
           type="submit"
           color="primary"
           :loading="isSubmitting"
-          :disabled="!isValid || order.items.length === 0"
+          :disabled="!isValid || orderItems.length === 0"
         >
           Submit Order
         </UButton>
       </div>
     </form>
+
+    <!-- Product Form Modal -->
+    <ProductForm
+      v-if="showProductForm"
+      :item="editingItem"
+      :is-new="editingIndex === -1"
+      @save="saveItem"
+      @cancel="cancelProductForm"
+      @validation-error="handleValidationError"
+      @notification="$emit('notification', $event)"
+    />
   </UCard>
 </template>
 
 <script setup>
 import { ref, computed, watch } from 'vue'
-import CustomerForm from './CustomerForm.vue'
+import ClientCard from './ClientCard.vue'
 import SalespersonCard from './SalespersonCard.vue'
 import ProductCard from './ProductCard.vue'
 import ProductForm from './ProductForm.vue'
-import EmptyItemsState from './EmptyItemsState.vue'
 
 const props = defineProps({
   selectedClient: {
@@ -147,234 +293,169 @@ const props = defineProps({
 const emit = defineEmits([
   'submit', 
   'reset',
-  'update:selectedClient',
-  'update:selectedSalesperson',
+  'update:selected-client',
+  'update:selected-salesperson',
   'open-client-search',
   'open-salesperson-search',
   'validation-error',
   'notification'
 ])
 
-// Use computed properties for two-way binding
-const selectedClientLocal = computed({
-  get: () => props.selectedClient,
-  set: (value) => emit('update:selectedClient', value)
-})
-
-const selectedSalespersonLocal = computed({
-  get: () => props.selectedSalesperson,
-  set: (value) => emit('update:selectedSalesperson', value)
-})
-
-// Client registration status
-const clientRegistrationStatus = ref('existing')
-
-// Form data - main order object
-const order = ref({
+// Form state
+const isExistingCustomer = ref(true)
+const customerData = ref({
   firstName: '',
   lastName: '',
-  phoneNumber: '',
   email: '',
-  clientId: null,
-  salespersonId: null,
-  company: '',
-  address: '',
-  city: '',
-  state: '',
-  postalCode: '',
-  notes: '',
-  items: []
+  phone: '',
+  company: ''
 })
-
-// Function to update customer data
-function updateCustomerData(data) {
-  // Update order with customer data
-  order.value = {
-    ...order.value,
-    ...data
-  }
-}
+const installationRequired = ref(false)
+const installationAddress = ref('')
+const country = ref('')
+const specialInstructions = ref('')
+const orderItems = ref([])
 
 // Product form state
 const showProductForm = ref(false)
-const editingItemIndex = ref(-1)
-const currentItem = ref({
-  productType: '',
-  material: '',
-  width: null,
-  height: null,
-  quantity: 1,
-  controlSide: 'Left',
-  chainType: '',
-  isMotorized: false,
-  motorType: '',
-  notes: ''
+const editingItem = ref(null)
+const editingIndex = ref(-1)
+
+// Countries list
+const countries = [
+  'United States',
+  'Canada',
+  'United Kingdom',
+  'Australia',
+  'New Zealand',
+  // Add more countries as needed
+]
+
+// Two-way binding for selected client and salesperson
+const selectedClient = computed({
+  get: () => props.selectedClient,
+  set: (value) => emit('update:selected-client', value)
 })
 
-// Watch for client selection
-watch(() => props.selectedClient, (newClient) => {
-  if (newClient) {
-    order.value.firstName = newClient.fields['First Name'] || ''
-    order.value.lastName = newClient.fields['Last Name'] || ''
-    order.value.phoneNumber = newClient.fields['Phone Number'] || ''
-    order.value.email = newClient.fields['Email'] || ''
-    order.value.clientId = newClient.id
-  }
+const selectedSalesperson = computed({
+  get: () => props.selectedSalesperson,
+  set: (value) => emit('update:selected-salesperson', value)
 })
 
-// Watch for salesperson selection
-watch(() => props.selectedSalesperson, (newSalesperson) => {
-  if (newSalesperson) {
-    order.value.salespersonId = newSalesperson.id
-  } else {
-    order.value.salespersonId = null
-  }
-})
-
-// Computed for form validation
+// Validation
 const isValid = computed(() => {
-  const errors = []
+  const errors = [];
   
-  // Customer information validation
-  if (!order.value.firstName) {
-    errors.push('First name is required')
+  // Customer validation
+  if (isExistingCustomer.value && !selectedClient.value) {
+    errors.push('Please select an existing customer');
   }
   
-  if (!order.value.lastName) {
-    errors.push('Last name is required')
+  if (!isExistingCustomer.value) {
+    if (!customerData.value.firstName) errors.push('Customer first name is required');
+    if (!customerData.value.lastName) errors.push('Customer last name is required');
+    // Optional validation for email/phone if needed
   }
   
-  if (!order.value.phoneNumber) {
-    errors.push('Phone number is required')
+  // Salesperson validation - optional validation
+  // if (!selectedSalesperson.value) {
+  //   errors.push('Please select a salesperson');
+  // }
+  
+  // Installation details validation
+  if (installationRequired.value && !installationAddress.value) {
+    errors.push('Installation address is required');
   }
   
-  if (!order.value.email) {
-    errors.push('Email is required')
-  } else if (!isValidEmail(order.value.email)) {
-    errors.push('Email format is invalid')
+  if (!installationRequired.value && !country.value) {
+    errors.push('Country is required for non-installation orders');
   }
   
-  // Salesperson validation
-  if (!order.value.salespersonId) {
-    errors.push('Salesperson is required')
+  // Order items validation
+  if (orderItems.value.length === 0) {
+    errors.push('At least one item is required');
   }
   
-  return errors.length === 0
+  // Update validation errors if any
+  if (errors.length > 0) {
+    emit('validation-error', errors);
+  }
+  
+  return errors.length === 0;
 })
 
-// Methods for item management
-function openNewItemForm() {
-  currentItem.value = {
-    productType: '',
-    material: '',
-    width: null,
-    height: null, 
-    quantity: 1,
-    controlSide: 'Left',
-    chainType: '',
-    isMotorized: false,
-    motorType: '',
-    notes: ''
-  }
-  editingItemIndex.value = -1
-  showProductForm.value = true
-}
-
+// Product form methods
 function editItem(index) {
-  editingItemIndex.value = index
-  currentItem.value = { ...order.value.items[index] }
-  showProductForm.value = true
+  editingIndex.value = index;
+  editingItem.value = { ...orderItems.value[index] };
+  showProductForm.value = true;
 }
 
 function removeItem(index) {
-  order.value.items.splice(index, 1)
-}
-
-function cancelItemEdit() {
-  showProductForm.value = false
-  editingItemIndex.value = -1
+  orderItems.value.splice(index, 1);
 }
 
 function saveItem(item) {
-  if (editingItemIndex.value === -1) {
-    // Add new item
-    order.value.items.push({ ...item })
+  if (editingIndex.value > -1) {
+    orderItems.value[editingIndex.value] = item;
   } else {
-    // Update existing item
-    order.value.items[editingItemIndex.value] = { ...item }
+    orderItems.value.push(item);
   }
-  
-  showProductForm.value = false
-  editingItemIndex.value = -1
+  cancelProductForm();
 }
 
-function handleItemValidationError(errors) {
-  emit('validation-error', errors)
+function cancelProductForm() {
+  showProductForm.value = false;
+  editingItem.value = null;
+  editingIndex.value = -1;
+}
+
+function handleValidationError(errors) {
+  emit('validation-error', errors);
 }
 
 // Form submission
 function submitOrder() {
-  if (!isValid.value) {
-    const errors = []
-    
-    if (!order.value.firstName) errors.push('First name is required')
-    if (!order.value.lastName) errors.push('Last name is required') 
-    if (!order.value.phoneNumber) errors.push('Phone number is required')
-    
-    if (!order.value.email) {
-      errors.push('Email is required')
-    } else if (!isValidEmail(order.value.email)) {
-      errors.push('Email format is invalid')
-    }
-    
-    if (!order.value.salespersonId) errors.push('Salesperson is required')
-    if (order.value.items.length === 0) errors.push('At least one product is required')
-    
-    emit('validation-error', errors)
-    return
-  }
+  if (!isValid.value) return;
   
-  // Create payload
-  const payload = {
-    ...order.value,
-    customerName: `${order.value.firstName} ${order.value.lastName}`.trim(),
-    isNewClient: clientRegistrationStatus.value === 'new'
-  }
+  const orderData = {
+    isExistingCustomer: isExistingCustomer.value,
+    selectedCustomerId: selectedClient.value?.id,
+    selectedSalespersonId: selectedSalesperson.value?.id,
+    customerFirstName: customerData.value.firstName,
+    customerLastName: customerData.value.lastName,
+    customerEmail: customerData.value.email,
+    customerPhone: customerData.value.phone,
+    company: customerData.value.company,
+    installationRequired: installationRequired.value,
+    installationAddress: installationAddress.value,
+    country: country.value,
+    specialInstructions: specialInstructions.value,
+    items: orderItems.value.map(item => ({
+      ...item,
+      fabricId: item.fabricDetails?.id
+    }))
+  };
   
-  emit('submit', payload)
+  emit('submit', orderData);
 }
 
-// Reset form
 function resetForm() {
-  order.value = {
+  isExistingCustomer.value = true;
+  selectedClient.value = null;
+  customerData.value = {
     firstName: '',
     lastName: '',
-    phoneNumber: '',
     email: '',
-    clientId: null,
-    salespersonId: null,
-    company: '',
-    address: '',
-    city: '',
-    state: '',
-    postalCode: '',
-    notes: '',
-    items: []
-  }
+    phone: '',
+    company: ''
+  };
+  installationRequired.value = false;
+  installationAddress.value = '';
+  country.value = '';
+  specialInstructions.value = '';
+  orderItems.value = [];
   
-  emit('update:selectedClient', null)
-  emit('update:selectedSalesperson', null)
-  
-  clientRegistrationStatus.value = 'existing'
-  showProductForm.value = false
-  editingItemIndex.value = -1
-  
-  emit('reset')
-}
-
-// Helper for email validation
-function isValidEmail(email) {
-  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  return re.test(email)
+  emit('reset');
 }
 </script>

@@ -15,28 +15,33 @@ export default defineEventHandler(async (event) => {
 
   if (method === 'POST') {
     try {
-      // For testing, let's use a simple body that specifies if we're using an existing customer
       const body = await readBody(event);
-      console.log('Received request body:', JSON.stringify(body, null, 2));
+      console.log('Received order request:', JSON.stringify(body, null, 2));
 
+      // STEP 1: Handle customer creation or selection
       let customerId;
       
-      // Test with both scenarios - new and existing customer
-      if (body.useExistingCustomer) {
-        // Use existing customer ID
-        customerId = body.customerId; // This should be a valid customer ID from your database
+      if (body.isExistingCustomer) {
+        // Use existing customer
+        customerId = body.selectedCustomerId;
+        console.log(`Using existing customer with ID: ${customerId}`);
       } else {
         // Create new customer
+        const customerID = Math.floor(Math.random() * 100000).toString();
+        
         const newCustomerBody = [{
           fields: {
-            'First Name': 'Test',
-            'Last Name': 'Customer',
-            'Email Address': 'test@example.com',
-            'Phone Number': '1234567890',
-            'Customer ID': Math.floor(Math.random() * 100000).toString()
+            'First Name': body.customerFirstName,
+            'Last Name': body.customerLastName,
+            'Email Address': body.customerEmail,
+            'Phone Number': body.customerPhone,
+            'Company': body.company || '',
+            'Customer ID': customerID
           }
         }];
 
+        console.log('Creating new customer:', JSON.stringify(newCustomerBody, null, 2));
+        
         const customerResponse = await axios.post(
           `https://api.ninox.com/v1/teams/${NINOX_TEAM_ID}/databases/${NINOX_DATABASE_ID}/tables/${CUSTOMERS_TABLE}/records`,
           newCustomerBody,
@@ -52,17 +57,21 @@ export default defineEventHandler(async (event) => {
         customerId = customerResponse.data[0].id;
       }
 
-      // Create order with proper customer relationship
+      // STEP 2: Create the main order
       const orderBody = [{
         fields: {
-          'Status': 1,
-          'Date Order Created': new Date().toISOString().split('T')[0],
-          'Customer': customerId  // Direct ID approach
+          'Status': 1, // New order status
+          'Date Order Created': new Date().toISOString().split('T')[0], // today's date
+          'Customer': customerId, // Direct ID for relationship
+          // 'Salesperson': body.selectedSalespersonId || null, // Add salesperson relationship
+          'Fulfillment': body.installationRequired ? 1 : 3, // 1 for installation, 3 for pickup/delivery
+          'Customer Location': body.installationRequired ? body.installationAddress : body.country,
+          'Notes': body.specialInstructions || ''
         }
       }];
 
-      console.log('Sending order data:', JSON.stringify(orderBody, null, 2));
-
+      console.log('Creating order:', JSON.stringify(orderBody, null, 2));
+      
       const orderResponse = await axios.post(
         `https://api.ninox.com/v1/teams/${NINOX_TEAM_ID}/databases/${NINOX_DATABASE_ID}/tables/${ORDERS_TABLE}/records`,
         orderBody,
@@ -77,46 +86,63 @@ export default defineEventHandler(async (event) => {
       console.log('Order creation response:', JSON.stringify(orderResponse.data, null, 2));
       const orderId = orderResponse.data[0].id;
 
-      // Create Order Items related to the Order
-      // We'll create a test order item
-      const orderItemBody = [{
-        fields: {
-          'Orders': orderId,  // Direct ID approach for relation
-          'Product Type': 'Roller Shades',
-          'Width': 1000,
-          'Height': 1200,
-          'Qty': 1,
-          'Order Item Id': Math.floor(Math.random() * 900000000 + 100000000).toString(),
-          'Control Position': 'Left'
-        }
-      }];
-
-      console.log('Sending order item data:', JSON.stringify(orderItemBody, null, 2));
-
-      const orderItemResponse = await axios.post(
-        `https://api.ninox.com/v1/teams/${NINOX_TEAM_ID}/databases/${NINOX_DATABASE_ID}/tables/${ORDER_ITEMS_TABLE}/records`,
-        orderItemBody,
-        {
-          headers: {
-            'Authorization': `Bearer ${NINOX_API_TOKEN}`,
-            'Content-Type': 'application/json',
+      // STEP 3: Create order items
+      if (body.items && body.items.length > 0) {
+        // Map order items to Ninox format
+        const orderItems = body.items.map(item => ({
+          fields: {
+            'Orders': orderId, // Direct ID for relationship to order
+            'Status': 1, // New item status
+            'Product Type': item.productType,
+            'Width': Number(item.width),
+            'Height': Number(item.height),
+            'Qty': Number(item.quantity),
+            'Order Item Id': Math.floor(Math.random() * 900000000 + 100000000).toString(),
+            // 'Is Motorized': item.isMotorized ? 2 : 1, // 1 for No, 2 for Yes
+            // 'Control Side': item.controlSide || null, // Make sure this matches your Ninox field name exactly
+            // 'Fabric': item.fabricId || null, // Make sure this matches your Ninox field name for fabric selection
+            // 'Chain Type': item.chainType || null,
+            // 'Motor Type': item.motorType || null,
+            // 'Notes': item.notes || ''
           }
-        }
-      );
+        }));
 
-      console.log('Order item creation response:', JSON.stringify(orderItemResponse.data, null, 2));
+        console.log('Creating order items:', JSON.stringify(orderItems, null, 2));
+        
+        const orderItemsResponse = await axios.post(
+          `https://api.ninox.com/v1/teams/${NINOX_TEAM_ID}/databases/${NINOX_DATABASE_ID}/tables/${ORDER_ITEMS_TABLE}/records`,
+          orderItems,
+          {
+            headers: {
+              'Authorization': `Bearer ${NINOX_API_TOKEN}`,
+              'Content-Type': 'application/json',
+            }
+          }
+        );
 
-      return {
-        success: true,
-        data: {
-          customer: customerId,
-          order: orderResponse.data[0],
-          orderItem: orderItemResponse.data[0]
-        },
-        message: 'Order and Order Items created successfully'
-      };
+        console.log('Order items creation response:', JSON.stringify(orderItemsResponse.data, null, 2));
 
+        return {
+          success: true,
+          data: {
+            order: orderResponse.data[0],
+            orderItems: orderItemsResponse.data,
+            customerId: customerId
+          },
+          message: 'Order created successfully with items'
+        };
+      } else {
+        return {
+          success: true,
+          data: {
+            order: orderResponse.data[0],
+            customerId: customerId
+          },
+          message: 'Order created successfully but no items were added'
+        };
+      }
     } catch (error) {
+      console.error('Error creating order:', error);
       console.error('Full error details:', {
         message: error.message,
         response: error.response?.data,
@@ -125,7 +151,7 @@ export default defineEventHandler(async (event) => {
       
       return {
         success: false,
-        error: error.response?.data || error.message || 'Internal server error'
+        error: error.response?.data || error.message || 'Failed to create order'
       };
     }
   }
