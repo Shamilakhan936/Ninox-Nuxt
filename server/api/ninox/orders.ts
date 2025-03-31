@@ -2,105 +2,130 @@ import { defineEventHandler, readBody } from 'h3';
 import axios from 'axios';
 
 export default defineEventHandler(async (event) => {
-  // Handle different HTTP methods
   const method = event.node.req.method;
-  
-  // Get environment variables from Nuxt runtime config
   const config = useRuntimeConfig();
   const NINOX_API_TOKEN = config.ninoxApiKey;
   const NINOX_TEAM_ID = config.ninoxTeamId;
   const NINOX_DATABASE_ID = config.ninoxDatabaseId;
   
-  console.log('API Token (first few chars):', NINOX_API_TOKEN ? NINOX_API_TOKEN.substring(0, 5) + '...' : 'undefined');
-  console.log('Team ID:', NINOX_TEAM_ID);
-  console.log('Database ID:', NINOX_DATABASE_ID);
-  
-  // Update to the correct orders table ID
-  const ordersTableId = 'A';
-  
+  // Table IDs
+  const ORDERS_TABLE = 'Orders';
+  const CUSTOMERS_TABLE = 'Customers';
+  const ORDER_ITEMS_TABLE = 'Order Items';
+
   if (method === 'POST') {
     try {
+      // For testing, let's use a simple body that specifies if we're using an existing customer
       const body = await readBody(event);
-      console.log('Received order request:', JSON.stringify(body, null, 2));
+      console.log('Received request body:', JSON.stringify(body, null, 2));
+
+      let customerId;
       
-      // Format the request body in Ninox's expected format
-      const requestBody = [{
-        _upsert: true,  // Create new record or update if exists
-        fields: {
-          "Customer Name": body.customerName,
-          "Phone Number": body.phoneNumber,
-          "Email": body.email,
-          "Product Type": body.productType,
-          "Material": body.material,
-          "Width (mm)": body.width,
-          "Drop (mm)": body.drop,
-          "Quantity": body.quantity,
-          "Control Side": body.controlSide,
-          "Chain Type": body.chainType,
-          "Notes": body.notes,
-          "Order Date": new Date().toISOString(),
-          "Status": "New"  // Default status for new orders
-        }
-      }];
-      
-      // If a client ID was provided, link this order to that client
-      if (body.clientId) {
-        requestBody[0].fields["Client"] = body.clientId;
-      }
-      
-      console.log('Sending to Ninox:', JSON.stringify(requestBody, null, 2));
-      console.log('Request URL:', `https://api.ninox.com/v1/teams/${NINOX_TEAM_ID}/databases/${NINOX_DATABASE_ID}/tables/${ordersTableId}/records`);
-      
-      try {
-        const response = await axios.post(
-          `https://api.ninox.com/v1/teams/${NINOX_TEAM_ID}/databases/${NINOX_DATABASE_ID}/tables/${ordersTableId}/records`, 
-          requestBody, 
+      // Test with both scenarios - new and existing customer
+      if (body.useExistingCustomer) {
+        // Use existing customer ID
+        customerId = body.customerId; // This should be a valid customer ID from your database
+      } else {
+        // Create new customer
+        const newCustomerBody = [{
+          fields: {
+            'First Name': 'Test',
+            'Last Name': 'Customer',
+            'Email Address': 'test@example.com',
+            'Phone Number': '1234567890',
+            'Customer ID': Math.floor(Math.random() * 100000).toString()
+          }
+        }];
+
+        const customerResponse = await axios.post(
+          `https://api.ninox.com/v1/teams/${NINOX_TEAM_ID}/databases/${NINOX_DATABASE_ID}/tables/${CUSTOMERS_TABLE}/records`,
+          newCustomerBody,
           {
             headers: {
               'Authorization': `Bearer ${NINOX_API_TOKEN}`,
               'Content-Type': 'application/json',
-            },
+            }
           }
         );
         
-        console.log('Ninox response:', JSON.stringify(response.data, null, 2));
-        
-        return { 
-          success: true, 
-          data: response.data,
-          message: 'Order created successfully' 
-        };
-      } catch (axiosError) {
-        // Extract detailed error information from axios error
-        if (axiosError.response) {
-          // The request was made and the server responded with a status code
-          // that falls out of the range of 2xx
-          console.error('Ninox API error response:');
-          console.error('Status:', axiosError.response.status);
-          console.error('Headers:', JSON.stringify(axiosError.response.headers, null, 2));
-          console.error('Data:', JSON.stringify(axiosError.response.data, null, 2));
-        } else if (axiosError.request) {
-          // The request was made but no response was received
-          console.error('Ninox API no response:', axiosError.request);
-        } else {
-          // Something happened in setting up the request that triggered an Error
-          console.error('Ninox API request setup error:', axiosError.message);
+        console.log('Customer creation response:', JSON.stringify(customerResponse.data, null, 2));
+        customerId = customerResponse.data[0].id;
+      }
+
+      // Create order with proper customer relationship
+      const orderBody = [{
+        fields: {
+          'Status': 1,
+          'Date Order Created': new Date().toISOString().split('T')[0],
+          'Customer': customerId  // Direct ID approach
         }
-        
-        // Re-throw to be caught by the outer catch
-        throw axiosError;
-      }
+      }];
+
+      console.log('Sending order data:', JSON.stringify(orderBody, null, 2));
+
+      const orderResponse = await axios.post(
+        `https://api.ninox.com/v1/teams/${NINOX_TEAM_ID}/databases/${NINOX_DATABASE_ID}/tables/${ORDERS_TABLE}/records`,
+        orderBody,
+        {
+          headers: {
+            'Authorization': `Bearer ${NINOX_API_TOKEN}`,
+            'Content-Type': 'application/json',
+          }
+        }
+      );
+
+      console.log('Order creation response:', JSON.stringify(orderResponse.data, null, 2));
+      const orderId = orderResponse.data[0].id;
+
+      // Create Order Items related to the Order
+      // We'll create a test order item
+      const orderItemBody = [{
+        fields: {
+          'Orders': orderId,  // Direct ID approach for relation
+          'Product Type': 'Roller Shades',
+          'Width': 1000,
+          'Height': 1200,
+          'Qty': 1,
+          'Order Item Id': Math.floor(Math.random() * 900000000 + 100000000).toString(),
+          'Control Position': 'Left'
+        }
+      }];
+
+      console.log('Sending order item data:', JSON.stringify(orderItemBody, null, 2));
+
+      const orderItemResponse = await axios.post(
+        `https://api.ninox.com/v1/teams/${NINOX_TEAM_ID}/databases/${NINOX_DATABASE_ID}/tables/${ORDER_ITEMS_TABLE}/records`,
+        orderItemBody,
+        {
+          headers: {
+            'Authorization': `Bearer ${NINOX_API_TOKEN}`,
+            'Content-Type': 'application/json',
+          }
+        }
+      );
+
+      console.log('Order item creation response:', JSON.stringify(orderItemResponse.data, null, 2));
+
+      return {
+        success: true,
+        data: {
+          customer: customerId,
+          order: orderResponse.data[0],
+          orderItem: orderItemResponse.data[0]
+        },
+        message: 'Order and Order Items created successfully'
+      };
+
     } catch (error) {
-      console.error('Error creating order:', error);
-      if (error.response) {
-        return { 
-          success: false, 
-          error: `API Error (${error.response.status}): ${JSON.stringify(error.response.data)}` 
-        };
-      }
-      return { 
-        success: false, 
-        error: error.message || 'Internal server error' 
+      console.error('Full error details:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status
+      });
+      
+      return {
+        success: false,
+        error: error.response?.data || error.message || 'Internal server error'
       };
     }
   }
