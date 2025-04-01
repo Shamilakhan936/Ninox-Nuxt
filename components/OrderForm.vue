@@ -309,7 +309,7 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
 import ClientCard from './ClientCard.vue'
-import SalespersonCard from './SalespersonCard.vue'
+import SalesPersonCard from './SalesPersonCard.vue'
 import ProductCard from './ProductCard.vue'
 import ProductForm from './ProductForm.vue'
 
