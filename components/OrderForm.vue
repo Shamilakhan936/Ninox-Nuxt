@@ -261,6 +261,48 @@
       @validation-error="handleValidationError"
       @notification="$emit('notification', $event)"
     />
+
+    <!-- Success Notification Overlay (shown when an order is successfully created) -->
+    <div 
+      v-if="localSuccessInfo.show" 
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+      @click="localSuccessInfo.show = false"
+    >
+      <div 
+        class="bg-gray-800 border border-green-500 rounded-lg p-6 max-w-lg w-full mx-4 shadow-xl" 
+        @click.stop
+      >
+        <div class="flex items-center mb-4">
+          <UIcon name="i-heroicons-check-circle" class="text-green-500 h-8 w-8 mr-3" />
+          <h2 class="text-xl font-semibold text-white">Order Created Successfully!</h2>
+        </div>
+        
+        <div class="text-gray-300 mb-4">
+          <p>{{ localSuccessInfo.message }}</p>
+          <div v-if="localSuccessInfo.orderData" class="mt-3 p-3 bg-gray-700 rounded text-sm">
+            <div><span class="text-green-400">Order ID:</span> {{ localSuccessInfo.orderData.order?.id }}</div>
+            <div><span class="text-green-400">Items:</span> {{ localSuccessInfo.orderData.orderItems?.length || 0 }}</div>
+          </div>
+        </div>
+        
+        <div class="flex justify-end space-x-3">
+          <UButton
+            color="gray"
+            variant="solid"
+            @click="localSuccessInfo.show = false"
+          >
+            Close
+          </UButton>
+          <UButton
+            color="green"
+            variant="solid"
+            @click="resetItems(); localSuccessInfo.show = false"
+          >
+            Add Another Order
+          </UButton>
+        </div>
+      </div>
+    </div>
   </UCard>
 </template>
 
@@ -287,6 +329,10 @@ const props = defineProps({
   validationErrors: {
     type: Array,
     default: () => []
+  },
+  successInfo: {
+    type: Object,
+    default: () => ({ show: false, message: '', orderData: null })
   }
 })
 
@@ -476,9 +522,39 @@ function submitOrder() {
   emit('submit', orderData);
 }
 
+// Local success info to manage the modal/overlay
+const localSuccessInfo = ref({ ...props.successInfo });
+
+// Watch for changes in success info from parent
+watch(() => props.successInfo, (newValue) => {
+  localSuccessInfo.value = { ...newValue };
+}, { deep: true });
+
+// Add a method to reset just the items and form data, not customer/salesperson
+function resetItems() {
+  // Keep customer and salesperson info
+  // Only reset the order-specific data
+  installationRequired.value = false;
+  installationAddress.value = '';
+  country.value = '';
+  specialInstructions.value = '';
+  orderItems.value = [];
+  
+  // Optional: Reset validation errors
+  emit('validation-error', []);
+}
+
+// Expose the resetItems method to parent components
+defineExpose({
+  resetItems
+})
+
+// Update the reset method to call resetItems
 function resetForm() {
+  // Reset everything including customer/salesperson
   isExistingCustomer.value = true;
   selectedClient.value = null;
+  selectedSalesperson.value = null;
   customerData.value = {
     firstName: '',
     lastName: '',
@@ -486,11 +562,9 @@ function resetForm() {
     phone: '',
     company: ''
   };
-  installationRequired.value = false;
-  installationAddress.value = '';
-  country.value = '';
-  specialInstructions.value = '';
-  orderItems.value = [];
+  
+  // Reset the rest of the form
+  resetItems();
   
   emit('reset');
 }

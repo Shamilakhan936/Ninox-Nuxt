@@ -12,6 +12,7 @@
         :selected-salesperson="selectedSalesperson"
         :is-submitting="isSubmitting"
         :validation-errors="validationErrors"
+        :success-info="successInfo"
         @submit="submitOrder"
         @reset="handleFormReset"
         @update:selected-client="selectedClient = $event"
@@ -20,6 +21,7 @@
         @open-salesperson-search="openSalespersonModal"
         @validation-error="handleValidationError"
         @notification="showNotification"
+        ref="orderFormRef"
       />
 
       <!-- Client Search Modal -->
@@ -69,6 +71,13 @@ const notification = ref({
   title: '',
   description: '',
   color: 'green'
+})
+
+// Success notification
+const successInfo = ref({
+  show: false,
+  message: '',
+  orderData: null
 })
 
 // Modal controls
@@ -121,22 +130,13 @@ async function submitOrder(orderData) {
     const result = await response.json()
     
     if (result.success) {
-      showNotification({
-        title: 'Success',
-        description: result.message || 'Order submitted successfully!',
-        color: 'green'
-      })
+      showSuccessNotification(result.message || 'Order submitted successfully!', result.data);
       
-      // Reset state after successful submission
-      selectedClient.value = null
-      selectedSalesperson.value = null
-      validationErrors.value = []
+      validationErrors.value = [];
       
-      // If we have a form reset method on our refs, call it
-      if (clientSearchModalRef.value && clientSearchModalRef.value.reset) {
-        clientSearchModalRef.value.reset()
+      if (orderFormRef.value && orderFormRef.value.resetItems) {
+        orderFormRef.value.resetItems();
       }
-      
     } else {
       throw new Error(result.error || 'Failed to submit order')
     }
@@ -149,6 +149,24 @@ async function submitOrder(orderData) {
   } finally {
     isSubmitting.value = false
   }
+}
+
+function showSuccessNotification(message, data) {
+  showNotification({
+    title: 'Success',
+    description: message,
+    color: 'green'
+  });
+  
+  successInfo.value = {
+    show: true,
+    message,
+    orderData: data
+  };
+  
+  setTimeout(() => {
+    successInfo.value.show = false;
+  }, 10000);
 }
 
 // Helper functions
@@ -182,6 +200,7 @@ function showNotification(notify) {
 // Template refs for modals
 const clientSearchModalRef = ref(null)
 const salespersonSearchModalRef = ref(null)
+const orderFormRef = ref(null)
 </script>
 
 <style>
