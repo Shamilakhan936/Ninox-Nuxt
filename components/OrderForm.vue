@@ -310,7 +310,7 @@
 import { ref, computed, watch } from 'vue'
 import ClientCard from './ClientCard.vue'
 import SalesPersonCard from './SalesPersonCard.vue'
-import ProductCard from './ProductCard.vue'
+import ProductCard from './ProductDisplayCard.vue'
 import ProductForm from './ProductForm.vue'
 
 const props = defineProps({
