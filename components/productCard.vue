@@ -16,20 +16,30 @@
     <!-- Product header with delete button -->
     <div class="flex justify-between items-center p-4 border-b border-gray-800">
       <h3 class="text-md font-semibold text-white">
-        Item #{{ index + 1 }}: {{ item.productType || 'Product' }}
-        <span class="ml-2 text-sm font-normal text-gray-400">
-          {{ item.material || 'No material selected' }}
+        {{ item.productType }}
+        <span v-if="hasFabric" class="text-sm font-normal text-gray-400">
+          • {{ getFabricName }}
+        </span>
+        <span v-else class="text-sm font-normal text-yellow-400">
+          • No fabric selected
         </span>
       </h3>
-      <UButton
-        color="red"
-        variant="ghost"
-        icon="i-heroicons-trash"
-        size="xs"
-        class="text-gray-400 hover:text-red-400"
-        @click="$emit('remove')"
-        title="Remove item"
-      />
+      <div class="flex space-x-2">
+        <UButton
+          color="blue"
+          variant="ghost"
+          icon="i-heroicons-pencil-square"
+          size="xs"
+          @click="$emit('edit')"
+        />
+        <UButton
+          color="red"
+          variant="ghost"
+          icon="i-heroicons-trash"
+          size="xs"
+          @click="$emit('remove')"
+        />
+      </div>
     </div>
     
     <!-- Product details in grid layout -->
@@ -76,15 +86,28 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
+
 const props = defineProps({
   item: {
     type: Object,
     required: true
-  },
-  index: {
-    type: Number,
-    required: true
   }
+})
+
+const hasFabric = computed(() => {
+  return !!(props.item.fabricId || 
+    (props.item.fabricDetails && 
+     (props.item.fabricDetails.fabricId || 
+      props.item.fabricDetails.fields?.['Fabric ID'] || 
+      props.item.fabricDetails.fields?.['Fabric Name'])))
+})
+
+const getFabricName = computed(() => {
+  if (props.item.fabricDetails && props.item.fabricDetails.fields?.['Fabric Name']) {
+    return props.item.fabricDetails.fields['Fabric Name']
+  }
+  return 'Selected'
 })
 
 defineEmits(['edit', 'remove'])

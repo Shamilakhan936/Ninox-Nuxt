@@ -417,14 +417,22 @@ function openFabricModal() {
 }
 
 function selectFabric(fabric) {
-  selectedFabric.value = fabric
-  formData.value.fabricId = fabric.id
+  selectedFabric.value = fabric;
+  // Use the fabricId from the passed fabric object, or the Fabric ID field
+  formData.value.fabricId = fabric.fabricId || fabric.fields['Fabric ID'] || fabric.id;
+  
+  console.log('Selected fabric in ProductForm:', {
+    fabricId: formData.value.fabricId,
+    id: fabric.id,
+    fabricID: fabric.fields['Fabric ID'],
+    name: fabric.fields['Fabric Name']
+  });
   
   emit('notification', {
     title: 'Fabric Selected',
     description: `${fabric.fields['Fabric Name']} has been selected.`,
     color: 'blue'
-  })
+  });
 }
 
 function clearSelectedFabric() {
@@ -439,11 +447,33 @@ function saveItem() {
     return
   }
   
-  // Add fabric details to the saved item
+  // Add specific check for fabric
+  if (!selectedFabric.value) {
+    emit('validation-error', ['Fabric selection is required'])
+    return
+  }
+  
+  // Ensure we're capturing fabricId correctly
+  const fabricId = selectedFabric.value?.fabricId || 
+                  selectedFabric.value?.fields['Fabric ID'] || 
+                  formData.value.fabricId
+  
+  if (!fabricId) {
+    emit('validation-error', ['Could not determine fabric ID. Please try selecting the fabric again.'])
+    return
+  }
+  
+  // Make sure fabricId is included in the saved item
   const itemToSave = { 
     ...formData.value,
-    fabricDetails: selectedFabric.value
+    fabricDetails: selectedFabric.value,
+    fabricId: fabricId
   }
+  
+  console.log('Saving item with fabric:', {
+    fabricId: itemToSave.fabricId,
+    fabricName: selectedFabric.value?.fields['Fabric Name']
+  })
   
   emit('save', itemToSave)
 }

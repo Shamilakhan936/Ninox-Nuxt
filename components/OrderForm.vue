@@ -396,6 +396,12 @@ function removeItem(index) {
 }
 
 function saveItem(item) {
+  // Check if the item has a valid fabric
+  if (!item.fabricId && (!item.fabricDetails || !item.fabricDetails.fields?.['Fabric ID'])) {
+    handleValidationError(['Fabric selection is required']);
+    return;
+  }
+
   if (editingIndex.value > -1) {
     orderItems.value[editingIndex.value] = item;
   } else {
@@ -418,6 +424,20 @@ function handleValidationError(errors) {
 function submitOrder() {
   if (!isValid.value) return;
   
+  // Check all items have valid fabrics
+  const invalidItems = orderItems.value.filter(item => 
+    !item.fabricId && 
+    (!item.fabricDetails || !item.fabricDetails.fields?.['Fabric ID'])
+  );
+  
+  if (invalidItems.length > 0) {
+    handleValidationError([`${invalidItems.length} item(s) are missing fabric selection`]);
+    return;
+  }
+  
+  // Log items for debugging
+  console.log('Order items before submission:', orderItems.value);
+  
   const orderData = {
     isExistingCustomer: isExistingCustomer.value,
     selectedCustomerId: selectedClient.value?.id,
@@ -431,11 +451,27 @@ function submitOrder() {
     installationAddress: installationAddress.value,
     country: country.value,
     specialInstructions: specialInstructions.value,
-    items: orderItems.value.map(item => ({
-      ...item,
-      fabricId: item.fabricDetails?.id
-    }))
+    items: orderItems.value.map(item => {
+      // Ensure fabricId is correctly included, checking all possible locations
+      const fabricId = item.fabricId || 
+                      (item.fabricDetails?.fabricId) || 
+                      (item.fabricDetails?.fields['Fabric ID']) || 
+                      null;
+      
+      console.log(`Item ${item.productType}: fabricId = ${fabricId}`);
+      
+      if (!fabricId) {
+        console.error('Missing fabric ID for item:', item);
+      }
+      
+      return {
+        ...item,
+        fabricId: fabricId
+      };
+    })
   };
+  
+  console.log('Final order data:', orderData);
   
   emit('submit', orderData);
 }

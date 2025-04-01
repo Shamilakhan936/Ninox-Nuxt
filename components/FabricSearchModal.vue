@@ -292,13 +292,28 @@ function changePage(newPage) {
 
 // Function to select a fabric
 function selectFabric(fabric) {
-  emit('select', fabric)
+  // Looking at the logs, we can see the Fabric ID is in fields['Fabric ID']
+  const fabricId = fabric.fields['Fabric ID'];
+  
+  console.log('Selected fabric with fabricId:', fabricId);
+  console.log('Full fabric data:', fabric);
+  
+  if (!fabricId) {
+    console.error('No Fabric ID found in the selected fabric:', fabric);
+  }
+  
+  emit('select', {
+    ...fabric,
+    fabricId: fabricId // Add this explicit property
+  });
+  
   emit('notification', {
     title: 'Fabric Selected',
     description: `${fabric.fields['Fabric Name']} has been selected.`,
     color: 'blue'
-  })
-  close()
+  });
+  
+  close();
 }
 
 // Function to close the modal

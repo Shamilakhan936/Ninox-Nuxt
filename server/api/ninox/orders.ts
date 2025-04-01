@@ -89,23 +89,39 @@ export default defineEventHandler(async (event) => {
       // STEP 3: Create order items
       if (body.items && body.items.length > 0) {
         // Map order items to Ninox format
-        const orderItems = body.items.map(item => ({
-          fields: {
-            'Orders': orderId, // Direct ID for relationship to order
-            'Status': 1, // New item status
-            'Product Type': item.productType,
-            'Width': Number(item.width),
-            'Height': Number(item.height),
-            'Qty': Number(item.quantity),
-            'Order Item Id': Math.floor(Math.random() * 900000000 + 100000000).toString(),
-            // 'Is Motorized': item.isMotorized ? 2 : 1, // 1 for No, 2 for Yes
-            // 'Control Side': item.controlSide || null, // Make sure this matches your Ninox field name exactly
-            'Fabric': item.fabricId || null, // Make sure this matches your Ninox field name for fabric selection
-            // 'Chain Type': item.chainType || null,
-            // 'Motor Type': item.motorType || null,
-            // 'Notes': item.notes || ''
+        const orderItems = body.items.map(item => {
+          console.log('Processing item:', JSON.stringify(item, null, 2));
+          
+          // Determine the fabric ID correctly - checking all possible locations
+          let fabricId = item.fabricId || null;
+          
+          if (!fabricId && item.fabricDetails) {
+            fabricId = item.fabricDetails.fabricId || 
+                      item.fabricDetails.fields?.['Fabric ID'] ||
+                      null;
           }
-        }));
+          
+          console.log(`Extracted fabricId: ${fabricId}`);
+          
+          return {
+            fields: {
+              'Orders': orderId,
+              'Status': 1,
+              'Product Type': item.productType,
+              'Width': Number(item.width),
+              'Height': Number(item.height),
+              'Qty': Number(item.quantity),
+              'Order Item Id': Math.floor(Math.random() * 900000000 + 100000000).toString(),
+              'Fabric Selection': fabricId,
+              // Add back other fields now that we've fixed the main issue
+              // 'Is Motorized': item.isMotorized ? 2 : 1,
+              // 'Control Side': item.controlSide || null,
+              // 'Chain Type': item.chainType || null,
+              // 'Motor Type': item.motorType || null,
+              // 'Notes': item.notes || ''
+            }
+          };
+        });
 
         console.log('Creating order items:', JSON.stringify(orderItems, null, 2));
         
