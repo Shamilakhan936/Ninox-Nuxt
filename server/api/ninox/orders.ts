@@ -8,7 +8,6 @@ export default defineEventHandler(async (event) => {
   const NINOX_TEAM_ID = config.ninoxTeamId;
   const NINOX_DATABASE_ID = config.ninoxDatabaseId;
   
-  // Table IDs
   const ORDERS_TABLE = 'Orders';
   const CUSTOMERS_TABLE = 'Customers';
   const ORDER_ITEMS_TABLE = 'Order Items';
@@ -18,15 +17,13 @@ export default defineEventHandler(async (event) => {
       const body = await readBody(event);
       console.log('Received order request:', JSON.stringify(body, null, 2));
 
-      // STEP 1: Handle customer creation or selection
+
       let customerId;
       
       if (body.isExistingCustomer) {
-        // Use existing customer
         customerId = body.selectedCustomerId;
         console.log(`Using existing customer with ID: ${customerId}`);
       } else {
-        // Create new customer
         const customerID = Math.floor(Math.random() * 100000).toString();
         
         const newCustomerBody = [{
@@ -57,12 +54,12 @@ export default defineEventHandler(async (event) => {
         customerId = customerResponse.data[0].id;
       }
 
-      // STEP 2: Create the main order
+
       const orderBody = [{
         fields: {
-          'Status': 1, // New order status
-          'Date Order Created': new Date().toISOString().split('T')[0], // today's date
-          'Customer': customerId, // Direct ID for relationship
+          'Status': 1, 
+          'Date Order Created': new Date().toISOString().split('T')[0], 
+          'Customer': customerId, 
           // 'Salesperson': body.selectedSalespersonId || null, // Add salesperson relationship
           'Fulfillment': body.installationRequired ? 1 : 3, // 1 for installation, 3 for pickup/delivery
           'Customer Location': body.installationRequired ? body.installationAddress : body.country,
@@ -86,13 +83,11 @@ export default defineEventHandler(async (event) => {
       console.log('Order creation response:', JSON.stringify(orderResponse.data, null, 2));
       const orderId = orderResponse.data[0].id;
 
-      // STEP 3: Create order items
+      
       if (body.items && body.items.length > 0) {
-        // Map order items to Ninox format
         const orderItems = body.items.map(item => {
           console.log('Processing item:', JSON.stringify(item, null, 2));
           
-          // Determine the fabric ID correctly - checking all possible locations
           let fabricId = item.fabricId || null;
           
           if (!fabricId && item.fabricDetails) {
