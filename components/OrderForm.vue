@@ -115,7 +115,7 @@
           
           <div class="flex flex-wrap items-center gap-4">
             <div class="flex-grow">
-              <SalespersonCard v-if="selectedSalesperson" :salesperson="selectedSalesperson" @remove="selectedSalesperson = null" />
+              <SalesPersonCard v-if="selectedSalesperson" :salesperson="selectedSalesperson" @remove="selectedSalesperson = null" />
               <div v-else class="p-4 rounded bg-gray-800 border border-gray-700">
                 <p class="text-gray-400">No salesperson selected</p>
               </div>
