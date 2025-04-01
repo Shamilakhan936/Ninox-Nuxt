@@ -54,7 +54,7 @@
 import { ref } from 'vue'
 import OrderForm from '../components/OrderForm.vue'
 import ClientSearchModal from '../components/ClientSearchModal.vue'
-import SalespersonSearchModal from '../components/SalespersonSearchModal.vue'
+import SalespersonSearchModal from '../components/SalesPersonSearchModal.vue'
 import NotificationSystem from '../components/NotificationSystem.vue'
 
 // State
