@@ -1,43 +1,17 @@
 <template>
   <div class="min-h-screen bg-gray-50 dark:bg-gray-900">
-    <!-- Top Navigation -->
-    <div class="border-b border-gray-200 dark:border-gray-800 p-4 bg-white dark:bg-gray-800">
-      <div class="container mx-auto flex justify-between items-center">
-        <div>
-          <h1 class="text-xl font-semibold text-gray-900 dark:text-white">Window Treatment Order Entry</h1>
-          <p v-if="$auth.user" class="text-sm text-gray-600 dark:text-gray-400">
-            Welcome, {{ $auth.user.given_name }} {{ $auth.user.family_name }}
-          </p>
-        </div>
-        
-        <!-- User menu -->
-        <div v-if="$auth.loggedIn" class="flex items-center space-x-3">
-          <div class="flex items-center space-x-2">
-            <img 
-              v-if="$auth.user.picture" 
-              :src="$auth.user.picture" 
-              class="h-8 w-8 rounded-full" 
-              alt="Profile" 
-            />
-            <span v-else class="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center text-white">
-              {{ $auth.user.given_name?.[0] || 'U' }}
-            </span>
-          </div>
-          <UButton 
-            to="/api/logout" 
-            external 
-            color="gray" 
-            variant="ghost" 
-            size="sm"
-            icon="i-heroicons-arrow-right-on-rectangle"
-          >
-            Sign out
-          </UButton>
-        </div>
-      </div>
-    </div>
+    <!-- Navigation -->
+    <Navbar />
 
+    <!-- Page Content -->
     <div class="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
+      <div class="mb-8">
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Order Entry System</h1>
+        <p class="text-gray-600 dark:text-gray-400">
+          Create and submit orders for window treatments and accessories.
+        </p>
+      </div>
+      
       <div v-if="isLoading" class="flex justify-center items-center h-64">
         <UIcon name="i-heroicons-arrow-path" class="w-8 h-8 animate-spin text-gray-500" />
       </div>
@@ -106,6 +80,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import Navbar from '../components/Navbar.vue'
 import OrderForm from '../components/OrderForm.vue'
 import ClientSearchModal from '../components/ClientSearchModal.vue'
 import SalespersonSearchModal from '../components/SalespersonSearchModal.vue'
