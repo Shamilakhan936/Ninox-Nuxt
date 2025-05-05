@@ -5,9 +5,7 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
 
   // Add Nuxt UI and Tailwind modules
-  modules: [
-    '@nuxt/ui'
-  ],
+  modules: ['@nuxt/ui', '@nuxtjs/kinde'],
 
   // UI configuration
   ui: {
@@ -36,5 +34,52 @@ export default defineNuxtConfig({
   // Remove the PostCSS configuration entirely
   // The @nuxt/ui module will handle Tailwind configuration
   
-  compatibilityDate: '2025-03-19'
-}) 
+  compatibilityDate: '2025-03-19',
+
+  // Add route protection
+  routeRules: {
+    // Public routes
+    '/': {
+      appMiddleware: ['auth-logged-in'],
+      kinde: {
+        public: true,
+      },
+    },
+    '/login': {
+      appMiddleware: ['auth-logged-in'],
+      kinde: {
+        public: true,
+      },
+    },
+    
+    // Protected routes - just require authentication, no specific permissions yet
+    '/orders': {
+      appMiddleware: ['auth-logged-in'],
+      kinde: {
+        redirectUrl: '/api/login',
+        external: true,
+        // Don't require specific permissions yet
+        // permissions: {
+        //   "create:orders": true
+        // }
+      },
+    },
+    
+    // Admin routes (if needed)
+    '/admin/**': {
+      appMiddleware: ['auth-logged-in'],
+      kinde: {
+        permissions: {
+          admin: true,
+        },
+        redirectUrl: '/api/login',
+        external: true,
+      },
+    },
+  },
+  
+  // Optional: Enable debug for health check
+  kinde: {
+    debug: process.env.NODE_ENV !== 'production'
+  }
+})

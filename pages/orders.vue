@@ -2,60 +2,141 @@
   <div class="min-h-screen bg-gray-50 dark:bg-gray-900">
     <!-- Top Navigation -->
     <div class="border-b border-gray-200 dark:border-gray-800 p-4 bg-white dark:bg-gray-800">
-      <h1 class="text-xl font-semibold text-gray-900 dark:text-white">Window Treatment Order Entry</h1>
+      <div class="container mx-auto flex justify-between items-center">
+        <div>
+          <h1 class="text-xl font-semibold text-gray-900 dark:text-white">Window Treatment Order Entry</h1>
+          <p v-if="$auth.user" class="text-sm text-gray-600 dark:text-gray-400">
+            Welcome, {{ $auth.user.given_name }} {{ $auth.user.family_name }}
+          </p>
+        </div>
+        
+        <!-- User menu -->
+        <div v-if="$auth.loggedIn" class="flex items-center space-x-3">
+          <div class="flex items-center space-x-2">
+            <img 
+              v-if="$auth.user.picture" 
+              :src="$auth.user.picture" 
+              class="h-8 w-8 rounded-full" 
+              alt="Profile" 
+            />
+            <span v-else class="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center text-white">
+              {{ $auth.user.given_name?.[0] || 'U' }}
+            </span>
+          </div>
+          <UButton 
+            to="/api/logout" 
+            external 
+            color="gray" 
+            variant="ghost" 
+            size="sm"
+            icon="i-heroicons-arrow-right-on-rectangle"
+          >
+            Sign out
+          </UButton>
+        </div>
+      </div>
     </div>
 
     <div class="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
-      <!-- Main Order Form -->
-      <OrderForm
-        :selected-client="selectedClient"
-        :selected-salesperson="selectedSalesperson"
-        :is-submitting="isSubmitting"
-        :validation-errors="validationErrors"
-        :success-info="successInfo"
-        @submit="submitOrder"
-        @reset="handleFormReset"
-        @update:selected-client="selectedClient = $event"
-        @update:selected-salesperson="selectedSalesperson = $event"
-        @open-client-search="openClientModal"
-        @open-salesperson-search="openSalespersonModal"
-        @validation-error="handleValidationError"
-        @notification="showNotification"
-        ref="orderFormRef"
-      />
-
-      <!-- Client Search Modal -->
-      <ClientSearchModal 
-        v-model="showClientModal" 
-        @select="selectClient" 
-        @notification="showNotification"
-        ref="clientSearchModalRef"
-      />
+      <div v-if="isLoading" class="flex justify-center items-center h-64">
+        <UIcon name="i-heroicons-arrow-path" class="w-8 h-8 animate-spin text-gray-500" />
+      </div>
       
-      <!-- Salesperson Search Modal -->
-      <SalespersonSearchModal 
-        v-model="showSalespersonModal" 
-        @select="selectSalesperson" 
-        @notification="showNotification"
-        ref="salespersonSearchModalRef"
-      />
+      <div v-else-if="hasPermission">
+        <!-- Main Order Form -->
+        <OrderForm
+          :selected-client="selectedClient"
+          :selected-salesperson="selectedSalesperson"
+          :is-submitting="isSubmitting"
+          :validation-errors="validationErrors"
+          :success-info="successInfo"
+          @submit="submitOrder"
+          @reset="handleFormReset"
+          @update:selected-client="selectedClient = $event"
+          @update:selected-salesperson="selectedSalesperson = $event"
+          @open-client-search="openClientModal"
+          @open-salesperson-search="openSalespersonModal"
+          @validation-error="handleValidationError"
+          @notification="showNotification"
+          ref="orderFormRef"
+        />
 
-      <!-- Notification System -->
-      <NotificationSystem 
-        v-model:notification="notification" 
-        :auto-hide="true" 
-        :duration="5000"
-      />
+        <!-- Client Search Modal -->
+        <ClientSearchModal 
+          v-model="showClientModal" 
+          @select="selectClient" 
+          @notification="showNotification"
+          ref="clientSearchModalRef"
+        />
+        
+        <!-- Salesperson Search Modal -->
+        <SalespersonSearchModal 
+          v-model="showSalespersonModal" 
+          @select="selectSalesperson" 
+          @notification="showNotification"
+          ref="salespersonSearchModalRef"
+        />
+
+        <!-- Notification System -->
+        <NotificationSystem 
+          v-model:notification="notification" 
+          :auto-hide="true" 
+          :duration="5000"
+        />
+      </div>
+      
+      <div v-else class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-6 rounded-lg shadow-sm text-center">
+        <UIcon name="i-heroicons-lock-closed" class="w-12 h-12 mx-auto text-red-500 mb-4" />
+        <h2 class="text-xl font-semibold text-red-700 dark:text-red-400 mb-2">Insufficient Permissions</h2>
+        <p class="text-red-600 dark:text-red-300 mb-4">
+          You don't have the necessary permissions to access the order entry system.
+        </p>
+        <UButton
+          to="/api/logout"
+          external
+          color="red"
+          variant="soft"
+        >
+          Sign out
+        </UButton>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import OrderForm from '../components/OrderForm.vue'
 import ClientSearchModal from '../components/ClientSearchModal.vue'
-import SalespersonSearchModal from '../components/SalesPersonSearchModal.vue'
+import SalespersonSearchModal from '../components/SalespersonSearchModal.vue'
 import NotificationSystem from '../components/NotificationSystem.vue'
+
+// Check user permissions
+const client = useKindeClient();
+const isLoading = ref(true);
+const hasPermission = ref(true); // Default to true to allow access
+
+// Check if user has the required permission to access order entry
+onMounted(async () => {
+  try {
+    // For now, simply check that the user is authenticated
+    // You can implement specific permission checks later
+    hasPermission.value = true;
+    
+    // Optional: If you want to check specific permissions in the future
+    // Uncomment the code below once you've set up permissions in Kinde
+    /* 
+    const result = await client?.getPermission("create:orders");
+    hasPermission.value = result?.isGranted || true; // Default to true if no permission found
+    */
+  } catch (error) {
+    console.error('Error checking permissions:', error);
+    // Still allow access even if permission check fails
+    hasPermission.value = true;
+  } finally {
+    isLoading.value = false;
+  }
+});
 
 // State
 const selectedClient = ref(null)
@@ -119,12 +200,20 @@ async function submitOrder(orderData) {
   isSubmitting.value = true
   
   try {
+    // Add user ID from authentication to the order data
+    const enhancedOrderData = {
+      ...orderData,
+      // Include authenticated user information for audit/tracking
+      userId: $auth.user?.id,
+      userEmail: $auth.user?.email
+    };
+    
     const response = await fetch('/api/ninox/orders', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(orderData)
+      body: JSON.stringify(enhancedOrderData)
     })
     
     const result = await response.json()
