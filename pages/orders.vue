@@ -6,9 +6,9 @@
     <!-- Page Content -->
     <div class="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
       <div class="mb-8">
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Order Entry System</h1>
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Wholesale Order Management</h1>
         <p class="text-gray-600 dark:text-gray-400">
-          Create and submit orders for window treatments and accessories.
+          Create and manage bulk orders for your business with volume discounts.
         </p>
       </div>
       
@@ -17,6 +17,37 @@
       </div>
       
       <div v-else-if="hasPermission">
+        <!-- Order Summary Header -->
+        <div v-if="selectedClient" class="bg-blue-900 dark:bg-blue-800 rounded-lg shadow-md p-4 mb-6">
+          <div class="flex flex-col md:flex-row md:justify-between md:items-center">
+            <div class="mb-4 md:mb-0">
+              <p class="text-blue-200 text-sm">Customer Account</p>
+              <h2 class="text-white text-xl font-semibold">
+                {{ selectedClient.fields['Company'] || `${selectedClient.fields['First Name']} ${selectedClient.fields['Last Name']}` }}
+              </h2>
+              <p class="text-blue-100 text-sm">Account #: {{ selectedClient.id }}</p>
+            </div>
+            <div class="flex flex-col sm:flex-row gap-3">
+              <UButton 
+                color="white" 
+                variant="soft" 
+                icon="i-heroicons-document-text" 
+                to="/account"
+              >
+                View Account History
+              </UButton>
+              <UButton 
+                color="white" 
+                variant="outline" 
+                icon="i-heroicons-arrow-path" 
+                @click="openClientModal"
+              >
+                Change Account
+              </UButton>
+            </div>
+          </div>
+        </div>
+
         <!-- Main Order Form -->
         <OrderForm
           :selected-client="selectedClient"
@@ -61,18 +92,27 @@
       
       <div v-else class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-6 rounded-lg shadow-sm text-center">
         <UIcon name="i-heroicons-lock-closed" class="w-12 h-12 mx-auto text-red-500 mb-4" />
-        <h2 class="text-xl font-semibold text-red-700 dark:text-red-400 mb-2">Insufficient Permissions</h2>
+        <h2 class="text-xl font-semibold text-red-700 dark:text-red-400 mb-2">Wholesale Access Required</h2>
         <p class="text-red-600 dark:text-red-300 mb-4">
-          You don't have the necessary permissions to access the order entry system.
+          You need a wholesale account to access the order management system.
         </p>
-        <UButton
-          to="/api/logout"
-          external
-          color="red"
-          variant="soft"
-        >
-          Sign out
-        </UButton>
+        <div class="flex justify-center space-x-4">
+          <UButton
+            to="/account"
+            color="blue"
+            variant="soft"
+          >
+            Apply for Wholesale
+          </UButton>
+          <UButton
+            to="/api/logout"
+            external
+            color="red"
+            variant="soft"
+          >
+            Sign out
+          </UButton>
+        </div>
       </div>
     </div>
   </div>
@@ -101,7 +141,7 @@ onMounted(async () => {
     // Optional: If you want to check specific permissions in the future
     // Uncomment the code below once you've set up permissions in Kinde
     /* 
-    const result = await client?.getPermission("create:orders");
+    const result = await client?.getPermission("create:wholesale_orders");
     hasPermission.value = result?.isGranted || true; // Default to true if no permission found
     */
   } catch (error) {
@@ -155,8 +195,8 @@ function openSalespersonModal() {
 function selectClient(client) {
   selectedClient.value = client
   showNotification({
-    title: 'Client Selected',
-    description: `${client.fields['First Name']} ${client.fields['Last Name']} has been selected.`,
+    title: 'Wholesale Account Selected',
+    description: `${client.fields['Company'] || `${client.fields['First Name']} ${client.fields['Last Name']}`} has been selected.`,
     color: 'blue'
   })
 }
@@ -164,8 +204,8 @@ function selectClient(client) {
 function selectSalesperson(salesperson) {
   selectedSalesperson.value = salesperson
   showNotification({
-    title: 'Salesperson Selected',
-    description: `${salesperson.fields['First Name']} ${salesperson.fields['Last Name']} has been selected.`,
+    title: 'Account Manager Selected',
+    description: `${salesperson.fields['First Name']} ${salesperson.fields['Last Name']} has been assigned to this order.`,
     color: 'blue'
   })
 }
@@ -175,12 +215,13 @@ async function submitOrder(orderData) {
   isSubmitting.value = true
   
   try {
-    // Add user ID from authentication to the order data
+    // Add wholesale-specific fields
     const enhancedOrderData = {
       ...orderData,
+      orderType: 'wholesale',
       // Include authenticated user information for audit/tracking
-      userId: $auth.user?.id,
-      userEmail: $auth.user?.email
+      userId: useKindeAuth().user?.id,
+      userEmail: useKindeAuth().user?.email
     };
     
     const response = await fetch('/api/ninox/orders', {
@@ -194,7 +235,7 @@ async function submitOrder(orderData) {
     const result = await response.json()
     
     if (result.success) {
-      showSuccessNotification(result.message || 'Order submitted successfully!', result.data);
+      showSuccessNotification(result.message || 'Wholesale order submitted successfully!', result.data);
       
       validationErrors.value = [];
       
@@ -202,7 +243,7 @@ async function submitOrder(orderData) {
         orderFormRef.value.resetItems();
       }
     } else {
-      throw new Error(result.error || 'Failed to submit order')
+      throw new Error(result.error || 'Failed to submit wholesale order')
     }
   } catch (error) {
     showNotification({
@@ -247,7 +288,7 @@ function handleFormReset() {
   validationErrors.value = []
   showNotification({
     title: 'Form Reset',
-    description: 'The form has been reset to its initial state.',
+    description: 'The wholesale order form has been reset.',
     color: 'blue'
   })
 }
