@@ -83,7 +83,7 @@ import { ref, onMounted } from 'vue'
 import Navbar from '../components/Navbar.vue'
 import OrderForm from '../components/OrderForm.vue'
 import ClientSearchModal from '../components/ClientSearchModal.vue'
-import SalespersonSearchModal from '../components/SalespersonSearchModal.vue'
+import SalespersonSearchModal from '../components/SalesPersonSearchModal.vue'
 import NotificationSystem from '../components/NotificationSystem.vue'
 
 // Check user permissions
