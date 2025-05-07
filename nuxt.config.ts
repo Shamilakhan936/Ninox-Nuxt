@@ -22,7 +22,19 @@ export default defineNuxtConfig({
     
     // Public variables that are exposed to the client
     public: {
-      apiBase: process.env.API_BASE || '/api'
+      apiBase: process.env.API_BASE || '/api',
+      kindeDomain: process.env.NUXT_KINDE_AUTH_DOMAIN
+    },
+
+    // Add runtime config for Kinde
+    kinde: {
+      clientId: process.env.NUXT_KINDE_CLIENT_ID,
+      clientSecret: process.env.NUXT_KINDE_CLIENT_SECRET,
+      authDomain: process.env.NUXT_KINDE_AUTH_DOMAIN,
+      redirectUrl: process.env.NUXT_KINDE_REDIRECT_URL,
+      logoutRedirectUrl: process.env.NUXT_KINDE_LOGOUT_REDIRECT_URL,
+      password: process.env.NUXT_KINDE_PASSWORD,
+      postLoginRedirectUrl: process.env.NUXT_KINDE_POST_LOGIN_REDIRECT_URL || '/orders'
     }
   },
 
@@ -76,6 +88,10 @@ export default defineNuxtConfig({
         external: true,
       },
     },
+
+    '/account': {
+      appMiddleware: ['auth-logged-in']
+    }
   },
   
   // Optional: Enable debug for health check
