@@ -36,11 +36,10 @@ export default defineEventHandler(async (event) => {
     const orderItemsTableId = "J"; // Order Items table ID
     
     try {
-   
       const customerQuery = `
         let email := "${userEmail}";
         let customer := (select Customers where 'Email Address' = email);
-      customer.'Customer ID'
+        customer.'Customer ID'
       `;
 
       const customerQueryResponse = await $fetch(`https://api.ninox.com/v1/teams/${NINOX_TEAM_ID}/databases/${NINOX_DATABASE_ID}/query`, {
@@ -65,7 +64,7 @@ export default defineEventHandler(async (event) => {
       const customerId = customerQueryResponse[0];
       console.log(`Found customer ID: ${customerId}`);
       
-      // Step 2: Get orders for this customer (using field ID 'K')
+      // Step 2: Get orders for this customer
       const ordersQuery = await $fetch(`https://api.ninox.com/v1/teams/${NINOX_TEAM_ID}/databases/${NINOX_DATABASE_ID}/query`, {
         method: 'POST',
         headers: {
@@ -90,23 +89,36 @@ export default defineEventHandler(async (event) => {
         
         for (const orderId of ordersQuery) {
           try {
-            // Fetch order details
-            const orderResponse = await $fetch(`https://api.ninox.com/v1/teams/${NINOX_TEAM_ID}/databases/${NINOX_DATABASE_ID}/tables/${ordersTableId}/records/${orderId}`, {
-              method: 'GET',
+            // Approach based on clients.ts - post to /record endpoint instead of using query
+            const orderResponse = await $fetch(`https://api.ninox.com/v1/teams/${NINOX_TEAM_ID}/databases/${NINOX_DATABASE_ID}/tables/Orders/record`, {
+              method: 'POST',
               headers: {
                 'Authorization': `Bearer ${NINOX_API_TOKEN}`,
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                filters: {
+                  "F": orderId // Using 'N' field ID for 'Order ID'
+                }
+              }),
+              query: {
+                style: 'object',
+                dateStyle: 'iso',
+                choiceStyle: 'text'
               }
             });
             
+            console.log(`Order ${orderId} details:`, orderResponse);
+            
             if (!orderResponse || !orderResponse.fields) {
-              continue; // Skip this order if no data returned
+              console.log(`No details found for order ${orderId}, skipping`);
+              continue;
             }
             
-            // Format the order
+            // Format the order with the correct field access pattern
             const formattedOrder = {
               id: orderId,
-              createdAt: orderResponse.fields['Date Order Created'] || orderResponse.createdAt,
+              createdAt: orderResponse.fields['Date Order Created'] || new Date().toISOString(),
               status: orderResponse.fields['Status'] || 1,
               total: orderResponse.fields['Total'] || 0,
               shipping: {
@@ -117,27 +129,40 @@ export default defineEventHandler(async (event) => {
               items: [] // We'll add items in the next step
             };
             
-            // Try to fetch order items
+            // Get order items - use the query endpoint to find items by Order ID
             try {
-              const itemsQuery = await $fetch(`https://api.ninox.com/v1/teams/${NINOX_TEAM_ID}/databases/${NINOX_DATABASE_ID}/query`, {
+              const itemsQueryStr = `
+                let items := (select 'Order Items' where OrderID = "${orderId}");
+                items.id
+              `;
+              
+              const itemIdsResponse = await $fetch(`https://api.ninox.com/v1/teams/${NINOX_TEAM_ID}/databases/${NINOX_DATABASE_ID}/query`, {
                 method: 'POST',
                 headers: {
                   'Authorization': `Bearer ${NINOX_API_TOKEN}`,
                   'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                  query: `(select 'Order Items' where Orders = "${orderId}").id`
+                  query: itemsQueryStr
                 })
               });
               
-              if (itemsQuery && Array.isArray(itemsQuery) && itemsQuery.length > 0) {
-                // We have item IDs, fetch details for each
-                for (const itemId of itemsQuery) {
-                  const itemResponse = await $fetch(`https://api.ninox.com/v1/teams/${NINOX_TEAM_ID}/databases/${NINOX_DATABASE_ID}/tables/${orderItemsTableId}/records/${itemId}`, {
+              console.log(`Item IDs for order ${orderId}:`, itemIdsResponse);
+              
+              // If we have item IDs, get each item's details
+              if (itemIdsResponse && Array.isArray(itemIdsResponse) && itemIdsResponse.length > 0) {
+                for (const itemId of itemIdsResponse) {
+                  // Fetch each item using record endpoint like in clients.ts
+                  const itemResponse = await $fetch(`https://api.ninox.com/v1/teams/${NINOX_TEAM_ID}/databases/${NINOX_DATABASE_ID}/tables/Order Items/records/${itemId}`, {
                     method: 'GET',
                     headers: {
                       'Authorization': `Bearer ${NINOX_API_TOKEN}`,
                       'Content-Type': 'application/json'
+                    },
+                    query: {
+                      style: 'object',
+                      dateStyle: 'iso',
+                      choiceStyle: 'text'
                     }
                   });
                   
