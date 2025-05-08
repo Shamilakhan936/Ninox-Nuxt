@@ -73,7 +73,9 @@ export default defineEventHandler(async (event) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          query: `(select Orders where CustomerID = "${customerId}")`
+          query: `let orders := (select Orders where CustomerID = "${customerId}"); 
+          orders.'Order ID'
+          `
         })
       });
       
