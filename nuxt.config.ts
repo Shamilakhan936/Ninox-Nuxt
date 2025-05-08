@@ -23,7 +23,8 @@ export default defineNuxtConfig({
     // Public variables that are exposed to the client
     public: {
       apiBase: process.env.API_BASE || '/api',
-      kindeDomain: process.env.NUXT_KINDE_AUTH_DOMAIN
+      kindeDomain: process.env.NUXT_KINDE_AUTH_DOMAIN,
+      kindeEnabled: true
     },
 
     // Add runtime config for Kinde
@@ -48,15 +49,36 @@ export default defineNuxtConfig({
   
   compatibilityDate: '2025-03-19',
 
-  // Add route protection
+  // Route protection
   routeRules: {
-    // Public routes
-    '/': {
+    // Protect account page
+    '/account': {
       appMiddleware: ['auth-logged-in'],
       kinde: {
-        public: true,
+        redirectUrl: '/api/login',
+        external: true,
       },
     },
+    
+    // Protect orders page
+    '/orders': {
+      appMiddleware: ['auth-logged-in'],
+      kinde: {
+        redirectUrl: '/api/login',
+        external: true,
+      },
+    },
+    
+    // Protect API routes that should only be accessed by authenticated users
+    '/api/ninox/user-orders': {
+      appMiddleware: ['auth-logged-in'],
+      kinde: {
+        redirectUrl: '/api/login',
+        external: true,
+      },
+    },
+    
+    // Allow public access to login page
     '/login': {
       appMiddleware: ['auth-logged-in'],
       kinde: {
@@ -64,34 +86,13 @@ export default defineNuxtConfig({
       },
     },
     
-    // Protected routes - just require authentication, no specific permissions yet
-    '/orders': {
+    // Allow public access to home page
+    '/': {
       appMiddleware: ['auth-logged-in'],
       kinde: {
-        redirectUrl: '/api/login',
-        external: true,
-        // Don't require specific permissions yet
-        // permissions: {
-        //   "create:orders": true
-        // }
+        public: true,
       },
     },
-    
-    // Admin routes (if needed)
-    '/admin/**': {
-      appMiddleware: ['auth-logged-in'],
-      kinde: {
-        permissions: {
-          admin: true,
-        },
-        redirectUrl: '/api/login',
-        external: true,
-      },
-    },
-
-    '/account': {
-      appMiddleware: ['auth-logged-in']
-    }
   },
   
   // Optional: Enable debug for health check
