@@ -98,7 +98,8 @@ export default defineEventHandler(async (event) => {
               },
               body: JSON.stringify({
                 filters: {
-                  "F": orderId // Using 'N' field ID for 'Order ID'
+                  "F": orderId 
+                  
                 }
               }),
               query: {
@@ -132,8 +133,8 @@ export default defineEventHandler(async (event) => {
             // Get order items - use the query endpoint to find items by Order ID
             try {
               const itemsQueryStr = `
-                let items := (select 'Order Items' where OrderID = "${orderId}");
-                items.id
+                let items := (select 'Order Items' where 'Parent Order Id' = "${orderId}");
+                items.'Order Item Id'
               `;
               
               const itemIdsResponse = await $fetch(`https://api.ninox.com/v1/teams/${NINOX_TEAM_ID}/databases/${NINOX_DATABASE_ID}/query`, {
@@ -152,31 +153,50 @@ export default defineEventHandler(async (event) => {
               // If we have item IDs, get each item's details
               if (itemIdsResponse && Array.isArray(itemIdsResponse) && itemIdsResponse.length > 0) {
                 for (const itemId of itemIdsResponse) {
-                  // Fetch each item using record endpoint like in clients.ts
-                  const itemResponse = await $fetch(`https://api.ninox.com/v1/teams/${NINOX_TEAM_ID}/databases/${NINOX_DATABASE_ID}/tables/Order Items/records/${itemId}`, {
-                    method: 'GET',
-                    headers: {
-                      'Authorization': `Bearer ${NINOX_API_TOKEN}`,
-                      'Content-Type': 'application/json'
-                    },
-                    query: {
-                      style: 'object',
-                      dateStyle: 'iso',
-                      choiceStyle: 'text'
-                    }
-                  });
-                  
-                  if (itemResponse && itemResponse.fields) {
-                    formattedOrder.items.push({
-                      id: itemId,
-                      productType: itemResponse.fields['Product Type'] || 'Unknown',
-                      width: itemResponse.fields['Width'] || 0,
-                      height: itemResponse.fields['Height'] || 0,
-                      quantity: itemResponse.fields['Qty'] || 1,
-                      fabric: itemResponse.fields['Fabric selection'] || 'N/A',
-                      motorized: itemResponse.fields['Is Motorized'] === 2, // Assuming 2 means "Yes"
-                      status: itemResponse.fields['Status'] || 1
+                  try {
+                    // Use record endpoint with POST method and filters like we do for orders
+                    const itemResponse = await $fetch(`https://api.ninox.com/v1/teams/${NINOX_TEAM_ID}/databases/${NINOX_DATABASE_ID}/tables/Order Items/record`, {
+                      method: 'POST',
+                      headers: {
+                        'Authorization': `Bearer ${NINOX_API_TOKEN}`,
+                        'Content-Type': 'application/json',
+                      },
+                      body: JSON.stringify({
+                        filters: {
+                          "H1": itemId  // Filter by Order Item Id field
+                        }
+                      }),
+                      query: {
+                        style: 'object',
+                        dateStyle: 'iso',
+                        choiceStyle: 'text'
+                      }
                     });
+                    
+                    console.log(`Item ${itemId} details:`, itemResponse);
+                    
+                    if (itemResponse && itemResponse.fields) {
+                      formattedOrder.items.push({
+                        id: itemId,
+                        productType: itemResponse.fields['Product Type'] || 'Unknown',
+                        width: itemResponse.fields['Width'] || 0,
+                        height: itemResponse.fields['Height'] || 0,
+                        quantity: itemResponse.fields['Qty'] || 1,
+                        fabric: itemResponse.fields['Fabric Selection'] || 'N/A',
+                        motorized: itemResponse.fields['Is Motorized'] === 'Yes', // Updated to handle string value
+                        status: itemResponse.fields['Status'] || 1,
+                        // Add new fields from the API response
+                        mountLocation: itemResponse.fields['Mount Location'] || 'Inside',
+                        style: itemResponse.fields['Style'] || null,
+                        control: itemResponse.fields['Control'] || null,
+                        rollDirection: itemResponse.fields['Roll Direction'] || null,
+                        hardwareColor: itemResponse.fields['Hardware Color'] || null,
+                        controlPosition: itemResponse.fields['Control Position'] || null,
+                        includesRemote: itemResponse.fields['Includes Remote?'] || false
+                      });
+                    }
+                  } catch (itemError) {
+                    console.error(`Error fetching details for item ${itemId}:`, itemError);
                   }
                 }
               }
@@ -192,6 +212,7 @@ export default defineEventHandler(async (event) => {
         }
         
         console.log(`Successfully processed ${orders.length} orders`);
+        console.log(orders);
         return { orders };
       } else {
         console.log(`No orders found for customer ${customerId}`);

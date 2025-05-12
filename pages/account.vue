@@ -506,17 +506,26 @@
             </thead>
             <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
               <tr v-for="(item, index) in selectedOrder.items" :key="index">
-                <td class="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                <td class="px-4 py-4 text-sm font-medium text-gray-900 dark:text-white">
                   {{ item.productType }}
                   <span v-if="item.motorized" class="ml-1 text-xs text-blue-600 dark:text-blue-400">(Motorized)</span>
                 </td>
-                <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                  {{ item.width }}mm × {{ item.height }}mm
+                <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-400">
+                  <div>{{ item.width }}mm × {{ item.height }}mm</div>
+                  <div class="text-xs text-gray-400 mt-1">Mount: {{ item.mountLocation || 'Inside' }}</div>
+                  <div v-if="item.hardwareColor" class="text-xs text-gray-400">Color: {{ item.hardwareColor }}</div>
                 </td>
-                <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                  {{ item.fabric }}
+                <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-400">
+                  <div>{{ item.fabric }}</div>
+                  <div v-if="item.style" class="text-xs text-gray-400 mt-1">Style: {{ item.style }}</div>
+                  <div v-if="item.control" class="text-xs text-gray-400">
+                    {{ item.controlPosition || '' }} {{ item.control }}
+                  </div>
+                  <div v-if="item.rollDirection" class="text-xs text-gray-400">
+                    {{ item.rollDirection }} roll
+                  </div>
                 </td>
-                <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-400">
                   {{ item.quantity }}
                 </td>
                 <td class="px-4 py-4 whitespace-nowrap">
@@ -862,16 +871,24 @@ function getOrderProducts(order) {
     content: `
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 py-2">
         <div>
-          <p class="text-sm text-gray-500 dark:text-gray-400">Size</p>
+          <p class="text-sm text-gray-500 dark:text-gray-400">Size & Mount</p>
           <p class="font-medium text-gray-900 dark:text-white">${item.width}mm × ${item.height}mm</p>
+          <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Mount: ${item.mountLocation || 'Inside'}</p>
+          <p class="text-xs text-gray-500 dark:text-gray-400">${item.rollDirection || ''} roll</p>
         </div>
         <div>
-          <p class="text-sm text-gray-500 dark:text-gray-400">Fabric</p>
+          <p class="text-sm text-gray-500 dark:text-gray-400">Materials & Style</p>
           <p class="font-medium text-gray-900 dark:text-white">${item.fabric || 'N/A'}</p>
+          <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Style: ${item.style || 'N/A'}</p>
+          <p class="text-xs text-gray-500 dark:text-gray-400">Hardware: ${item.hardwareColor || 'Standard'}</p>
         </div>
         <div>
-          <p class="text-sm text-gray-500 dark:text-gray-400">Features</p>
+          <p class="text-sm text-gray-500 dark:text-gray-400">Controls</p>
           <p class="font-medium text-gray-900 dark:text-white">${item.motorized ? 'Motorized' : 'Manual'}</p>
+          ${item.control ? `<p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            ${item.controlPosition || ''} ${item.control}
+          </p>` : ''}
+          ${item.includesRemote ? `<p class="text-xs text-gray-500 dark:text-gray-400">Includes remote</p>` : ''}
         </div>
       </div>
     `,
