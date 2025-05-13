@@ -82,396 +82,52 @@
           </div>
         </div>
         
-        <!-- Account Content Tabs -->
-        <UTabs :items="tabItems" class="mb-8">
-          <template #default="{ activeTabValue }">
-            <div class="py-4">
-              <!-- Orders Tab -->
-              <div v-if="activeTabValue === 'orders'">
-                <div class="flex justify-between items-center mb-6">
-                  <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Order History</h2>
-                  <div class="space-x-2">
-                    <UButton @click="fetchOrders" icon="i-heroicons-arrow-path" color="blue" size="sm">
-                      Refresh Orders
-                    </UButton>
-                    <UButton to="/orders" icon="i-heroicons-plus" color="primary" size="sm">
-                      New Order
-                    </UButton>
-                  </div>
-                </div>
-                
-                <div v-if="isLoading" class="flex justify-center py-12">
-                  <UIcon name="i-heroicons-arrow-path" class="w-8 h-8 animate-spin text-gray-500" />
-                </div>
-                
-                <div v-else-if="orders.length > 0">
-                  <!-- Order Cards List -->
-                  <div class="space-y-6">
-                    <div 
-                      v-for="order in orders" 
-                      :key="order.id" 
-                      class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm"
-                    >
-                      <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
-                        <div>
-                          <p class="text-sm text-gray-500 dark:text-gray-400">
-                            Order #{{ order.id }}
-                          </p>
-                          <p class="font-medium text-gray-900 dark:text-white">
-                            {{ formatDate(order.createdAt) }}
-                          </p>
-                        </div>
-                        <UBadge 
-                          :color="getStatusColor(order.status)" 
-                          variant="subtle"
-                        >
-                          {{ getStatusLabel(order.status) }}
-                        </UBadge>
-                      </div>
-                      
-                      <!-- Order Summary -->
-                      <div class="px-6 py-4">
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                          <div>
-                            <p class="text-sm text-gray-500 dark:text-gray-400">
-                              Items
-                            </p>
-                            <p class="font-medium text-gray-900 dark:text-white">
-                              {{ order.items?.length || 0 }} products
-                            </p>
-                          </div>
-                          <div>
-                            <p class="text-sm text-gray-500 dark:text-gray-400">
-                              Shipping
-                            </p>
-                            <p class="font-medium text-gray-900 dark:text-white">
-                              {{ order.shipping?.method || 'Standard' }}
-                            </p>
-                          </div>
-                          <div>
-                            <p class="text-sm text-gray-500 dark:text-gray-400">
-                              Total
-                            </p>
-                            <p class="font-medium text-gray-900 dark:text-white">
-                              {{ formatPrice(order.total) }}
-                            </p>
-                          </div>
-                        </div>
-                        
-                        <!-- Shipping Information -->
-                        <div v-if="order.shipping?.trackingNumber" class="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-md">
-                          <div class="flex items-start">
-                            <UIcon name="i-heroicons-truck" class="w-5 h-5 text-blue-500 mt-0.5 mr-2" />
-                            <div>
-                              <p class="font-medium text-blue-700 dark:text-blue-300">Shipping Status</p>
-                              <p class="text-sm text-blue-600 dark:text-blue-400">
-                                Tracking #: {{ order.shipping.trackingNumber }}
-                              </p>
-                              <p v-if="order.shipping.estimatedDate" class="text-sm text-blue-600 dark:text-blue-400">
-                                Estimated delivery: {{ formatDate(order.shipping.estimatedDate) }}
-                              </p>
-                              <UButton
-                                size="xs"
-                                color="blue"
-                                variant="link"
-                                class="mt-1 px-0"
-                                @click="trackOrder(order.shipping.trackingNumber)"
-                              >
-                                Track package
-                              </UButton>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <!-- Order Products -->
-                        <UAccordion :items="getOrderProducts(order)" class="mb-4" />
-                        
-                        <!-- Order Actions -->
-                        <div class="flex justify-end space-x-2">
-                          <UButton 
-                            size="sm" 
-                            color="gray" 
-                            variant="ghost" 
-                            icon="i-heroicons-document-duplicate"
-                            @click="duplicateOrder(order)"
-                          >
-                            Duplicate
-                          </UButton>
-                          <UButton 
-                            size="sm" 
-                            color="primary" 
-                            icon="i-heroicons-eye"
-                            @click="viewOrderDetails(order)"
-                          >
-                            View Details
-                          </UButton>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                
-                <div v-else class="bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 text-center">
-                  <UIcon name="i-heroicons-shopping-bag" class="w-12 h-12 mx-auto text-gray-400 mb-4" />
-                  <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">No orders yet</h3>
-                  <p class="text-gray-600 dark:text-gray-400 mb-4">
-                    You haven't placed any orders yet. Start by creating your first order.
-                  </p>
-                  <UButton to="/orders" color="primary" icon="i-heroicons-plus">
-                    Create Your First Order
-                  </UButton>
-                </div>
-              </div>
-              
-              <!-- Settings Tab -->
-              <div v-else-if="activeTabValue === 'settings'">
-                <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm">
-                  <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">Account Settings</h3>
-                  </div>
-                  
-                  <div class="px-6 py-4">
-                    <div class="space-y-6">
-                      <!-- Contact Information -->
-                      <div>
-                        <h4 class="text-md font-medium text-gray-900 dark:text-white mb-4">Contact Information</h4>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <UFormGroup label="First Name" class="text-gray-600 dark:text-gray-300">
-                            <UInput
-                              :model-value="user.given_name"
-                              disabled
-                              :ui="{
-                                base: 'relative',
-                                form: 'form-input',
-                                input: 'bg-gray-50 dark:bg-gray-700 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-600 cursor-not-allowed'
-                              }"
-                            />
-                          </UFormGroup>
-                          
-                          <UFormGroup label="Last Name" class="text-gray-600 dark:text-gray-300">
-                            <UInput
-                              :model-value="user.family_name"
-                              disabled
-                              :ui="{
-                                base: 'relative',
-                                form: 'form-input',
-                                input: 'bg-gray-50 dark:bg-gray-700 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-600 cursor-not-allowed'
-                              }"
-                            />
-                          </UFormGroup>
-                          
-                          <UFormGroup label="Email Address" class="text-gray-600 dark:text-gray-300">
-                            <UInput
-                              :model-value="user.email"
-                              disabled
-                              :ui="{
-                                base: 'relative',
-                                form: 'form-input',
-                                input: 'bg-gray-50 dark:bg-gray-700 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-600 cursor-not-allowed'
-                              }"
-                            />
-                          </UFormGroup>
-                        </div>
-                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
-                          To update your profile information, please contact customer support.
-                        </p>
-                      </div>
-                      
-                      <!-- Company Information -->
-                      <div>
-                        <h4 class="text-md font-medium text-gray-900 dark:text-white mb-4">Company Information</h4>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <UFormGroup label="Company Name" class="text-gray-600 dark:text-gray-300">
-                            <UInput
-                              v-model="companyInfo.name"
-                              placeholder="Enter company name"
-                              :ui="{
-                                base: 'relative',
-                                form: 'form-input',
-                                input: 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-200 dark:border-gray-700'
-                              }"
-                            />
-                          </UFormGroup>
-                          
-                          <UFormGroup label="Business Type" class="text-gray-600 dark:text-gray-300">
-                            <USelect
-                              v-model="companyInfo.type"
-                              :options="businessTypes"
-                              placeholder="Select business type"
-                              :ui="{
-                                base: 'relative',
-                                form: 'form-select',
-                                input: 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-200 dark:border-gray-700'
-                              }"
-                            />
-                          </UFormGroup>
-                          
-                          <UFormGroup label="Tax ID / Business Number" class="text-gray-600 dark:text-gray-300">
-                            <UInput
-                              v-model="companyInfo.taxId"
-                              placeholder="Enter tax ID"
-                              :ui="{
-                                base: 'relative',
-                                form: 'form-input',
-                                input: 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-200 dark:border-gray-700'
-                              }"
-                            />
-                          </UFormGroup>
-                        </div>
-                      </div>
-                      
-                      <!-- Shipping Information -->
-                      <div>
-                        <h4 class="text-md font-medium text-gray-900 dark:text-white mb-4">Default Shipping Address</h4>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <UFormGroup label="Address Line 1" class="text-gray-600 dark:text-gray-300 md:col-span-2">
-                            <UInput
-                              v-model="shippingInfo.address1"
-                              placeholder="Enter address line 1"
-                              :ui="{
-                                base: 'relative',
-                                form: 'form-input',
-                                input: 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-200 dark:border-gray-700'
-                              }"
-                            />
-                          </UFormGroup>
-                          
-                          <UFormGroup label="Address Line 2" class="text-gray-600 dark:text-gray-300 md:col-span-2">
-                            <UInput
-                              v-model="shippingInfo.address2"
-                              placeholder="Enter address line 2 (optional)"
-                              :ui="{
-                                base: 'relative',
-                                form: 'form-input',
-                                input: 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-200 dark:border-gray-700'
-                              }"
-                            />
-                          </UFormGroup>
-                          
-                          <UFormGroup label="City" class="text-gray-600 dark:text-gray-300">
-                            <UInput
-                              v-model="shippingInfo.city"
-                              placeholder="Enter city"
-                              :ui="{
-                                base: 'relative',
-                                form: 'form-input',
-                                input: 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-200 dark:border-gray-700'
-                              }"
-                            />
-                          </UFormGroup>
-                          
-                          <UFormGroup label="State / Province" class="text-gray-600 dark:text-gray-300">
-                            <UInput
-                              v-model="shippingInfo.state"
-                              placeholder="Enter state or province"
-                              :ui="{
-                                base: 'relative',
-                                form: 'form-input',
-                                input: 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-200 dark:border-gray-700'
-                              }"
-                            />
-                          </UFormGroup>
-                          
-                          <UFormGroup label="Postal Code" class="text-gray-600 dark:text-gray-300">
-                            <UInput
-                              v-model="shippingInfo.postalCode"
-                              placeholder="Enter postal code"
-                              :ui="{
-                                base: 'relative',
-                                form: 'form-input',
-                                input: 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-200 dark:border-gray-700'
-                              }"
-                            />
-                          </UFormGroup>
-                          
-                          <UFormGroup label="Country" class="text-gray-600 dark:text-gray-300">
-                            <USelect
-                              v-model="shippingInfo.country"
-                              :options="countries"
-                              placeholder="Select country"
-                              :ui="{
-                                base: 'relative',
-                                form: 'form-select',
-                                input: 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-200 dark:border-gray-700'
-                              }"
-                            />
-                          </UFormGroup>
-                        </div>
-                      </div>
-                      
-                      <!-- Save Button -->
-                      <div class="flex justify-end">
-                        <UButton 
-                          color="primary" 
-                          icon="i-heroicons-check" 
-                          :loading="isSaving"
-                          @click="saveSettings"
-                        >
-                          Save Changes
-                        </UButton>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              <!-- Support Tab -->
-              <div v-else-if="activeTabValue === 'support'">
-                <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm">
-                  <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">Customer Support</h3>
-                  </div>
-                  
-                  <div class="px-6 py-4">
-                    <p class="text-gray-600 dark:text-gray-400 mb-6">
-                      Need assistance with your wholesale account or orders? Our support team is here to help.
-                    </p>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                        <div class="flex items-center mb-4">
-                          <UIcon name="i-heroicons-envelope" class="w-6 h-6 text-blue-500 mr-2" />
-                          <h4 class="text-md font-medium text-gray-900 dark:text-white">Email Support</h4>
-                        </div>
-                        <p class="text-gray-600 dark:text-gray-400 mb-3">
-                          Send us an email and we'll respond within 24 hours.
-                        </p>
-                        <a href="mailto:support@windowtreatment.com" class="text-blue-600 dark:text-blue-400 font-medium">
-                          support@windowtreatment.com
-                        </a>
-                      </div>
-                      
-                      <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                        <div class="flex items-center mb-4">
-                          <UIcon name="i-heroicons-phone" class="w-6 h-6 text-blue-500 mr-2" />
-                          <h4 class="text-md font-medium text-gray-900 dark:text-white">Phone Support</h4>
-                        </div>
-                        <p class="text-gray-600 dark:text-gray-400 mb-3">
-                          Call us Monday-Friday, 9am-5pm EST.
-                        </p>
-                        <a href="tel:+15551234567" class="text-blue-600 dark:text-blue-400 font-medium">
-                          +1 (555) 123-4567
-                        </a>
-                      </div>
-                    </div>
-                    
-                    <div class="mt-8 border-t border-gray-200 dark:border-gray-700 pt-6">
-                      <h4 class="text-md font-medium text-gray-900 dark:text-white mb-4">Frequently Asked Questions</h4>
-                      
-                      <UAccordion :items="supportFaqs" class="mb-6" />
-                      
-                      <div class="text-center mt-6">
-                        <UButton color="primary" variant="soft">
-                          View All FAQs
-                        </UButton>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </template>
-        </UTabs>
+        <!-- Alternative approach using buttons instead of tabs -->
+        <div class="mb-6 border-b border-gray-200">
+          <div class="flex space-x-4">
+            <button 
+              v-for="tab in ['orders', 'settings', 'support']" 
+              :key="tab"
+              @click="activeTab = tab"
+              class="px-4 py-2 border-b-2 font-medium text-sm"
+              :class="activeTab === tab ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+            >
+              {{ tab.charAt(0).toUpperCase() + tab.slice(1) }}
+            </button>
+          </div>
+        </div>
+        
+        <!-- Content sections -->
+        <div v-if="activeTab === 'orders'">
+          <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-6">Order History</h2>
+          
+          <p>Debug: {{ orders.length }} orders loaded</p>
+          
+          <!-- Super simple list -->
+          <ul class="mt-4 border border-gray-200 rounded-lg divide-y">
+            <li v-for="order in orders" :key="order.id" class="p-4 hover:bg-gray-50">
+              <p class="font-bold">Order #{{ order.id }}</p>
+              <p>Date: {{ formatDate(order.createdAt) }}</p>
+              <p>Status: {{ order.status }}</p>
+              <button 
+                @click="viewOrderDetails(order)" 
+                class="mt-2 bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm"
+              >
+                View Details
+              </button>
+            </li>
+          </ul>
+          
+          <p v-if="orders.length === 0" class="text-center text-gray-500 my-12">
+            No orders found
+          </p>
+        </div>
+        <div v-else-if="activeTab === 'settings'">
+          <!-- Settings content -->
+        </div>
+        <div v-else-if="activeTab === 'support'">
+          <!-- Support content -->
+        </div>
       </div>
     </div>
     
@@ -516,7 +172,7 @@
                   <div v-if="item.hardwareColor" class="text-xs text-gray-400">Color: {{ item.hardwareColor }}</div>
                 </td>
                 <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-400">
-                  <div>{{ item.fabric }}</div>
+                  <div>{{ typeof item.fabric === 'number' ? `Fabric #${item.fabric}` : (item.fabric || 'N/A') }}</div>
                   <div v-if="item.style" class="text-xs text-gray-400 mt-1">Style: {{ item.style }}</div>
                   <div v-if="item.control" class="text-xs text-gray-400">
                     {{ item.controlPosition || '' }} {{ item.control }}
@@ -622,6 +278,7 @@ const orders = ref([])
 const isSaving = ref(false)
 const showOrderDetailModal = ref(false)
 const selectedOrder = ref(null)
+const activeTab = ref('orders')
 
 // Create a safe way to access auth
 const auth = computed(() => {
@@ -682,12 +339,13 @@ const countries = [
 ]
 
 // Tabs configuration
-const tabItems = [
+const tabItems = computed(() => [
   {
     label: 'Orders',
     icon: 'i-heroicons-shopping-bag',
     slot: 'orders',
-    value: 'orders'
+    value: 'orders',
+    default: true
   },
   {
     label: 'Settings',
@@ -697,11 +355,11 @@ const tabItems = [
   },
   {
     label: 'Support',
-    icon: 'i-heroicons-life-buoy',
+    icon: 'i-heroicons-question-mark-circle',
     slot: 'support',
     value: 'support'
   }
-]
+]);
 
 // Support FAQs
 const supportFaqs = [
@@ -761,8 +419,20 @@ async function fetchOrders() {
     const data = await response.json();
     
     if (data.orders && Array.isArray(data.orders)) {
-      orders.value = data.orders;
+      // Force reactivity by creating a new array
+      orders.value = [...data.orders];
       console.log(`Loaded ${orders.value.length} orders successfully`);
+      console.log('Order data:', JSON.stringify(orders.value));
+      
+      // Add this to check if each order can be displayed correctly
+      orders.value.forEach((order, index) => {
+        console.log(`Order ${index + 1} (${order.id}):`, {
+          hasItems: !!order.items && Array.isArray(order.items),
+          itemCount: order.items?.length || 0,
+          status: order.status,
+          displayStatus: getStatusLabel(order.status)
+        });
+      });
     } else {
       console.warn('No valid orders data in response');
       orders.value = [];
@@ -790,6 +460,8 @@ onMounted(() => {
     
     if (isLoggedIn.value) {
       fetchOrders();
+      // Force the active tab to be orders
+      activeTab.value = 'orders';
     } else {
       isLoading.value = false;
     }
@@ -849,6 +521,8 @@ function getStatusColor(status) {
     'pending': 'gray',
     'fabrication': 'purple',
     'cancelled': 'red',
+    'defining order': 'yellow',
+    'queued': 'blue',
     
     // Numeric values
     1: 'gray',    // Pending
@@ -866,34 +540,41 @@ function getStatusColor(status) {
 function getOrderProducts(order) {
   if (!order.items || order.items.length === 0) return []
   
-  return order.items.map(item => ({
-    label: `${item.productType} (${item.quantity})`,
-    content: `
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 py-2">
-        <div>
-          <p class="text-sm text-gray-500 dark:text-gray-400">Size & Mount</p>
-          <p class="font-medium text-gray-900 dark:text-white">${item.width}mm × ${item.height}mm</p>
-          <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Mount: ${item.mountLocation || 'Inside'}</p>
-          <p class="text-xs text-gray-500 dark:text-gray-400">${item.rollDirection || ''} roll</p>
+  return order.items.map(item => {
+    // Convert fabric ID to a meaningful string if it's a number
+    const fabricDisplay = typeof item.fabric === 'number' 
+      ? `Fabric #${item.fabric}` 
+      : (item.fabric || 'N/A');
+    
+    return {
+      label: `${item.productType} (${item.quantity})`,
+      content: `
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 py-2">
+          <div>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Size & Mount</p>
+            <p class="font-medium text-gray-900 dark:text-white">${item.width}mm × ${item.height}mm</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Mount: ${item.mountLocation || 'Inside'}</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400">${item.rollDirection || ''} roll</p>
+          </div>
+          <div>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Materials & Style</p>
+            <p class="font-medium text-gray-900 dark:text-white">${fabricDisplay}</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Style: ${item.style || 'N/A'}</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400">Hardware: ${item.hardwareColor || 'Standard'}</p>
+          </div>
+          <div>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Controls</p>
+            <p class="font-medium text-gray-900 dark:text-white">${item.motorized ? 'Motorized' : 'Manual'}</p>
+            ${item.control ? `<p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              ${item.controlPosition || ''} ${item.control}
+            </p>` : ''}
+            ${item.includesRemote ? `<p class="text-xs text-gray-500 dark:text-gray-400">Includes remote</p>` : ''}
+          </div>
         </div>
-        <div>
-          <p class="text-sm text-gray-500 dark:text-gray-400">Materials & Style</p>
-          <p class="font-medium text-gray-900 dark:text-white">${item.fabric || 'N/A'}</p>
-          <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Style: ${item.style || 'N/A'}</p>
-          <p class="text-xs text-gray-500 dark:text-gray-400">Hardware: ${item.hardwareColor || 'Standard'}</p>
-        </div>
-        <div>
-          <p class="text-sm text-gray-500 dark:text-gray-400">Controls</p>
-          <p class="font-medium text-gray-900 dark:text-white">${item.motorized ? 'Motorized' : 'Manual'}</p>
-          ${item.control ? `<p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-            ${item.controlPosition || ''} ${item.control}
-          </p>` : ''}
-          ${item.includesRemote ? `<p class="text-xs text-gray-500 dark:text-gray-400">Includes remote</p>` : ''}
-        </div>
-      </div>
-    `,
-    open: false
-  }))
+      `,
+      open: false
+    };
+  });
 }
 
 // Order tracking function
