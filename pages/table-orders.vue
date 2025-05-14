@@ -42,29 +42,6 @@
             >
               Select Client
             </UButton>
-            
-            <!-- Salesperson Selection -->
-            <div v-if="selectedSalesperson" class="flex items-center space-x-2">
-              <UIcon name="i-heroicons-user" class="w-5 h-5 text-green-500" />
-              <span class="font-medium text-gray-900 dark:text-white">
-                {{ selectedSalesperson.fields['First Name'] }} {{ selectedSalesperson.fields['Last Name'] }}
-              </span>
-              <UButton
-                color="gray"
-                variant="ghost"
-                icon="i-heroicons-x-mark"
-                size="xs"
-                @click="selectedSalesperson = null"
-              />
-            </div>
-            <UButton
-              v-else
-              color="primary"
-              variant="soft"
-              @click="openSalespersonModal"
-            >
-              Select Salesperson
-            </UButton>
           </div>
           
           <div>
@@ -141,11 +118,96 @@
         <div v-if="activeTabIndex >= 0" class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
           <!-- Add inside the Current Active Order Content div, at the top -->
           <div class="p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
-            <div class="flex justify-between items-center">
-              <h3 class="text-lg font-medium text-gray-900 dark:text-white">
-                {{ orders[activeTabIndex].name }} <span class="text-sm text-gray-500 dark:text-gray-400 ml-2">({{ orders[activeTabIndex].products.length }} products)</span>
-              </h3>
-              <UBadge color="blue" variant="soft">Order #{{ activeTabIndex + 1 }} of {{ orders.length }}</UBadge>
+            <div class="flex flex-col gap-2">
+              <!-- Order header with name and info -->
+              <div class="flex justify-between items-center">
+                <div class="flex items-center">
+                  <!-- Order name (editable) -->
+                  <div v-if="!isEditingOrderName" class="flex items-center cursor-pointer group" @click="startEditingOrderName">
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+                      {{ orders[activeTabIndex].name }}
+                    </h3>
+                    <UIcon 
+                      name="i-heroicons-pencil-square" 
+                      class="w-4 h-4 ml-2 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity"
+                      aria-label="Edit order name"
+                    />
+                    <span class="text-sm text-gray-500 dark:text-gray-400 ml-2">({{ orders[activeTabIndex].products.length }} products)</span>
+                  </div>
+                  <!-- Order name editing form -->
+                  <div v-else class="flex items-center">
+                    <UInput
+                      v-model="editedOrderName"
+                      size="sm"
+                      class="w-64"
+                      placeholder="Order name"
+                      @keyup.enter="saveOrderName"
+                      @keyup.esc="cancelEditingOrderName"
+                      ref="orderNameInputRef"
+                    />
+                    <div class="flex ml-2">
+                      <UButton
+                        color="green"
+                        variant="soft"
+                        size="xs"
+                        icon="i-heroicons-check"
+                        @click="saveOrderName"
+                        aria-label="Save order name"
+                      />
+                      <UButton
+                        color="gray"
+                        variant="soft"
+                        size="xs"
+                        icon="i-heroicons-x-mark"
+                        class="ml-1"
+                        @click="cancelEditingOrderName"
+                        aria-label="Cancel editing"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <UBadge color="blue" variant="soft">Order #{{ activeTabIndex + 1 }} of {{ orders.length }}</UBadge>
+              </div>
+              
+              <!-- Customer selection for this order -->
+              <div class="flex items-center mt-2">
+                <div v-if="orders[activeTabIndex].client" class="flex items-center space-x-2 bg-blue-50 dark:bg-blue-900/20 px-3 py-1.5 rounded-md">
+                  <UIcon name="i-heroicons-user-circle" class="w-5 h-5 text-blue-500" />
+                  <span class="font-medium text-gray-900 dark:text-white">
+                    {{ orders[activeTabIndex].client.fields['First Name'] }} {{ orders[activeTabIndex].client.fields['Last Name'] }}
+                  </span>
+                  <UButton
+                    color="gray"
+                    variant="ghost"
+                    icon="i-heroicons-x-mark"
+                    size="xs"
+                    @click="removeOrderClient"
+                  />
+                </div>
+                <UButton
+                  v-else
+                  color="primary"
+                  variant="soft"
+                  size="sm"
+                  @click="openOrderClientModal"
+                >
+                  <UIcon name="i-heroicons-user-plus" class="w-4 h-4 mr-1" />
+                  Select Client for Order
+                </UButton>
+                
+                <!-- Submit button moved from top control bar -->
+                <div class="ml-auto">
+                  <UButton
+                    color="green"
+                    variant="solid"
+                    icon="i-heroicons-paper-airplane"
+                    :disabled="!isOrderValid || isSubmitting"
+                    @click="submitCurrentOrder"
+                  >
+                    Submit Order
+                  </UButton>
+                </div>
+              </div>
             </div>
           </div>
           <!-- Product Table - Now with no column headers, only inline labels -->
@@ -442,14 +504,6 @@
           ref="clientSearchModalRef"
         />
         
-        <!-- Salesperson Search Modal -->
-        <SalespersonSearchModal 
-          v-model="showSalespersonModal" 
-          @select="selectSalesperson" 
-          @notification="showNotification"
-          ref="salespersonSearchModalRef"
-        />
-        
         <!-- Fabric Search Modal -->
         <FabricSearchModal
           v-if="editingProductIndex !== null && orders[activeTabIndex] && orders[activeTabIndex].products[editingProductIndex]"
@@ -492,7 +546,6 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import Navbar from '../components/Navbar.vue'
 import ClientSearchModal from '../components/ClientSearchModal.vue'
-import SalespersonSearchModal from '../components/SalesPersonSearchModal.vue'
 import FabricSearchModal from '../components/FabricSearchModal.vue'
 import NotificationSystem from '../components/NotificationSystem.vue'
 
@@ -517,15 +570,14 @@ onMounted(async () => {
 });
 
 // State
-const selectedClient = ref(null)
-const selectedSalesperson = ref(null)
 const isSubmitting = ref(false)
 const activeTabIndex = ref(0)
 const orders = ref([
   {
     name: 'Order #1',
     products: [],
-    specialInstructions: ''
+    specialInstructions: '',
+    client: null
   }
 ])
 const newOrderName = ref('')
@@ -533,8 +585,9 @@ const editingProductIndex = ref(null)
 const editingProduct = ref(null)
 const showProductDetailsModal = ref(false)
 const showClientModal = ref(false)
-const showSalespersonModal = ref(false)
 const showFabricModal = ref(false)
+const isEditingOrderName = ref(false)
+const editedOrderName = ref('')
 
 // Notification system
 const notification = ref({
@@ -599,7 +652,7 @@ const currentOrder = computed(() => {
 // Computed property to check if the form is valid
 const isFormValid = computed(() => {
   // Must have a client
-  if (!selectedClient.value) return false
+  if (!currentOrder.value.client) return false
   
   // Current order must have at least one product
   if (currentOrder.value.products.length === 0) return false
@@ -622,7 +675,8 @@ function createNewOrder() {
   orders.value.push({
     name: newOrderName.value,
     products: [],
-    specialInstructions: ''
+    specialInstructions: '',
+    client: null
   })
   
   activeTabIndex.value = orders.value.length - 1
@@ -764,30 +818,23 @@ function openClientModal() {
   showClientModal.value = true
 }
 
-function openSalespersonModal() {
-  if (salespersonSearchModalRef.value) {
-    salespersonSearchModalRef.value.reset()
-  }
-  showSalespersonModal.value = true
-}
-
 // Selection handlers
 function selectClient(client) {
-  selectedClient.value = client
+  if (activeTabIndex.value < 0 || activeTabIndex.value >= orders.value.length) return
+  
+  orders.value[activeTabIndex.value].client = client
+  
   showNotification({
     title: 'Client Selected',
-    description: `${client.fields['First Name']} ${client.fields['Last Name']} has been selected.`,
+    description: `${client.fields['First Name']} ${client.fields['Last Name']} has been selected for this order.`,
     color: 'blue'
   })
 }
 
-function selectSalesperson(salesperson) {
-  selectedSalesperson.value = salesperson
-  showNotification({
-    title: 'Salesperson Selected',
-    description: `${salesperson.fields['First Name']} ${salesperson.fields['Last Name']} has been selected.`,
-    color: 'blue'
-  })
+function removeOrderClient() {
+  if (activeTabIndex.value < 0 || activeTabIndex.value >= orders.value.length) return
+  
+  orders.value[activeTabIndex.value].client = null
 }
 
 // Show notification
@@ -806,7 +853,7 @@ async function submitCurrentOrder() {
   if (!isFormValid.value) {
     showNotification({
       title: 'Validation Error',
-      description: 'Please fill in all required fields and select a client before submitting.',
+      description: 'Please fill in all required fields and select a client for this order before submitting.',
       color: 'red'
     })
     return
@@ -815,19 +862,19 @@ async function submitCurrentOrder() {
   isSubmitting.value = true
   
   try {
+    const order = orders.value[activeTabIndex.value]
     const orderData = {
       isExistingCustomer: true,
-      selectedCustomerId: selectedClient.value?.id,
-      selectedSalespersonId: selectedSalesperson.value?.id,
+      selectedCustomerId: order.client?.id,
       installationRequired: false,
       country: 'United States',
-      specialInstructions: currentOrder.value.specialInstructions,
-      items: currentOrder.value.products.map(product => {
+      specialInstructions: order.specialInstructions,
+      items: order.products.map(product => {
         // Ensure fabricId is correctly included
         const fabricId = product.fabricId || 
-                        (product.fabricDetails?.fabricId) || 
-                        (product.fabricDetails?.fields['Fabric ID']) || 
-                        null
+                       (product.fabricDetails?.fabricId) || 
+                       (product.fabricDetails?.fields['Fabric ID']) || 
+                       null
         
         return {
           ...product,
@@ -863,7 +910,8 @@ async function submitCurrentOrder() {
           orders.value.push({
             name: 'Order #1',
             products: [],
-            specialInstructions: ''
+            specialInstructions: '',
+            client: null
           })
           activeTabIndex.value = 0
         } else {
@@ -884,10 +932,56 @@ async function submitCurrentOrder() {
   }
 }
 
+// Order name editing functions
+function startEditingOrderName() {
+  if (activeTabIndex.value < 0 || activeTabIndex.value >= orders.value.length) return
+  
+  editedOrderName.value = orders.value[activeTabIndex.value].name
+  isEditingOrderName.value = true
+  
+  // Focus the input after the DOM updates
+  nextTick(() => {
+    if (orderNameInputRef.value) {
+      orderNameInputRef.value.focus()
+    }
+  })
+}
+
+function saveOrderName() {
+  if (activeTabIndex.value < 0 || activeTabIndex.value >= orders.value.length) return
+  
+  if (editedOrderName.value.trim()) {
+    orders.value[activeTabIndex.value].name = editedOrderName.value.trim()
+    showNotification({
+      title: 'Order Renamed',
+      description: `Order has been renamed to "${editedOrderName.value.trim()}"`,
+      color: 'blue'
+    })
+  }
+  
+  isEditingOrderName.value = false
+  editedOrderName.value = ''
+}
+
+function cancelEditingOrderName() {
+  isEditingOrderName.value = false
+  editedOrderName.value = ''
+}
+
 // Template refs for modals
 const clientSearchModalRef = ref(null)
-const salespersonSearchModalRef = ref(null)
 const fabricSearchModalRef = ref(null)
+const orderNameInputRef = ref(null)
+
+// Add functions to handle per-order client selection
+function openOrderClientModal() {
+  if (activeTabIndex.value < 0 || activeTabIndex.value >= orders.value.length) return
+  
+  if (clientSearchModalRef.value) {
+    clientSearchModalRef.value.reset()
+  }
+  showClientModal.value = true
+}
 </script>
 
 <style>

@@ -12,16 +12,16 @@
       
       <!-- Not logged in state -->
       <div v-else-if="!isLoggedIn" class="text-center py-12">
-        <UIcon name="i-heroicons-lock-closed" class="w-12 h-12 mx-auto text-gray-400 mb-4" />
-        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Authentication Required</h2>
-        <p class="text-gray-600 dark:text-gray-400 mb-6">
-          Please sign in to view your account information.
-        </p>
-        <LoginLink to="/api/login" external>
-          <UButton color="primary" icon="i-heroicons-arrow-right-on-rectangle">
-            Sign In
-          </UButton>
-        </LoginLink>
+          <UIcon name="i-heroicons-lock-closed" class="w-12 h-12 mx-auto text-gray-400 mb-4" />
+          <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Authentication Required</h2>
+          <p class="text-gray-600 dark:text-gray-400 mb-6">
+            Please sign in to view your account information.
+          </p>
+          <LoginLink to="/api/login" external>
+            <UButton color="primary" icon="i-heroicons-arrow-right-on-rectangle">
+              Sign In
+            </UButton>
+          </LoginLink>
       </div>
       
       <!-- Logged in state -->
@@ -94,15 +94,15 @@
             >
               {{ tab.charAt(0).toUpperCase() + tab.slice(1) }}
             </button>
-          </div>
-        </div>
-        
+                          </div>
+                        </div>
+                        
         <!-- Content sections -->
         <div v-if="activeTab === 'orders'">
           <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-6">Order History</h2>
           
           <p>Debug: {{ orders.length }} orders loaded</p>
-          
+                        
           <!-- Super simple list -->
           <ul class="mt-4 border border-gray-200 rounded-lg divide-y">
             <li v-for="order in orders" :key="order.id" class="p-4 hover:bg-gray-50">
@@ -113,7 +113,7 @@
                 @click="viewOrderDetails(order)" 
                 class="mt-2 bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm"
               >
-                View Details
+                            View Details
               </button>
             </li>
           </ul>
@@ -121,16 +121,16 @@
           <p v-if="orders.length === 0" class="text-center text-gray-500 my-12">
             No orders found
           </p>
-        </div>
+                        </div>
         <div v-else-if="activeTab === 'settings'">
           <!-- Settings content -->
-        </div>
+                      </div>
         <div v-else-if="activeTab === 'support'">
           <!-- Support content -->
-        </div>
-      </div>
-    </div>
-    
+                    </div>
+                  </div>
+                </div>
+                
     <!-- Order Detail Modal -->
     <UModal v-model="showOrderDetailModal" :ui="{ width: 'max-w-3xl' }">
       <div v-if="selectedOrder" class="p-4">
@@ -142,12 +142,12 @@
             <p class="text-sm text-gray-500 dark:text-gray-400">
               Placed on {{ formatDate(selectedOrder.createdAt) }}
             </p>
-          </div>
+                </div>
           <UBadge :color="getStatusColor(selectedOrder.status)" class="ml-2">
             {{ getStatusLabel(selectedOrder.status) }}
           </UBadge>
-        </div>
-        
+              </div>
+              
         <!-- Order Items Table -->
         <div class="mb-6 overflow-hidden border border-gray-200 dark:border-gray-700 rounded-lg">
           <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
@@ -179,7 +179,7 @@
                   </div>
                   <div v-if="item.rollDirection" class="text-xs text-gray-400">
                     {{ item.rollDirection }} roll
-                  </div>
+                        </div>
                 </td>
                 <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-400">
                   {{ item.quantity }}
@@ -192,54 +192,54 @@
               </tr>
             </tbody>
           </table>
-        </div>
-        
+                      </div>
+                      
         <!-- Order Shipping Information -->
         <div v-if="selectedOrder.shipping" class="mb-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
           <h4 class="font-medium text-gray-900 dark:text-white mb-2">Shipping Information</h4>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
               <p class="text-sm text-gray-500 dark:text-gray-400">Method</p>
               <p class="font-medium text-gray-900 dark:text-white">{{ selectedOrder.shipping.method }}</p>
-            </div>
+                        </div>
             <div v-if="selectedOrder.shipping.estimatedDate">
               <p class="text-sm text-gray-500 dark:text-gray-400">Estimated Delivery</p>
               <p class="font-medium text-gray-900 dark:text-white">{{ formatDate(selectedOrder.shipping.estimatedDate) }}</p>
-            </div>
+                      </div>
             <div v-if="selectedOrder.shipping.trackingNumber" class="md:col-span-2">
               <p class="text-sm text-gray-500 dark:text-gray-400">Tracking Number</p>
               <div class="flex items-center">
                 <p class="font-medium text-gray-900 dark:text-white">{{ selectedOrder.shipping.trackingNumber }}</p>
-                <UButton
+                        <UButton 
                   size="xs"
                   color="blue"
                   variant="link"
                   class="ml-2"
                   @click="trackOrder(selectedOrder.shipping.trackingNumber)"
-                >
+                        >
                   Track package
-                </UButton>
+                        </UButton>
+                    </div>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-        </div>
-        
+              
         <!-- Order Total Information -->
         <div class="mb-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
           <div class="flex justify-between items-center border-b border-gray-200 dark:border-gray-700 pb-2 mb-2">
             <span class="text-gray-600 dark:text-gray-400">Subtotal</span>
             <span class="font-medium text-gray-900 dark:text-white">{{ formatPrice(selectedOrder.total * 0.9) }}</span>
-          </div>
+                  </div>
           <div class="flex justify-between items-center border-b border-gray-200 dark:border-gray-700 pb-2 mb-2">
             <span class="text-gray-600 dark:text-gray-400">Tax</span>
             <span class="font-medium text-gray-900 dark:text-white">{{ formatPrice(selectedOrder.total * 0.1) }}</span>
-          </div>
+                        </div>
           <div class="flex justify-between items-center">
             <span class="text-lg font-bold text-gray-900 dark:text-white">Total</span>
             <span class="text-lg font-bold text-gray-900 dark:text-white">{{ formatPrice(selectedOrder.total) }}</span>
-          </div>
-        </div>
-        
+                      </div>
+                    </div>
+                    
         <!-- Modal Actions -->
         <div class="flex justify-end space-x-3">
           <UButton
@@ -255,8 +255,8 @@
             @click="duplicateOrder(selectedOrder)"
           >
             Reorder
-          </UButton>
-        </div>
+                        </UButton>
+                      </div>
       </div>
     </UModal>
   </div>
@@ -548,31 +548,31 @@ function getOrderProducts(order) {
     
     return {
       label: `${item.productType} (${item.quantity})`,
-      content: `
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 py-2">
-          <div>
+    content: `
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 py-2">
+        <div>
             <p class="text-sm text-gray-500 dark:text-gray-400">Size & Mount</p>
             <p class="font-medium text-gray-900 dark:text-white">${item.width}mm × ${item.height}mm</p>
             <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Mount: ${item.mountLocation || 'Inside'}</p>
             <p class="text-xs text-gray-500 dark:text-gray-400">${item.rollDirection || ''} roll</p>
-          </div>
-          <div>
+        </div>
+        <div>
             <p class="text-sm text-gray-500 dark:text-gray-400">Materials & Style</p>
             <p class="font-medium text-gray-900 dark:text-white">${fabricDisplay}</p>
             <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Style: ${item.style || 'N/A'}</p>
             <p class="text-xs text-gray-500 dark:text-gray-400">Hardware: ${item.hardwareColor || 'Standard'}</p>
-          </div>
-          <div>
+        </div>
+        <div>
             <p class="text-sm text-gray-500 dark:text-gray-400">Controls</p>
             <p class="font-medium text-gray-900 dark:text-white">${item.motorized ? 'Motorized' : 'Manual'}</p>
             ${item.control ? `<p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
               ${item.controlPosition || ''} ${item.control}
             </p>` : ''}
             ${item.includesRemote ? `<p class="text-xs text-gray-500 dark:text-gray-400">Includes remote</p>` : ''}
-          </div>
         </div>
-      `,
-      open: false
+      </div>
+    `,
+    open: false
     };
   });
 }
