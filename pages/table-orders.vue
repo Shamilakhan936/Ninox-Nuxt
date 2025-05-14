@@ -17,47 +17,7 @@
       </div>
       
       <div v-else-if="hasPermission" class="space-y-6">
-        <!-- Top Control Bar -->
-        <div class="flex justify-between items-center bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
-          <div class="flex items-center space-x-4">
-            <!-- Customer Information -->
-            <div v-if="selectedClient" class="flex items-center space-x-2">
-              <UIcon name="i-heroicons-user-circle" class="w-5 h-5 text-blue-500" />
-              <span class="font-medium text-gray-900 dark:text-white">
-                {{ selectedClient.fields['First Name'] }} {{ selectedClient.fields['Last Name'] }}
-              </span>
-              <UButton
-                color="gray"
-                variant="ghost"
-                icon="i-heroicons-x-mark"
-                size="xs"
-                @click="selectedClient = null"
-              />
-            </div>
-            <UButton
-              v-else
-              color="primary"
-              variant="soft"
-              @click="openClientModal"
-            >
-              Select Client
-            </UButton>
-          </div>
-          
-          <div>
-            <UButton
-              color="green"
-              variant="solid"
-              icon="i-heroicons-plus"
-              :disabled="!isFormValid || isSubmitting"
-              @click="submitCurrentOrder"
-            >
-              Submit Order
-            </UButton>
-          </div>
-        </div>
-
-        <!-- Add right after the top control bar -->
+        <!-- Information Banner -->
         <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 p-4 rounded-lg mb-4">
           <div class="flex items-start">
             <UIcon name="i-heroicons-information-circle" class="w-5 h-5 text-blue-500 mr-2 flex-shrink-0 mt-0.5" />
@@ -194,19 +154,6 @@
                   <UIcon name="i-heroicons-user-plus" class="w-4 h-4 mr-1" />
                   Select Client for Order
                 </UButton>
-                
-                <!-- Submit button moved from top control bar -->
-                <div class="ml-auto">
-                  <UButton
-                    color="green"
-                    variant="solid"
-                    icon="i-heroicons-paper-airplane"
-                    :disabled="!isOrderValid || isSubmitting"
-                    @click="submitCurrentOrder"
-                  >
-                    Submit Order
-                  </UButton>
-                </div>
               </div>
             </div>
           </div>
