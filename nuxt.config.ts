@@ -10,7 +10,11 @@ export default defineNuxtConfig({
   // UI configuration
   ui: {
     global: true,
-    icons: ['heroicons']
+    icons: ['heroicons'],
+    components: {
+      global: true,
+      dirs: ['~/components']
+    }
   },
 
   // Runtime config

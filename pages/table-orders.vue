@@ -80,80 +80,100 @@
           </div>
         </div>
 
+        <!-- Add right after the top control bar -->
+        <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 p-4 rounded-lg mb-4">
+          <div class="flex items-start">
+            <UIcon name="i-heroicons-information-circle" class="w-5 h-5 text-blue-500 mr-2 flex-shrink-0 mt-0.5" />
+            <div>
+              <h3 class="text-sm font-medium text-blue-800 dark:text-blue-300">Multiple Orders System</h3>
+              <p class="text-sm text-blue-700 dark:text-blue-400 mt-1">
+                You can create multiple separate orders using the tabs below. Each tab represents a different order with its own products.
+                Click the "+" tab to create a new order.
+              </p>
+            </div>
+          </div>
+        </div>
+
         <!-- Tabs for Multiple Orders -->
-        <UTabs v-model="activeTab">
-          <UTab v-for="(order, index) in orders" :key="index" :name="order.name">
-            {{ order.name }}
-            <template #trailing>
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+          <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+            <div class="flex gap-2 overflow-x-auto">
               <UButton
-                v-if="orders.length > 1"
-                color="gray"
+                v-for="(order, index) in orders"
+                :key="index"
+                :color="activeTabIndex === index ? 'primary' : 'gray'"
+                :variant="activeTabIndex === index ? 'soft' : 'ghost'"
+                class="px-4 py-2 whitespace-nowrap"
+                @click="activeTabIndex = index"
+              >
+                <div class="flex items-center">
+                  <UIcon name="i-heroicons-document-text" class="w-4 h-4 mr-2" />
+                  {{ order.name }}
+                </div>
+                <template v-if="orders.length > 1" #trailing>
+                  <UButton
+                    color="gray"
+                    variant="ghost"
+                    icon="i-heroicons-x-mark"
+                    size="xs"
+                    @click.stop="removeOrder(index)"
+                    aria-label="Remove order"
+                  />
+                </template>
+              </UButton>
+              
+              <UButton
+                color="green"
                 variant="ghost"
-                icon="i-heroicons-x-mark"
-                size="xs"
-                @click.stop="removeOrder(index)"
-              />
-            </template>
-          </UTab>
-          
-          <UTab name="add-new" as="button" icon="i-heroicons-plus">
-            <span class="sr-only">Add New Tab</span>
-          </UTab>
-        </UTabs>
+                class="px-4 py-2 whitespace-nowrap"
+                @click="activeTabIndex = -1"
+              >
+                <div class="flex items-center text-green-600 dark:text-green-400">
+                  <UIcon name="i-heroicons-plus-circle" class="w-4 h-4 mr-2" />
+                  Create New Order
+                </div>
+              </UButton>
+            </div>
+          </div>
+        </div>
         
         <!-- Current Active Order Content -->
-        <div v-if="activeTab !== 'add-new'" class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
-          <!-- Product Table -->
+        <div v-if="activeTabIndex >= 0" class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+          <!-- Add inside the Current Active Order Content div, at the top -->
+          <div class="p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
+            <div class="flex justify-between items-center">
+              <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+                {{ orders[activeTabIndex].name }} <span class="text-sm text-gray-500 dark:text-gray-400 ml-2">({{ orders[activeTabIndex].products.length }} products)</span>
+              </h3>
+              <UBadge color="blue" variant="soft">Order #{{ activeTabIndex + 1 }} of {{ orders.length }}</UBadge>
+            </div>
+          </div>
+          <!-- Product Table - Now with no column headers, only inline labels -->
           <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-              <thead class="bg-gray-50 dark:bg-gray-700">
-                <tr>
-                  <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-40">
-                    Product Type
-                  </th>
-                  <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-52">
-                    Fabric
-                  </th>
-                  <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-24">
-                    Width (mm)
-                  </th>
-                  <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-24">
-                    Height (mm)
-                  </th>
-                  <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-24">
-                    Quantity
-                  </th>
-                  <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-24">
-                    Motorized
-                  </th>
-                  <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-28">
-                    Control
-                  </th>
-                  <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-28">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
               <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                 <!-- Product rows -->
-                <tr v-for="(product, pIndex) in currentOrder.products" :key="pIndex" class="hover:bg-gray-50 dark:hover:bg-gray-700">
-                  <td class="px-4 py-3 whitespace-nowrap">
+                <tr v-for="(product, pIndex) in orders[activeTabIndex].products" :key="pIndex" class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                  <!-- Product Type Cell -->
+                  <td class="px-2 py-3 whitespace-nowrap">
                     <USelect
                       v-model="product.productType"
                       :options="productTypes"
-                      placeholder="Select type"
+                      placeholder="Type"
                       class="w-full"
                       size="sm"
                     />
                   </td>
-                  <td class="px-4 py-3 whitespace-nowrap">
+                  
+                  <!-- Fabric Selection Cell -->
+                  <td class="px-2 py-3 whitespace-nowrap">
                     <div class="flex items-center space-x-2">
                       <div v-if="product.fabricDetails" class="flex items-center">
                         <div 
-                          class="w-5 h-5 rounded-full mr-2"
+                          class="w-4 h-4 rounded-full mr-2"
                           :style="{ backgroundColor: product.fabricDetails.fields['Color Hex'] || '#64748b' }"
                         ></div>
-                        <span class="text-sm font-medium text-gray-900 dark:text-white">
+                        <span class="text-sm font-medium text-gray-900 dark:text-white truncate max-w-[80px]">
                           {{ product.fabricDetails.fields['Fabric Name'] }}
                         </span>
                       </div>
@@ -163,29 +183,35 @@
                         color="primary"
                         @click="openFabricModal(pIndex)"
                       >
-                        {{ product.fabricDetails ? 'Change' : 'Select' }}
+                        {{ product.fabricDetails ? 'FT - Change' : 'FT - Select' }}
                       </UButton>
                     </div>
                   </td>
-                  <td class="px-4 py-3 whitespace-nowrap">
+                  
+                  <!-- Width Cell -->
+                  <td class="px-2 py-3 whitespace-nowrap">
                     <UInput
                       v-model="product.width"
                       type="number"
-                      placeholder="Width"
+                      placeholder="Width - mm"
                       class="w-full"
                       size="sm"
                     />
                   </td>
-                  <td class="px-4 py-3 whitespace-nowrap">
+                  
+                  <!-- Height Cell -->
+                  <td class="px-2 py-3 whitespace-nowrap">
                     <UInput
                       v-model="product.height"
                       type="number"
-                      placeholder="Height"
+                      placeholder="Height - mm"
                       class="w-full"
                       size="sm"
                     />
                   </td>
-                  <td class="px-4 py-3 whitespace-nowrap">
+                  
+                  <!-- Quantity Cell -->
+                  <td class="px-2 py-3 whitespace-nowrap">
                     <UInput
                       v-model="product.quantity"
                       type="number"
@@ -195,18 +221,25 @@
                       size="sm"
                     />
                   </td>
-                  <td class="px-4 py-3 whitespace-nowrap text-center">
-                    <UCheckbox
-                      v-model="product.isMotorized"
-                      :disabled="!['Roller Shades', 'Roman Shades'].includes(product.productType)"
-                    />
+                  
+                  <!-- Motorized Cell -->
+                  <td class="px-2 py-3 whitespace-nowrap text-center">
+                    <div class="flex items-center">
+                      <span class="text-xs text-gray-500 mr-2">Motor</span>
+                      <UCheckbox
+                        v-model="product.isMotorized"
+                        :disabled="!['Roller Shades', 'Roman Shades'].includes(product.productType)"
+                      />
+                    </div>
                   </td>
-                  <td class="px-4 py-3 whitespace-nowrap">
+                  
+                  <!-- Control Cell (changes based on motorization) -->
+                  <td class="px-2 py-3 whitespace-nowrap">
                     <div v-if="product.isMotorized">
                       <USelect
                         v-model="product.motorType"
                         :options="getMotorTypes(product.productType)"
-                        placeholder="Motor type"
+                        placeholder="Motor Type"
                         size="sm"
                         class="w-full"
                       />
@@ -221,14 +254,27 @@
                       />
                     </div>
                   </td>
-                  <td class="px-4 py-3 whitespace-nowrap">
-                    <div class="flex space-x-2">
+                  
+                  <!-- Notes Cell -->
+                  <td class="px-2 py-3 whitespace-nowrap">
+                    <UInput
+                      v-model="product.notes"
+                      placeholder="Notes"
+                      class="w-full"
+                      size="sm"
+                    />
+                  </td>
+                  
+                  <!-- Actions Cell -->
+                  <td class="px-2 py-3 whitespace-nowrap">
+                    <div class="flex space-x-1">
                       <UButton
                         color="red"
                         icon="i-heroicons-trash"
                         variant="ghost"
                         size="xs"
                         @click="removeProduct(pIndex)"
+                        aria-label="Delete product"
                       />
                       <UButton
                         color="blue"
@@ -236,34 +282,40 @@
                         variant="ghost"
                         size="xs"
                         @click="editProductDetails(pIndex)"
+                        aria-label="Edit product details"
                       />
                     </div>
                   </td>
                 </tr>
                 
                 <!-- Add new product row -->
-                <tr class="bg-gray-50 dark:bg-gray-700">
-                  <td colspan="8" class="px-4 py-3">
-                    <UButton
-                      block
-                      color="green"
-                      variant="ghost"
-                      icon="i-heroicons-plus"
-                      @click="addNewProduct"
-                    >
-                      Add New Product
-                    </UButton>
+                <tr v-if="orders[activeTabIndex].products.length === 0" class="text-center bg-gray-50 dark:bg-gray-700">
+                  <td colspan="9" class="px-4 py-8 text-gray-500 dark:text-gray-400">
+                    No products added yet. Click the button below to add your first product.
                   </td>
                 </tr>
               </tbody>
             </table>
+            
+            <!-- Add New Product Button -->
+            <div class="p-3 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">
+              <UButton
+                block
+                color="green"
+                variant="ghost"
+                icon="i-heroicons-plus"
+                @click="addNewProduct"
+              >
+                Add New Product
+              </UButton>
+            </div>
           </div>
           
           <!-- Order Notes -->
           <div class="p-4 border-t border-gray-200 dark:border-gray-700">
             <UFormGroup label="Special Instructions" class="mb-0">
               <UTextarea
-                v-model="currentOrder.specialInstructions"
+                v-model="orders[activeTabIndex].specialInstructions"
                 placeholder="Enter any special instructions for this order"
                 :rows="2"
               />
@@ -272,23 +324,31 @@
         </div>
         
         <!-- "Add New Tab" View -->
-        <div v-else class="bg-white dark:bg-gray-800 rounded-lg shadow p-8 text-center">
-          <UIcon name="i-heroicons-plus-circle" class="w-16 h-16 mx-auto text-gray-400 mb-4" />
-          <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Create a New Order</h3>
-          <p class="text-gray-500 dark:text-gray-400 mb-6">Start a new order with a clean template</p>
-          
-          <div class="max-w-md mx-auto">
-            <UFormGroup label="Order Name" class="mb-4">
-              <UInput v-model="newOrderName" placeholder="Enter a name for this order" />
-            </UFormGroup>
+        <div v-else class="bg-white dark:bg-gray-800 rounded-lg shadow p-8">
+          <div class="max-w-lg mx-auto text-center">
+            <UIcon name="i-heroicons-plus-circle" class="w-16 h-16 mx-auto text-green-500 mb-4" />
+            <h3 class="text-xl font-medium text-gray-900 dark:text-white mb-2">Create a New Order</h3>
+            <p class="text-gray-500 dark:text-gray-400 mb-6">
+              Each order can contain multiple products and has its own tab. You can switch between orders at any time using the tabs.
+            </p>
             
-            <UButton
-              color="primary"
-              @click="createNewOrder"
-              :disabled="!newOrderName"
-            >
-              Create Order
-            </UButton>
+            <div class="max-w-md mx-auto">
+              <UFormGroup label="Order Name" class="mb-4">
+                <UInput v-model="newOrderName" placeholder="Enter a name for this order" />
+              </UFormGroup>
+              
+              <div class="flex justify-center">
+                <UButton
+                  color="green"
+                  icon="i-heroicons-plus-circle"
+                  size="lg"
+                  @click="createNewOrder"
+                  :disabled="!newOrderName"
+                >
+                  Create New Order
+                </UButton>
+              </div>
+            </div>
           </div>
         </div>
         
@@ -297,7 +357,7 @@
           <UCard>
             <template #header>
               <div class="flex justify-between items-center">
-                <h3 class="text-lg font-medium">Edit Product Details</h3>
+                <h3 class="text-lg font-medium">Additional Product Details</h3>
                 <UButton
                   icon="i-heroicons-x-mark"
                   color="gray"
@@ -308,15 +368,15 @@
             </template>
             
             <div v-if="editingProduct" class="space-y-4">
-              <!-- Product Type -->
-              <UFormGroup label="Product Type">
+              <!-- Mount Location -->
+              <UFormGroup label="Mount Location">
                 <USelect
-                  v-model="editingProduct.productType"
-                  :options="productTypes"
-                  placeholder="Select product type"
+                  v-model="editingProduct.mountLocation"
+                  :options="['Inside', 'Outside', 'Ceiling']"
+                  placeholder="Select mount location"
                 />
               </UFormGroup>
-              
+
               <!-- Chain Type (for non-motorized) -->
               <UFormGroup v-if="!editingProduct.isMotorized && editingProduct.productType === 'Roller Shades'" label="Chain Type">
                 <USelect
@@ -325,9 +385,27 @@
                   placeholder="Select chain type"
                 />
               </UFormGroup>
+
+              <!-- Roll Direction (for roller shades) -->
+              <UFormGroup v-if="editingProduct.productType === 'Roller Shades'" label="Roll Direction">
+                <USelect
+                  v-model="editingProduct.rollDirection"
+                  :options="['Standard', 'Reverse']"
+                  placeholder="Select roll direction"
+                />
+              </UFormGroup>
+
+              <!-- Hardware Color -->
+              <UFormGroup label="Hardware Color">
+                <USelect
+                  v-model="editingProduct.hardwareColor"
+                  :options="['White', 'Black', 'Silver', 'Bronze', 'Antique Gold']"
+                  placeholder="Select hardware color"
+                />
+              </UFormGroup>
               
               <!-- Notes -->
-              <UFormGroup label="Item Notes">
+              <UFormGroup label="Additional Notes">
                 <UTextarea
                   v-model="editingProduct.notes"
                   placeholder="Enter any special instructions for this item"
@@ -374,9 +452,9 @@
         
         <!-- Fabric Search Modal -->
         <FabricSearchModal
-          v-if="editingProductIndex !== null && currentOrder.products[editingProductIndex]"
+          v-if="editingProductIndex !== null && orders[activeTabIndex] && orders[activeTabIndex].products[editingProductIndex]"
           v-model="showFabricModal"
-          :product-type="currentOrder.products[editingProductIndex]?.productType"
+          :product-type="orders[activeTabIndex].products[editingProductIndex]?.productType"
           @select="selectFabric"
           @notification="showNotification"
           ref="fabricSearchModalRef"
@@ -442,7 +520,7 @@ onMounted(async () => {
 const selectedClient = ref(null)
 const selectedSalesperson = ref(null)
 const isSubmitting = ref(false)
-const activeTab = ref(null)
+const activeTabIndex = ref(0)
 const orders = ref([
   {
     name: 'Order #1',
@@ -468,12 +546,12 @@ const notification = ref({
 
 // Initialize the first tab
 if (orders.value.length > 0) {
-  activeTab.value = orders.value[0].name
+  activeTabIndex.value = 0
 }
 
 // Watch for tab changes to "add-new"
-watch(activeTab, (newTab) => {
-  if (newTab === 'add-new') {
+watch(activeTabIndex, (newIndex) => {
+  if (newIndex === -1) {
     newOrderName.value = `Order #${orders.value.length + 1}`
   }
 })
@@ -513,8 +591,9 @@ function getMotorTypes(productType) {
 
 // Computed property to get the current order
 const currentOrder = computed(() => {
-  const index = orders.value.findIndex(order => order.name === activeTab.value)
-  return index !== -1 ? orders.value[index] : { products: [], specialInstructions: '' }
+  return activeTabIndex.value >= 0 && activeTabIndex.value < orders.value.length 
+    ? orders.value[activeTabIndex.value] 
+    : { name: '', products: [], specialInstructions: '' }
 })
 
 // Computed property to check if the form is valid
@@ -546,8 +625,14 @@ function createNewOrder() {
     specialInstructions: ''
   })
   
-  activeTab.value = newOrderName.value
+  activeTabIndex.value = orders.value.length - 1
   newOrderName.value = ''
+  
+  showNotification({
+    title: 'New Order Created',
+    description: `Order "${orders.value[activeTabIndex.value].name}" has been created. You can now add products to it.`,
+    color: 'green'
+  })
 }
 
 // Function to remove an order
@@ -565,17 +650,22 @@ function removeOrder(index) {
   orders.value.splice(index, 1)
   
   // If we removed the active tab, switch to the first tab
-  if (activeTab.value === orderName) {
-    activeTab.value = orders.value[0].name
+  if (activeTabIndex.value === index || activeTabIndex.value >= orders.value.length) {
+    activeTabIndex.value = 0
   }
+  
+  showNotification({
+    title: 'Order Removed',
+    description: `Order "${orderName}" has been removed.`,
+    color: 'blue'
+  })
 }
 
 // Function to add a new product
 function addNewProduct() {
-  const orderIndex = orders.value.findIndex(order => order.name === activeTab.value)
-  if (orderIndex === -1) return
+  if (activeTabIndex.value < 0 || activeTabIndex.value >= orders.value.length) return
   
-  orders.value[orderIndex].products.push({
+  orders.value[activeTabIndex.value].products.push({
     productType: '',
     fabricId: null,
     fabricDetails: null,
@@ -586,25 +676,26 @@ function addNewProduct() {
     chainType: '',
     isMotorized: false,
     motorType: '',
+    mountLocation: 'Inside',
+    rollDirection: 'Standard',
+    hardwareColor: 'White',
     notes: ''
   })
 }
 
 // Function to remove a product
 function removeProduct(index) {
-  const orderIndex = orders.value.findIndex(order => order.name === activeTab.value)
-  if (orderIndex === -1) return
+  if (activeTabIndex.value < 0 || activeTabIndex.value >= orders.value.length) return
   
-  orders.value[orderIndex].products.splice(index, 1)
+  orders.value[activeTabIndex.value].products.splice(index, 1)
 }
 
 // Function to edit product details
 function editProductDetails(index) {
-  const orderIndex = orders.value.findIndex(order => order.name === activeTab.value)
-  if (orderIndex === -1) return
+  if (activeTabIndex.value < 0 || activeTabIndex.value >= orders.value.length) return
   
   editingProductIndex.value = index
-  editingProduct.value = { ...orders.value[orderIndex].products[index] }
+  editingProduct.value = { ...orders.value[activeTabIndex.value].products[index] }
   showProductDetailsModal.value = true
 }
 
@@ -612,11 +703,10 @@ function editProductDetails(index) {
 function saveProductDetails() {
   if (!editingProduct.value) return
   
-  const orderIndex = orders.value.findIndex(order => order.name === activeTab.value)
-  if (orderIndex === -1 || editingProductIndex.value === null) return
+  if (activeTabIndex.value < 0 || activeTabIndex.value >= orders.value.length) return
   
   // Update the product in the order
-  orders.value[orderIndex].products[editingProductIndex.value] = { ...editingProduct.value }
+  orders.value[activeTabIndex.value].products[editingProductIndex.value] = { ...editingProduct.value }
   
   // Reset editing state
   showProductDetailsModal.value = false
@@ -626,10 +716,9 @@ function saveProductDetails() {
 
 // Open fabric modal for a specific product
 function openFabricModal(productIndex) {
-  const orderIndex = orders.value.findIndex(order => order.name === activeTab.value)
-  if (orderIndex === -1) return
+  if (activeTabIndex.value < 0 || activeTabIndex.value >= orders.value.length) return
   
-  const product = orders.value[orderIndex].products[productIndex]
+  const product = orders.value[activeTabIndex.value].products[productIndex]
   
   if (!product.productType) {
     showNotification({
@@ -649,9 +738,9 @@ function openFabricModal(productIndex) {
 
 // Select fabric for the current editing product
 function selectFabric(fabric) {
-  const orderIndex = orders.value.findIndex(order => order.name === activeTab.value)
-  if (orderIndex === -1 || editingProductIndex.value === null) return
+  if (activeTabIndex.value < 0 || activeTabIndex.value >= orders.value.length) return
   
+  const orderIndex = activeTabIndex.value
   const fabricId = fabric.fabricId || fabric.fields['Fabric ID'] || fabric.id
   
   orders.value[orderIndex].products[editingProductIndex.value].fabricDetails = fabric
@@ -704,6 +793,7 @@ function selectSalesperson(salesperson) {
 // Show notification
 function showNotification(notify) {
   notification.value = {
+    id: Date.now().toString(),
     show: true,
     title: notify.title || 'Notification',
     description: notify.description || '',
@@ -764,7 +854,7 @@ async function submitCurrentOrder() {
       })
       
       // Remove the submitted order and create a new one
-      const orderIndex = orders.value.findIndex(order => order.name === activeTab.value)
+      const orderIndex = activeTabIndex.value
       if (orderIndex !== -1) {
         orders.value.splice(orderIndex, 1)
         
@@ -775,9 +865,9 @@ async function submitCurrentOrder() {
             products: [],
             specialInstructions: ''
           })
-          activeTab.value = 'Order #1'
+          activeTabIndex.value = 0
         } else {
-          activeTab.value = orders.value[0].name
+          activeTabIndex.value = 0
         }
       }
     } else {
@@ -801,19 +891,9 @@ const fabricSearchModalRef = ref(null)
 </script>
 
 <style>
-/* Add custom styles for table-like interfaces */
-.editable-cell {
-  position: relative;
-}
-.editable-cell input {
-  background: transparent;
-  border: 1px solid transparent;
-  width: 100%;
-  padding: 0.5rem;
-}
-.editable-cell input:focus {
-  outline: none;
-  border-color: #3b82f6;
-  background-color: rgba(59, 130, 246, 0.05);
+/* Remove cell-label class as we don't need it anymore */
+td {
+  vertical-align: top;
+  min-width: 100px;
 }
 </style>
