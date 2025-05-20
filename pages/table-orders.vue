@@ -155,16 +155,40 @@
                   Select Client for Order
                 </UButton>
               </div>
+              <div class="flex justify-end mt-4">
+                <UButton
+                  color="green"
+                  icon="i-heroicons-paper-airplane"
+                  :loading="isSubmitting"
+                  :disabled="!isFormValid"
+                  @click="submitCurrentOrder"
+                >
+                  Submit Order
+                </UButton>
+              </div>
             </div>
           </div>
-          <!-- Product Table - Now with no column headers, only inline labels -->
-          <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-              <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+          <!-- Product Table - With enhanced scrolling but no fixed headers -->
+          <div class="relative">
+            <!-- Scroll indicators -->
+            <div class="absolute left-0 top-1/2 -translate-y-1/2 z-10 pointer-events-none">
+              <div class="scroll-indicator-left opacity-0 transition-opacity duration-300 bg-gradient-to-r from-gray-100 dark:from-gray-800 to-transparent h-12 w-8 flex items-center justify-center">
+                <UIcon name="i-heroicons-chevron-left" class="w-5 h-5 text-gray-500 dark:text-gray-400" />
+              </div>
+            </div>
+            <div class="absolute right-0 top-1/2 -translate-y-1/2 z-10 pointer-events-none">
+              <div class="scroll-indicator-right opacity-0 transition-opacity duration-300 bg-gradient-to-l from-gray-100 dark:from-gray-800 to-transparent h-12 w-8 flex items-center justify-center">
+                <UIcon name="i-heroicons-chevron-right" class="w-5 h-5 text-gray-500 dark:text-gray-400" />
+              </div>
+            </div>
+
+            <!-- Table container with improved scrolling but no fixed headers -->
+            <div class="overflow-x-auto scrollbar-track-rounded scrollbar-thumb-rounded scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-gray-100 dark:scrollbar-track-gray-800 scrollbar-thin" ref="tableContainer" @scroll="handleTableScroll">
+              <div class="bg-white dark:bg-gray-800">
                 <!-- Product rows -->
-                <tr v-for="(product, pIndex) in orders[activeTabIndex].products" :key="pIndex" class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                <div v-for="(product, pIndex) in orders[activeTabIndex].products" :key="pIndex" class="min-w-max flex border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
                   <!-- Product Type Cell -->
-                  <td class="px-2 py-3 whitespace-nowrap">
+                  <div class="w-[120px] p-2">
                     <USelect
                       v-model="product.productType"
                       :options="productTypes"
@@ -172,10 +196,10 @@
                       class="w-full"
                       size="sm"
                     />
-                  </td>
+                  </div>
                   
                   <!-- Fabric Selection Cell -->
-                  <td class="px-2 py-3 whitespace-nowrap">
+                  <div class="w-[180px] p-2">
                     <div class="flex items-center space-x-2">
                       <div v-if="product.fabricDetails" class="flex items-center">
                         <div 
@@ -195,10 +219,10 @@
                         {{ product.fabricDetails ? 'FT - Change' : 'FT - Select' }}
                       </UButton>
                     </div>
-                  </td>
+                  </div>
                   
                   <!-- Width Cell -->
-                  <td class="px-2 py-3 whitespace-nowrap">
+                  <div class="w-[120px] p-2">
                     <UInput
                       v-model="product.width"
                       type="number"
@@ -206,10 +230,10 @@
                       class="w-full"
                       size="sm"
                     />
-                  </td>
+                  </div>
                   
                   <!-- Height Cell -->
-                  <td class="px-2 py-3 whitespace-nowrap">
+                  <div class="w-[120px] p-2">
                     <UInput
                       v-model="product.height"
                       type="number"
@@ -217,10 +241,10 @@
                       class="w-full"
                       size="sm"
                     />
-                  </td>
+                  </div>
                   
                   <!-- Quantity Cell -->
-                  <td class="px-2 py-3 whitespace-nowrap">
+                  <div class="w-[80px] p-2">
                     <UInput
                       v-model="product.quantity"
                       type="number"
@@ -229,21 +253,19 @@
                       class="w-full"
                       size="sm"
                     />
-                  </td>
+                  </div>
                   
                   <!-- Motorized Cell -->
-                  <td class="px-2 py-3 whitespace-nowrap text-center">
-                    <div class="flex items-center">
-                      <span class="text-xs text-gray-500 mr-2">Motor</span>
-                      <UCheckbox
-                        v-model="product.isMotorized"
-                        :disabled="!['Roller Shades', 'Roman Shades'].includes(product.productType)"
-                      />
-                    </div>
-                  </td>
+                  <div class="w-[100px] p-2 flex items-center">
+                    <span class="text-xs text-gray-500 mr-2">Motor</span>
+                    <UCheckbox
+                      v-model="product.isMotorized"
+                      :disabled="!['Roller Shades', 'Roman Shades'].includes(product.productType)"
+                    />
+                  </div>
                   
                   <!-- Control Cell (changes based on motorization) -->
-                  <td class="px-2 py-3 whitespace-nowrap">
+                  <div class="w-[120px] p-2">
                     <div v-if="product.isMotorized">
                       <USelect
                         v-model="product.motorType"
@@ -262,20 +284,55 @@
                         class="w-full"
                       />
                     </div>
-                  </td>
+                  </div>
+                  
+                  <!-- Mount Location Cell -->
+                  <div class="w-[120px] p-2">
+                    <USelect
+                      v-model="product.mountLocation"
+                      :options="['Inside', 'Outside', 'Ceiling']"
+                      placeholder="Mount"
+                      size="sm"
+                      class="w-full"
+                    />
+                  </div>
+                  
+                  <!-- Hardware Color Cell -->
+                  <div class="w-[120px] p-2">
+                    <USelect
+                      v-model="product.hardwareColor"
+                      :options="['White', 'Black', 'Silver', 'Bronze', 'Antique Gold']"
+                      placeholder="Color"
+                      size="sm"
+                      class="w-full"
+                    />
+                  </div>
+                  
+                  <!-- Roll Direction Cell (for roller shades) -->
+                  <div class="w-[140px] p-2">
+                    <USelect
+                      v-if="product.productType === 'Roller Shades'"
+                      v-model="product.rollDirection"
+                      :options="['Standard', 'Reverse']"
+                      placeholder="Roll Direction"
+                      size="sm"
+                      class="w-full"
+                    />
+                    <span v-else class="text-sm text-gray-400">N/A</span>
+                  </div>
                   
                   <!-- Notes Cell -->
-                  <td class="px-2 py-3 whitespace-nowrap">
+                  <div class="w-[200px] p-2">
                     <UInput
                       v-model="product.notes"
                       placeholder="Notes"
                       class="w-full"
                       size="sm"
                     />
-                  </td>
+                  </div>
                   
                   <!-- Actions Cell -->
-                  <td class="px-2 py-3 whitespace-nowrap">
+                  <div class="w-[100px] p-2">
                     <div class="flex space-x-1">
                       <UButton
                         color="red"
@@ -294,30 +351,28 @@
                         aria-label="Edit product details"
                       />
                     </div>
-                  </td>
-                </tr>
+                  </div>
+                </div>
                 
-                <!-- Add new product row -->
-                <tr v-if="orders[activeTabIndex].products.length === 0" class="text-center bg-gray-50 dark:bg-gray-700">
-                  <td colspan="9" class="px-4 py-8 text-gray-500 dark:text-gray-400">
-                    No products added yet. Click the button below to add your first product.
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-            
-            <!-- Add New Product Button -->
-            <div class="p-3 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">
-              <UButton
-                block
-                color="green"
-                variant="ghost"
-                icon="i-heroicons-plus"
-                @click="addNewProduct"
-              >
-                Add New Product
-              </UButton>
+                <!-- Empty state -->
+                <div v-if="orders[activeTabIndex].products.length === 0" class="text-center p-8 text-gray-500 dark:text-gray-400">
+                  No products added yet. Click the button below to add your first product.
+                </div>
+              </div>
             </div>
+          </div>
+          
+          <!-- Add New Product Button -->
+          <div class="p-3 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">
+            <UButton
+              block
+              color="green"
+              variant="ghost"
+              icon="i-heroicons-plus"
+              @click="addNewProduct"
+            >
+              Add New Product
+            </UButton>
           </div>
           
           <!-- Order Notes -->
@@ -610,6 +665,10 @@ const isFormValid = computed(() => {
     if (!product.width || !product.height) return false
     if (!product.fabricId && !product.fabricDetails) return false
     if (product.isMotorized && !product.motorType) return false
+    if (!product.isMotorized && !product.controlSide) return false
+    if (!product.mountLocation) return false
+    if (product.productType === 'Roller Shades' && !product.rollDirection) return false
+    if (product.quantity < 1) return false
   }
   
   return true
@@ -810,12 +869,25 @@ async function submitCurrentOrder() {
   
   try {
     const order = orders.value[activeTabIndex.value]
+    
+    // Extract the client ID properly based on the object structure
+    const clientId = order.client?.id || 
+                    order.client?.fields?.['Customer ID'] || 
+                    order.client?.fields?.ID ||
+                    null
+                    
+    if (!clientId) {
+      throw new Error('Client information is missing or invalid')
+    }
+    
     const orderData = {
       isExistingCustomer: true,
-      selectedCustomerId: order.client?.id,
+      selectedCustomerId: clientId,
+      clientName: `${order.client.fields['First Name']} ${order.client.fields['Last Name']}`,
       installationRequired: false,
       country: 'United States',
       specialInstructions: order.specialInstructions,
+      orderName: order.name, // Include the order name
       items: order.products.map(product => {
         // Ensure fabricId is correctly included
         const fabricId = product.fabricId || 
@@ -823,12 +895,26 @@ async function submitCurrentOrder() {
                        (product.fabricDetails?.fields['Fabric ID']) || 
                        null
         
+        // Create a clean product object with only the necessary fields           
         return {
-          ...product,
-          fabricId: fabricId
+          productType: product.productType,
+          fabricId: fabricId,
+          width: product.width,
+          height: product.height,
+          quantity: product.quantity || 1,
+          isMotorized: product.isMotorized || false,
+          motorType: product.isMotorized ? product.motorType : null,
+          controlSide: !product.isMotorized ? product.controlSide : null,
+          mountLocation: product.mountLocation,
+          rollDirection: product.productType === 'Roller Shades' ? product.rollDirection : null,
+          hardwareColor: product.hardwareColor,
+          chainType: (!product.isMotorized && product.productType === 'Roller Shades') ? product.chainType : null,
+          notes: product.notes
         }
       })
     }
+    
+    console.log('Submitting order data:', orderData)
     
     const response = await fetch('/api/ninox/orders', {
       method: 'POST',
@@ -843,7 +929,7 @@ async function submitCurrentOrder() {
     if (result.success) {
       showNotification({
         title: 'Order Submitted',
-        description: result.message || 'Order submitted successfully!',
+        description: result.message || `Order "${order.name}" submitted successfully!`,
         color: 'green'
       })
       
@@ -869,6 +955,7 @@ async function submitCurrentOrder() {
       throw new Error(result.error || 'Failed to submit order')
     }
   } catch (error) {
+    console.error('Order submission error:', error)
     showNotification({
       title: 'Error',
       description: error.message || 'An unexpected error occurred',
@@ -929,12 +1016,66 @@ function openOrderClientModal() {
   }
   showClientModal.value = true
 }
+
+// Reference to the table container for scroll indicators
+const tableContainer = ref(null)
+
+// Function to handle table scrolling
+function handleTableScroll(event) {
+  const container = event.target
+  const leftIndicator = document.querySelector('.scroll-indicator-left')
+  const rightIndicator = document.querySelector('.scroll-indicator-right')
+  
+  if (leftIndicator && rightIndicator) {
+    // Show left indicator if scrolled right
+    if (container.scrollLeft > 20) {
+      leftIndicator.classList.add('opacity-100')
+    } else {
+      leftIndicator.classList.remove('opacity-100')
+    }
+    
+    // Show right indicator if can scroll more right
+    if (container.scrollLeft < (container.scrollWidth - container.clientWidth - 20)) {
+      rightIndicator.classList.add('opacity-100')
+    } else {
+      rightIndicator.classList.remove('opacity-100')
+    }
+  }
+}
+
+// Initialize scroll indicators on mount
+onMounted(() => {
+  nextTick(() => {
+    if (tableContainer.value) {
+      // Trigger scroll handler to set initial state
+      handleTableScroll({ target: tableContainer.value })
+    }
+  })
+})
 </script>
 
 <style>
-/* Remove cell-label class as we don't need it anymore */
-td {
-  vertical-align: top;
-  min-width: 100px;
+/* Scrollbar styling for better UX */
+.scrollbar-thin::-webkit-scrollbar {
+  height: 8px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background-color: rgba(156, 163, 175, 0.1);
+  border-radius: 4px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background-color: rgba(156, 163, 175, 0.5);
+  border-radius: 4px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(156, 163, 175, 0.7);
+}
+
+/* Ensure consistent cell heights */
+.min-w-max > div {
+  min-height: 44px;
 }
 </style>
