@@ -48,18 +48,18 @@
                   {{ order.name }}
                 </div>
                 <template v-if="orders.length > 1" #trailing>
-                  <UButton
-                    color="gray"
-                    variant="ghost"
-                    icon="i-heroicons-x-mark"
-                    size="xs"
+              <UButton
+                color="gray"
+                variant="ghost"
+                icon="i-heroicons-x-mark"
+                size="xs"
                     @click.stop="removeOrder(index)"
                     aria-label="Remove order"
-                  />
+              />
                 </template>
               </UButton>
               
-              <UButton
+            <UButton
                 color="green"
                 variant="ghost"
                 class="px-4 py-2 whitespace-nowrap"
@@ -69,7 +69,7 @@
                   <UIcon name="i-heroicons-plus-circle" class="w-4 h-4 mr-2" />
                   Create New Order
                 </div>
-              </UButton>
+            </UButton>
             </div>
           </div>
         </div>
@@ -133,40 +133,40 @@
               <div class="flex items-center mt-2">
                 <div v-if="orders[activeTabIndex].client" class="flex items-center space-x-2 bg-blue-50 dark:bg-blue-900/20 px-3 py-1.5 rounded-md">
                   <UIcon name="i-heroicons-user-circle" class="w-5 h-5 text-blue-500" />
-                  <span class="font-medium text-gray-900 dark:text-white">
+              <span class="font-medium text-gray-900 dark:text-white">
                     {{ orders[activeTabIndex].client.fields['First Name'] }} {{ orders[activeTabIndex].client.fields['Last Name'] }}
-                  </span>
-                  <UButton
-                    color="gray"
-                    variant="ghost"
-                    icon="i-heroicons-x-mark"
-                    size="xs"
+              </span>
+              <UButton
+                color="gray"
+                variant="ghost"
+                icon="i-heroicons-x-mark"
+                size="xs"
                     @click="removeOrderClient"
-                  />
-                </div>
-                <UButton
-                  v-else
-                  color="primary"
-                  variant="soft"
+              />
+            </div>
+            <UButton
+              v-else
+              color="primary"
+              variant="soft"
                   size="sm"
                   @click="openOrderClientModal"
-                >
+            >
                   <UIcon name="i-heroicons-user-plus" class="w-4 h-4 mr-1" />
                   Select Client for Order
-                </UButton>
-              </div>
+            </UButton>
+          </div>
               <div class="flex justify-end mt-4">
-                <UButton
-                  color="green"
+            <UButton
+              color="green"
                   icon="i-heroicons-paper-airplane"
                   :loading="isSubmitting"
                   :disabled="!isFormValid"
-                  @click="submitCurrentOrder"
-                >
-                  Submit Order
-                </UButton>
-              </div>
-            </div>
+              @click="submitCurrentOrder"
+            >
+              Submit Order
+            </UButton>
+          </div>
+        </div>
           </div>
           <!-- Product Table - With enhanced scrolling but no fixed headers -->
           <div class="relative">
@@ -198,18 +198,10 @@
                     />
                   </div>
                   
-                  <!-- Fabric Selection Cell -->
-                  <div class="w-[180px] p-2">
-                    <div class="flex items-center space-x-2">
-                      <div v-if="product.fabricDetails" class="flex items-center">
-                        <div 
-                          class="w-4 h-4 rounded-full mr-2"
-                          :style="{ backgroundColor: product.fabricDetails.fields['Color Hex'] || '#64748b' }"
-                        ></div>
-                        <span class="text-sm font-medium text-gray-900 dark:text-white truncate max-w-[80px]">
-                          {{ product.fabricDetails.fields['Fabric Name'] }}
-                        </span>
-                      </div>
+                  <!-- Fabric Selection Cell - Keep horizontal layout for fabric type, fix modal trigger -->
+                  <div class="w-[240px] p-2">
+                    <!-- Fabric Type Row -->
+                    <div class="flex items-center space-x-2 mb-1">
                       <UButton
                         size="xs"
                         variant="soft"
@@ -218,6 +210,46 @@
                       >
                         {{ product.fabricDetails ? 'FT - Change' : 'FT - Select' }}
                       </UButton>
+                      
+                      <div v-if="product.fabricDetails" class="flex items-center overflow-hidden">
+                        <div 
+                          class="w-3 h-3 rounded-full mr-1 flex-shrink-0"
+                          :style="{ backgroundColor: product.fabricDetails.fields['Color Hex'] || '#64748b' }"
+                        ></div>
+                        <span class="text-xs font-medium text-gray-900 dark:text-white truncate">
+                          {{ product.fabricDetails.fields['Fabric Name'] }}
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <!-- Fabric Color Row -->
+                    <div class="flex items-center space-x-2">
+                      <UButton
+                        size="xs"
+                        variant="soft"
+                        color="indigo"
+                        @click="openFabricColorModal(pIndex)"
+                        :disabled="!product.fabricDetails"
+                        class="whitespace-nowrap"
+                      >
+                        {{ product.fabricColorDetails ? 'FC - Change' : 'FC - Select' }}
+                      </UButton>
+                      
+                      <div v-if="product.fabricColorDetails" class="flex items-center overflow-hidden">
+                        <div 
+                          class="w-3 h-3 rounded-full mr-1 flex-shrink-0"
+                          :style="{ backgroundColor: product.fabricColorDetails.fields['Color Hex'] || '#64748b' }"
+                        ></div>
+                        <span class="text-xs text-gray-500 dark:text-gray-400 truncate">
+                          {{ product.fabricColorDetails.fields['Collection Name'] || '' }}
+                          <template v-if="product.fabricColorDetails.fields['Color Category']">
+                            - {{ product.fabricColorDetails.fields['Color Category'] }}
+                          </template>
+                          <template v-if="product.fabricColorDetails.fields['Color Specific']">
+                            - {{ product.fabricColorDetails.fields['Color Specific'] }}
+                          </template>
+                        </span>
+                      </div>
                     </div>
                   </div>
                   
@@ -356,23 +388,23 @@
                 
                 <!-- Empty state -->
                 <div v-if="orders[activeTabIndex].products.length === 0" class="text-center p-8 text-gray-500 dark:text-gray-400">
-                  No products added yet. Click the button below to add your first product.
+                    No products added yet. Click the button below to add your first product.
                 </div>
               </div>
             </div>
           </div>
-          
-          <!-- Add New Product Button -->
-          <div class="p-3 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">
-            <UButton
-              block
-              color="green"
-              variant="ghost"
-              icon="i-heroicons-plus"
-              @click="addNewProduct"
-            >
-              Add New Product
-            </UButton>
+            
+            <!-- Add New Product Button -->
+            <div class="p-3 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">
+              <UButton
+                block
+                color="green"
+                variant="ghost"
+                icon="i-heroicons-plus"
+                @click="addNewProduct"
+              >
+                Add New Product
+              </UButton>
           </div>
           
           <!-- Order Notes -->
@@ -395,22 +427,22 @@
             <p class="text-gray-500 dark:text-gray-400 mb-6">
               Each order can contain multiple products and has its own tab. You can switch between orders at any time using the tabs.
             </p>
+          
+          <div class="max-w-md mx-auto">
+            <UFormGroup label="Order Name" class="mb-4">
+              <UInput v-model="newOrderName" placeholder="Enter a name for this order" />
+            </UFormGroup>
             
-            <div class="max-w-md mx-auto">
-              <UFormGroup label="Order Name" class="mb-4">
-                <UInput v-model="newOrderName" placeholder="Enter a name for this order" />
-              </UFormGroup>
-              
               <div class="flex justify-center">
-                <UButton
+            <UButton
                   color="green"
                   icon="i-heroicons-plus-circle"
                   size="lg"
-                  @click="createNewOrder"
-                  :disabled="!newOrderName"
-                >
+              @click="createNewOrder"
+              :disabled="!newOrderName"
+            >
                   Create New Order
-                </UButton>
+            </UButton>
               </div>
             </div>
           </div>
@@ -516,6 +548,17 @@
           ref="fabricSearchModalRef"
         />
         
+        <!-- Fabric Color Search Modal -->
+        <FabricColorSearchModal
+          v-if="editingProductIndex !== null && orders[activeTabIndex] && orders[activeTabIndex].products[editingProductIndex]"
+          v-model="showFabricColorModal"
+          :fabric-id="orders[activeTabIndex].products[editingProductIndex]?.fabricDetails?.id"
+          :fabric-name="orders[activeTabIndex].products[editingProductIndex]?.fabricDetails?.fields['Fabric Name'] || ''"
+          @select="selectFabricColor"
+          @notification="showNotification"
+          ref="fabricColorSearchModalRef"
+        />
+        
         <!-- Notification System -->
         <NotificationSystem 
           v-model:notification="notification" 
@@ -545,10 +588,11 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import Navbar from '../components/Navbar.vue'
 import ClientSearchModal from '../components/ClientSearchModal.vue'
 import FabricSearchModal from '../components/FabricSearchModal.vue'
+import FabricColorSearchModal from '../components/FabricColorSearchModal.vue'
 import NotificationSystem from '../components/NotificationSystem.vue'
 
 // Check user permissions
@@ -588,6 +632,7 @@ const editingProduct = ref(null)
 const showProductDetailsModal = ref(false)
 const showClientModal = ref(false)
 const showFabricModal = ref(false)
+const showFabricColorModal = ref(false)
 const isEditingOrderName = ref(false)
 const editedOrderName = ref('')
 
@@ -664,6 +709,7 @@ const isFormValid = computed(() => {
     if (!product.productType) return false
     if (!product.width || !product.height) return false
     if (!product.fabricId && !product.fabricDetails) return false
+    if (!product.fabricColorId && !product.fabricColorDetails) return false
     if (product.isMotorized && !product.motorType) return false
     if (!product.isMotorized && !product.controlSide) return false
     if (!product.mountLocation) return false
@@ -729,6 +775,8 @@ function addNewProduct() {
     productType: '',
     fabricId: null,
     fabricDetails: null,
+    fabricColorId: null,
+    fabricColorDetails: null,
     width: null,
     height: null,
     quantity: 1,
@@ -891,14 +939,21 @@ async function submitCurrentOrder() {
       items: order.products.map(product => {
         // Ensure fabricId is correctly included
         const fabricId = product.fabricId || 
-                       (product.fabricDetails?.fabricId) || 
-                       (product.fabricDetails?.fields['Fabric ID']) || 
-                       null
+                        (product.fabricDetails?.fabricId) || 
+                        (product.fabricDetails?.fields['Fabric ID']) || 
+                        null
+        
+        // Ensure fabricColorId is correctly included
+        const fabricColorId = product.fabricColorId || 
+                            (product.fabricColorDetails?.id) || 
+                            (product.fabricColorDetails?.fields['Color ID']) || 
+                            null
         
         // Create a clean product object with only the necessary fields           
         return {
           productType: product.productType,
           fabricId: fabricId,
+          fabricColorId: fabricColorId,
           width: product.width,
           height: product.height,
           quantity: product.quantity || 1,
@@ -1006,6 +1061,7 @@ function cancelEditingOrderName() {
 const clientSearchModalRef = ref(null)
 const fabricSearchModalRef = ref(null)
 const orderNameInputRef = ref(null)
+const fabricColorSearchModalRef = ref(null)
 
 // Add functions to handle per-order client selection
 function openOrderClientModal() {
@@ -1052,6 +1108,48 @@ onMounted(() => {
     }
   })
 })
+
+// Add function to open the fabric color modal
+function openFabricColorModal(productIndex) {
+  if (activeTabIndex.value < 0 || activeTabIndex.value >= orders.value.length) return
+  
+  const product = orders.value[activeTabIndex.value].products[productIndex]
+  
+  if (!product.fabricDetails) {
+    showNotification({
+      title: 'Select Fabric Type First',
+      description: 'Please select a fabric type before choosing a fabric color.',
+      color: 'yellow'
+    })
+    return
+  }
+  
+  editingProductIndex.value = productIndex
+  if (fabricColorSearchModalRef.value) {
+    fabricColorSearchModalRef.value.reset()
+  }
+  showFabricColorModal.value = true
+}
+
+// Add function to handle fabric color selection
+function selectFabricColor(fabricColor) {
+  if (activeTabIndex.value < 0 || activeTabIndex.value >= orders.value.length) return
+  
+  const orderIndex = activeTabIndex.value
+  const colorId = fabricColor.id || fabricColor.fields['Color ID']
+  
+  orders.value[orderIndex].products[editingProductIndex.value].fabricColorDetails = fabricColor
+  orders.value[orderIndex].products[editingProductIndex.value].fabricColorId = colorId
+  
+  showNotification({
+    title: 'Fabric Color Selected',
+    description: `${fabricColor.fields['Color Name']} has been selected.`,
+    color: 'indigo'
+  })
+  
+  // Reset editing product index
+  editingProductIndex.value = null
+}
 </script>
 
 <style>
