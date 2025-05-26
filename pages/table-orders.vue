@@ -18,36 +18,34 @@
       
       <div v-else-if="hasPermission" class="space-y-6">
         <!-- Information Banner -->
-        <div class="border p-4 rounded-lg mb-4" style="background-color: #3A4A5C; border-color: #2D3748;">
-          <div class="flex items-start">
-            <UIcon name="i-heroicons-information-circle" class="w-5 h-5 mr-2 flex-shrink-0 mt-0.5 text-blue-300" />
-            <div>
-              <h3 class="text-sm font-medium text-white">Multiple Orders System</h3>
-              <p class="text-sm mt-1 text-gray-300">
-                You can create multiple separate orders using the tabs below. Each tab represents a different order with its own products.
-                Click the "+" tab to create a new order.
-              </p>
-            </div>
-          </div>
-        </div>
 
-        <!-- Connected Tabs Design -->
-        <div class="rounded-lg shadow-sm overflow-hidden" style="background-color: #3A4A5C;">
-          <div class="flex">
+
+        <!-- Elegant Tab Design with Physical Tab Look -->
+        <div class="space-y-0">
+          <!-- Tab Headers with Integrated Content -->
+          <div class="flex items-end gap-1">
             <!-- Order Tabs -->
             <div v-for="(order, index) in orders" :key="index" class="relative">
-              <button
+              <div
                 :class="[
-                  'px-6 py-3 text-sm font-medium transition-all duration-200 relative',
+                  'transition-all duration-200 border-0 rounded-t-lg',
                   activeTabIndex === index 
-                    ? 'bg-gray-600 text-white' 
-                    : 'text-gray-300 hover:text-white hover:bg-gray-700'
+                    ? 'bg-white shadow-sm' 
+                    : 'bg-gray-100'
                 ]"
-                @click="activeTabIndex = index"
+                style="min-width: 220px; min-height: 65px;"
               >
-                <div class="flex items-center">
-                  <UIcon name="i-heroicons-document-text" class="w-4 h-4 mr-2" />
-                  {{ order.name }}
+                <!-- Tab Header -->
+                <button
+                  :class="[
+                    'w-full px-3 py-1.5 text-sm font-medium transition-all duration-200 flex items-center justify-center',
+                    activeTabIndex === index 
+                      ? 'text-black' 
+                      : 'text-gray-600'
+                  ]"
+                  @click="activeTabIndex = index"
+                >
+                  <span>{{ order.name }}</span>
                   <UButton
                     v-if="orders.length > 1"
                     color="gray"
@@ -58,55 +56,43 @@
                     @click.stop="removeOrder(index)"
                     aria-label="Remove order"
                   />
-                </div>
-              </button>
-            </div>
-            
-            <!-- Create New Order Tab -->
-            <button
-              :class="[
-                'px-6 py-3 text-sm font-medium transition-all duration-200',
-                activeTabIndex === -1 
-                  ? 'bg-gray-500 text-white' 
-                  : 'text-gray-400 hover:text-gray-200 hover:bg-gray-600'
-              ]"
-              @click="activeTabIndex = -1"
-            >
-              <div class="flex items-center">
-                <UIcon name="i-heroicons-plus-circle" class="w-4 h-4 mr-2" />
-                Create New Order
-              </div>
-            </button>
-          </div>
-        </div>
-        
-        <!-- Current Active Order Content -->
-        <div v-if="activeTabIndex >= 0" class="rounded-lg shadow overflow-hidden" style="background-color: #FFFFFF;">
-          <!-- Order Header -->
-          <div class="p-6" style="background-color: #FAFAFA;">
-            <div class="flex flex-col gap-4">
-              <!-- Order header with name and info -->
-              <div class="flex justify-between items-center">
-                <div class="flex items-center">
-                  <!-- Order name (editable) -->
-                  <div v-if="!isEditingOrderName" class="flex items-center cursor-pointer group" @click="startEditingOrderName">
-                    <h3 class="text-xl font-medium" style="color: #2D2D2D;">
-                      {{ orders[activeTabIndex].name }}
-                    </h3>
-                    <UIcon 
-                      name="i-heroicons-pencil-square" 
-                      class="w-4 h-4 ml-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                      style="color: #6B6B6B;"
-                      aria-label="Edit order name"
-                    />
-                    <span class="text-sm ml-3" style="color: #6B6B6B;">({{ orders[activeTabIndex].products.length }} products)</span>
+                </button>
+                
+                <!-- Client Selection Area (always present to maintain consistent height) -->
+                <div class="px-3 pb-1.5 flex justify-center min-h-[28px] items-center">
+                  <div v-if="activeTabIndex === index">
+                    <div v-if="orders[activeTabIndex].client" class="flex items-center space-x-1 px-2 py-0.5 rounded-full text-xs" style="background-color: #E5E5E5;">
+                      <span class="font-medium" style="color: #2D2D2D;">
+                        {{ orders[activeTabIndex].client.fields['First Name'] }} {{ orders[activeTabIndex].client.fields['Last Name'] }}
+                      </span>
+                      <UButton
+                        color="gray"
+                        variant="ghost"
+                        icon="i-heroicons-x-mark"
+                        size="xs"
+                        @click="removeOrderClient"
+                      />
+                    </div>
+                    <UButton
+                      v-else
+                      class="px-3 py-0.5 rounded-full text-white text-xs font-medium"
+                      style="background-color: #9CA3AF; min-width: 120px;"
+                      @click="openOrderClientModal"
+                    >
+                      SELECT CLIENT
+                    </UButton>
                   </div>
-                  <!-- Order name editing form -->
-                  <div v-else class="flex items-center">
+                  <!-- Empty space for inactive tabs to maintain consistent height -->
+                  <div v-else class="h-[20px]"></div>
+                </div>
+                
+                <!-- Order editing controls (if needed) -->
+                <div v-if="isEditingOrderName && activeTabIndex === index" class="px-3 pb-1.5">
+                  <div class="flex items-center">
                     <UInput
                       v-model="editedOrderName"
-                      size="lg"
-                      class="w-64 input-rounded"
+                      size="sm"
+                      class="w-full input-rounded"
                       placeholder="Order name"
                       @keyup.enter="saveOrderName"
                       @keyup.esc="cancelEditingOrderName"
@@ -133,331 +119,331 @@
                     </div>
                   </div>
                 </div>
-                <div class="px-4 py-2 rounded-full text-sm font-medium" style="background-color: #E5E5E5; color: #2D2D2D;">
-                  Order #{{ activeTabIndex + 1 }} of {{ orders.length }}
-                </div>
-              </div>
-              
-              <!-- Customer selection and Submit button row -->
-              <div class="flex items-center justify-between">
-                <div v-if="orders[activeTabIndex].client" class="flex items-center space-x-3 px-4 py-2 rounded-full" style="background-color: #E5E5E5;">
-                  <UIcon name="i-heroicons-user-circle" class="w-5 h-5" style="color: #6B6B6B;" />
-                  <span class="font-medium" style="color: #2D2D2D;">
-                    {{ orders[activeTabIndex].client.fields['First Name'] }} {{ orders[activeTabIndex].client.fields['Last Name'] }}
-                  </span>
-                  <UButton
-                    color="gray"
-                    variant="ghost"
-                    icon="i-heroicons-x-mark"
-                    size="xs"
-                    @click="removeOrderClient"
-                  />
-                </div>
-                <UButton
-                  v-else
-                  class="px-6 py-3 rounded-full text-white font-medium"
-                  style="background-color: #B8A082;"
-                  @click="openOrderClientModal"
-                >
-                  <UIcon name="i-heroicons-user-plus" class="w-4 h-4 mr-2" />
-                  SELECT CLIENT
-                </UButton>
-                
-                <UButton
-                  class="px-8 py-3 rounded-full text-white font-medium"
-                  style="background-color: #B8860B;"
-                  icon="i-heroicons-paper-airplane"
-                  :loading="isSubmitting"
-                  :disabled="!isFormValid"
-                  @click="submitCurrentOrder"
-                >
-                  SUBMIT ORDER
-                </UButton>
-              </div>
-            </div>
-          </div>
-
-          <!-- Product Form Area -->
-          <div class="p-6">
-            <!-- Product rows -->
-            <div v-for="(product, pIndex) in orders[activeTabIndex].products" :key="pIndex" class="border-b border-gray-200 pb-6 mb-6 last:border-b-0 last:mb-0">
-              <div class="flex items-center justify-between mb-4">
-                <span class="text-lg font-medium" style="color: #2D2D2D;">{{ pIndex + 1 }}.</span>
-                <div class="flex space-x-2">
-                  <UButton
-                    color="red"
-                    icon="i-heroicons-trash"
-                    variant="ghost"
-                    size="sm"
-                    class="rounded-full"
-                    @click="removeProduct(pIndex)"
-                    aria-label="Delete product"
-                  />
-                  <UButton
-                    color="blue"
-                    icon="i-heroicons-pencil-square"
-                    variant="ghost"
-                    size="sm"
-                    class="rounded-full"
-                    @click="editProductDetails(pIndex)"
-                    aria-label="Edit product details"
-                  />
-                </div>
-              </div>
-
-              <!-- Form Fields Row -->
-              <div class="flex flex-wrap gap-4 items-center">
-                <!-- Product Type -->
-                <div class="flex-shrink-0">
-                  <USelect
-                    v-model="product.productType"
-                    :options="productTypes"
-                    placeholder="Type"
-                    class="select-rounded min-w-[140px]"
-                    size="lg"
-                  />
-                </div>
-                
-                <!-- Fabric Selection -->
-                <div class="flex items-center gap-2">
-                  <UButton
-                    size="sm"
-                    class="rounded-full px-4 py-2 text-sm font-medium"
-                    style="background-color: #B8A082; color: white;"
-                    @click="openFabricModal(pIndex)"
-                  >
-                    {{ product.fabricDetails ? 'FT - Change' : 'FT - Select' }}
-                  </UButton>
-                  
-                  <div v-if="product.fabricDetails" class="flex items-center">
-                    <div 
-                      class="w-4 h-4 rounded-full mr-2"
-                      :style="{ backgroundColor: product.fabricDetails.fields['Color Hex'] || '#64748b' }"
-                    ></div>
-                    <span class="text-sm font-medium" style="color: #2D2D2D;">
-                      {{ product.fabricDetails.fields['Fabric Name'] }}
-                    </span>
-                  </div>
-                </div>
-                
-                <!-- Fabric Color Selection -->
-                <div class="flex items-center gap-2">
-                  <UButton
-                    size="sm"
-                    class="rounded-full px-4 py-2 text-sm font-medium"
-                    style="background-color: #9CA3AF; color: white;"
-                    @click="openFabricColorModal(pIndex)"
-                    :disabled="!product.fabricDetails"
-                  >
-                    {{ product.fabricColorDetails ? 'Colour - Change' : 'Colour - Select' }}
-                  </UButton>
-                  
-                  <div v-if="product.fabricColorDetails" class="flex items-center">
-                    <div 
-                      class="w-4 h-4 rounded-full mr-2"
-                      :style="{ backgroundColor: product.fabricColorDetails.fields['Color Hex'] || '#64748b' }"
-                    ></div>
-                    <span class="text-sm" style="color: #6B6B6B;">
-                      {{ product.fabricColorDetails.fields['Collection Name'] || '' }}
-                    </span>
-                  </div>
-                </div>
-
-                <!-- Dimensions with custom number controls -->
-                <div class="flex items-center gap-2">
-                  <div class="input-rounded number-input">
-                    <UInput
-                      v-model="product.height"
-                      type="number"
-                      placeholder="Height"
-                      class="input-rounded w-24"
-                      size="lg"
-                    />
-                    <div class="number-controls">
-                      <div class="number-btn" @mousedown="incrementValue(product, 'height', 1)">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                          <polyline points="18,15 12,9 6,15"></polyline>
-                        </svg>
-                      </div>
-                      <div class="number-btn" @mousedown="incrementValue(product, 'height', -1)">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                          <polyline points="6,9 12,15 18,9"></polyline>
-                        </svg>
-                      </div>
-                    </div>
-                  </div>
-                  <span style="color: #6B6B6B;">×</span>
-                  <div class="input-rounded number-input">
-                    <UInput
-                      v-model="product.width"
-                      type="number"
-                      placeholder="Width"
-                      class="input-rounded w-24"
-                      size="lg"
-                    />
-                    <div class="number-controls">
-                      <div class="number-btn" @mousedown="incrementValue(product, 'width', 1)">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                          <polyline points="18,15 12,9 6,15"></polyline>
-                        </svg>
-                      </div>
-                      <div class="number-btn" @mousedown="incrementValue(product, 'width', -1)">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                          <polyline points="6,9 12,15 18,9"></polyline>
-                        </svg>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Quantity with custom number controls -->
-                <div class="flex items-center">
-                  <div class="input-rounded number-input">
-                    <UInput
-                      v-model="product.quantity"
-                      type="number"
-                      placeholder="1"
-                      min="1"
-                      class="input-rounded w-16"
-                      size="lg"
-                    />
-                    <div class="number-controls">
-                      <div class="number-btn" @mousedown="incrementValue(product, 'quantity', 1)">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                          <polyline points="18,15 12,9 6,15"></polyline>
-                        </svg>
-                      </div>
-                      <div class="number-btn" @mousedown="incrementValue(product, 'quantity', -1)">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                          <polyline points="6,9 12,15 18,9"></polyline>
-                        </svg>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                
-                <!-- Motor Checkbox -->
-                <div class="flex items-center gap-2">
-                  <UCheckbox
-                    v-model="product.isMotorized"
-                    :disabled="!['Roller Shades', 'Roman Shades'].includes(product.productType)"
-                  />
-                  <span class="text-sm" style="color: #6B6B6B;">Motor</span>
-                </div>
-                
-                <!-- Control/Motor Type -->
-                <div v-if="product.isMotorized">
-                  <USelect
-                    v-model="product.motorType"
-                    :options="getMotorTypes(product.productType)"
-                    placeholder="Motor Type"
-                    size="lg"
-                    class="select-rounded min-w-[140px]"
-                  />
-                </div>
-                <div v-else>
-                  <USelect
-                    v-model="product.controlSide"
-                    :options="['Left', 'Right']"
-                    placeholder="Side"
-                    size="lg"
-                    class="select-rounded min-w-[100px]"
-                  />
-                </div>
-                
-                <!-- Mount Location -->
-                <div>
-                  <USelect
-                    v-model="product.mountLocation"
-                    :options="['Inside', 'Outside', 'Ceiling']"
-                    placeholder="Rail"
-                    size="lg"
-                    class="select-rounded min-w-[120px]"
-                  />
-                </div>
-                
-                <!-- Hardware Color -->
-                <div>
-                  <USelect
-                    v-model="product.hardwareColor"
-                    :options="['White', 'Black', 'Silver', 'Bronze', 'Antique Gold']"
-                    placeholder="Hooks per Panel, total"
-                    size="lg"
-                    class="select-rounded min-w-[180px]"
-                  />
-                </div>
-                
-                <!-- Notes -->
-                <div class="flex-grow min-w-[200px]">
-                  <UInput
-                    v-model="product.notes"
-                    placeholder="Notes"
-                    class="input-rounded w-full"
-                    size="lg"
-                  />
-                </div>
               </div>
             </div>
             
-            <!-- Empty state -->
-            <div v-if="orders[activeTabIndex].products.length === 0" class="text-center py-12" style="color: #6B6B6B;">
-              <p class="text-lg mb-4">No products added yet.</p>
-              <p>Click the button below to add your first product.</p>
-            </div>
-          </div>
-            
-          <!-- Add New Product Button -->
-          <div class="px-6 pb-6">
-            <div class="flex justify-start">
+            <!-- Create New Order Tab -->
+            <div class="relative">
               <button
-                class="add-product-button"
-                @click="addNewProduct"
+                :class="[
+                  'px-3 py-1.5 text-sm font-medium transition-all duration-200 border-0 rounded-t-lg',
+                  activeTabIndex === -1 
+                    ? 'bg-white text-black shadow-sm' 
+                    : 'bg-gray-50 text-gray-400'
+                ]"
+                style="min-height: 65px; min-width: 160px;"
+                @click="activeTabIndex = -1"
               >
-                <UIcon name="i-heroicons-plus" class="w-4 h-4 mr-2" />
-                Add New Product
+                <div class="flex items-center justify-center h-full">
+                  <div class="flex items-center">
+                    <UIcon name="i-heroicons-plus" class="w-4 h-4 mr-2" />
+                    New Order
+                  </div>
+                </div>
               </button>
             </div>
           </div>
           
-          <!-- Order Notes -->
-          <div class="px-6 pb-6 border-t pt-6" style="border-color: #E5E5E5;">
-            <div class="rounded-2xl border p-4" style="border-color: #E5E5E5;">
-              <label class="block text-sm font-medium mb-2" style="color: #2D2D2D;">Special Instructions</label>
-              <UTextarea
-                v-model="orders[activeTabIndex].specialInstructions"
-                placeholder="Enter any special instructions for this order"
-                :rows="3"
-                class="textarea-rounded"
-              />
+          <!-- Tab Content Area (connected but extends further left) -->
+          <div v-if="activeTabIndex >= 0" class="bg-white rounded-b-lg shadow-sm border border-gray-100 -ml-12 pl-12 rounded-tl-lg">
+            <!-- Product Form Area -->
+            <div class="p-6">
+              <!-- Product rows -->
+              <div v-for="(product, pIndex) in orders[activeTabIndex].products" :key="pIndex" class="border-b border-gray-200 pb-6 mb-6 last:border-b-0 last:mb-0">
+                <!-- Form Fields Row with integrated numbering -->
+                <div class="flex flex-wrap gap-4 items-center">
+                  <!-- Compact Number -->
+                  <div class="flex-shrink-0 flex items-center gap-3">
+                    <span class="text-sm font-normal" style="color: #9CA3AF;">{{ pIndex + 1 }}.</span>
+                    <div class="flex space-x-1">
+                      <UButton
+                        color="red"
+                        icon="i-heroicons-trash"
+                        variant="ghost"
+                        size="xs"
+                        class="rounded-full"
+                        @click="removeProduct(pIndex)"
+                        aria-label="Delete product"
+                      />
+                      <UButton
+                        color="blue"
+                        icon="i-heroicons-pencil-square"
+                        variant="ghost"
+                        size="xs"
+                        class="rounded-full"
+                        @click="editProductDetails(pIndex)"
+                        aria-label="Edit product details"
+                      />
+                    </div>
+                  </div>
+                  
+                  <!-- Product Type -->
+                  <div class="flex-shrink-0">
+                    <USelect
+                      v-model="product.productType"
+                      :options="productTypes"
+                      placeholder="Type"
+                      class="select-rounded min-w-[140px]"
+                      size="lg"
+                    />
+                  </div>
+                  
+                  <!-- Fabric Selection -->
+                  <div class="flex items-center gap-2">
+                    <UButton
+                      size="sm"
+                      class="rounded-full px-4 py-2 text-sm font-medium"
+                      style="background-color: #B8A082; color: white;"
+                      @click="openFabricModal(pIndex)"
+                    >
+                      {{ product.fabricDetails ? 'FT - Change' : 'FT - Select' }}
+                    </UButton>
+                    
+                    <div v-if="product.fabricDetails" class="flex items-center">
+                      <div 
+                        class="w-4 h-4 rounded-full mr-2"
+                        :style="{ backgroundColor: product.fabricDetails.fields['Color Hex'] || '#64748b' }"
+                      ></div>
+                      <span class="text-sm font-medium" style="color: #2D2D2D;">
+                        {{ product.fabricDetails.fields['Fabric Name'] }}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <!-- Fabric Color Selection -->
+                  <div class="flex items-center gap-2">
+                    <UButton
+                      size="sm"
+                      class="rounded-full px-4 py-2 text-sm font-medium"
+                      style="background-color: #9CA3AF; color: white;"
+                      @click="openFabricColorModal(pIndex)"
+                      :disabled="!product.fabricDetails"
+                    >
+                      {{ product.fabricColorDetails ? 'Colour - Change' : 'Colour - Select' }}
+                    </UButton>
+                    
+                    <div v-if="product.fabricColorDetails" class="flex items-center">
+                      <div 
+                        class="w-4 h-4 rounded-full mr-2"
+                        :style="{ backgroundColor: product.fabricColorDetails.fields['Color Hex'] || '#64748b' }"
+                      ></div>
+                      <span class="text-sm" style="color: #6B6B6B;">
+                        {{ product.fabricColorDetails.fields['Collection Name'] || '' }}
+                      </span>
+                    </div>
+                  </div>
+
+                  <!-- Dimensions with custom number controls -->
+                  <div class="flex items-center gap-2">
+                    <div class="input-rounded number-input">
+                      <UInput
+                        v-model="product.height"
+                        type="number"
+                        placeholder="Height"
+                        class="input-rounded w-24"
+                        size="lg"
+                      />
+                      <div class="number-controls">
+                        <div class="number-btn" @mousedown="incrementValue(product, 'height', 1)">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="18,15 12,9 6,15"></polyline>
+                          </svg>
+                        </div>
+                        <div class="number-btn" @mousedown="incrementValue(product, 'height', -1)">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="6,9 12,15 18,9"></polyline>
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+                    <span style="color: #6B6B6B;">×</span>
+                    <div class="input-rounded number-input">
+                      <UInput
+                        v-model="product.width"
+                        type="number"
+                        placeholder="Width"
+                        class="input-rounded w-24"
+                        size="lg"
+                      />
+                      <div class="number-controls">
+                        <div class="number-btn" @mousedown="incrementValue(product, 'width', 1)">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="18,15 12,9 6,15"></polyline>
+                          </svg>
+                        </div>
+                        <div class="number-btn" @mousedown="incrementValue(product, 'width', -1)">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="6,9 12,15 18,9"></polyline>
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Quantity with custom number controls -->
+                  <div class="flex items-center">
+                    <div class="input-rounded number-input">
+                      <UInput
+                        v-model="product.quantity"
+                        type="number"
+                        placeholder="1"
+                        min="1"
+                        class="input-rounded w-16"
+                        size="lg"
+                      />
+                      <div class="number-controls">
+                        <div class="number-btn" @mousedown="incrementValue(product, 'quantity', 1)">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="18,15 12,9 6,15"></polyline>
+                          </svg>
+                        </div>
+                        <div class="number-btn" @mousedown="incrementValue(product, 'quantity', -1)">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="6,9 12,15 18,9"></polyline>
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- Motor Checkbox -->
+                  <div class="flex items-center gap-2">
+                    <UCheckbox
+                      v-model="product.isMotorized"
+                      :disabled="!['Roller Shades', 'Roman Shades'].includes(product.productType)"
+                    />
+                    <span class="text-sm" style="color: #6B6B6B;">Motor</span>
+                  </div>
+                  
+                  <!-- Control/Motor Type -->
+                  <div v-if="product.isMotorized">
+                    <USelect
+                      v-model="product.motorType"
+                      :options="getMotorTypes(product.productType)"
+                      placeholder="Motor Type"
+                      size="lg"
+                      class="select-rounded min-w-[140px]"
+                    />
+                  </div>
+                  <div v-else>
+                    <USelect
+                      v-model="product.controlSide"
+                      :options="['Left', 'Right']"
+                      placeholder="Side"
+                      size="lg"
+                      class="select-rounded min-w-[100px]"
+                    />
+                  </div>
+                  
+                  <!-- Mount Location -->
+                  <div>
+                    <USelect
+                      v-model="product.mountLocation"
+                      :options="['Inside', 'Outside', 'Ceiling']"
+                      placeholder="Rail"
+                      size="lg"
+                      class="select-rounded min-w-[120px]"
+                    />
+                  </div>
+                  
+                  <!-- Hardware Color -->
+                  <div>
+                    <USelect
+                      v-model="product.hardwareColor"
+                      :options="['White', 'Black', 'Silver', 'Bronze', 'Antique Gold']"
+                      placeholder="Hooks per Panel, total"
+                      size="lg"
+                      class="select-rounded min-w-[180px]"
+                    />
+                  </div>
+                  
+                  <!-- Notes -->
+                  <div class="flex-grow min-w-[200px]">
+                    <UInput
+                      v-model="product.notes"
+                      placeholder="Notes"
+                      class="input-rounded w-full"
+                      size="lg"
+                    />
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Empty state -->
+              <div v-if="orders[activeTabIndex].products.length === 0" class="text-center py-12" style="color: #6B6B6B;">
+                <p class="text-lg mb-4">No products added yet.</p>
+                <p>Click the button below to add your first product.</p>
+              </div>
+            </div>
+            
+            <!-- Add New Product Button -->
+            <div class="px-6 pb-6">
+              <div class="flex justify-start">
+                <button
+                  class="add-product-button"
+                  @click="addNewProduct"
+                >
+                  <UIcon name="i-heroicons-plus" class="w-4 h-4 mr-2" />
+                  Add New Product
+                </button>
+              </div>
+            </div>
+            
+            <!-- Special Instructions and Submit Order -->
+            <div class="px-6 pb-6 border-t pt-6" style="border-color: #F3F4F6;">
+              <div class="flex items-center gap-4">
+                <!-- Special Instructions Field -->
+                <div class="flex-grow">
+                  <UInput
+                    v-model="orders[activeTabIndex].specialInstructions"
+                    placeholder="Special instructions"
+                    class="input-rounded"
+                    size="lg"
+                  />
+                </div>
+                
+                <!-- Submit Order Button -->
+                <div class="flex-shrink-0">
+                  <UButton
+                    class="px-8 py-3 rounded-full text-white font-medium"
+                    style="background-color: #B8860B;"
+                    :loading="isSubmitting"
+                    :disabled="!isFormValid"
+                    @click="submitCurrentOrder"
+                  >
+                    SUBMIT ORDER
+                  </UButton>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-        
-        <!-- "Add New Tab" View -->
-        <div v-else class="rounded-lg shadow p-8" style="background-color: #FFFFFF;">
-          <div class="max-w-lg mx-auto text-center">
-            <UIcon name="i-heroicons-plus-circle" class="w-16 h-16 mx-auto mb-4" style="color: #B8A082;" />
-            <h3 class="text-xl font-medium mb-2" style="color: #2D2D2D;">Create a New Order</h3>
-            <p class="mb-6" style="color: #6B6B6B;">
-              Each order can contain multiple products and has its own tab. You can switch between orders at any time using the tabs.
-            </p>
           
-            <div class="max-w-md mx-auto">
-              <UFormGroup label="Order Name" class="mb-4">
-                <UInput v-model="newOrderName" placeholder="Enter a name for this order" class="input-rounded" size="lg" />
-              </UFormGroup>
-              
-              <div class="flex justify-center">
-                <UButton
-                  class="px-8 py-3 rounded-full text-white font-medium"
-                  style="background-color: #B8A082;"
-                  icon="i-heroicons-plus-circle"
-                  size="lg"
-                  @click="createNewOrder"
-                  :disabled="!newOrderName"
-                >
-                  Create New Order
-                </UButton>
+          <!-- "Add New Tab" View -->
+          <div v-else class="bg-white rounded-lg shadow-sm border border-gray-100 p-8 -ml-12 pl-20">
+            <div class="max-w-lg mx-auto text-center">
+              <UIcon name="i-heroicons-plus-circle" class="w-16 h-16 mx-auto mb-4" style="color: #B8A082;" />
+              <h3 class="text-xl font-medium mb-2" style="color: #2D2D2D;">Create a New Order</h3>
+              <p class="mb-6" style="color: #6B6B6B;">
+                Each order can contain multiple products and has its own tab. You can switch between orders at any time using the tabs.
+              </p>
+            
+              <div class="max-w-md mx-auto">
+                <UFormGroup label="Order Name" class="mb-4">
+                  <UInput v-model="newOrderName" placeholder="Enter a name for this order" class="input-rounded" size="lg" />
+                </UFormGroup>
+                
+                <div class="flex justify-center">
+                  <UButton
+                    class="px-8 py-3 rounded-full text-white font-medium"
+                    style="background-color: #B8A082;"
+                    icon="i-heroicons-plus-circle"
+                    size="lg"
+                    @click="createNewOrder"
+                    :disabled="!newOrderName"
+                  >
+                    Create New Order
+                  </UButton>
+                </div>
               </div>
             </div>
           </div>
