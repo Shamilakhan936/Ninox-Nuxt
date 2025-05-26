@@ -309,12 +309,6 @@
                   </div>
                 </div>
               </div>
-              
-              <!-- Empty state -->
-              <div v-if="orders[activeTabIndex].products.length === 0" class="text-center py-12" style="color: #6B6B6B;">
-                <p class="text-lg mb-4">No products added yet.</p>
-                <p>Click the button below to add your first product.</p>
-              </div>
             </div>
             
             <!-- Add New Product Button -->
@@ -564,13 +558,35 @@ onMounted(async () => {
   }
 });
 
-// State
+// Helper function to create a default product
+function createDefaultProduct() {
+  return {
+    productType: '',
+    fabricId: null,
+    fabricDetails: null,
+    fabricColorId: null,
+    fabricColorDetails: null,
+    width: null,
+    height: null,
+    quantity: 1,
+    controlSide: 'Left',
+    chainType: '',
+    isMotorized: false,
+    motorType: '',
+    mountLocation: 'Inside',
+    rollDirection: 'Standard',
+    hardwareColor: 'White',
+    notes: ''
+  }
+}
+
+// State - Updated to include one default product
 const isSubmitting = ref(false)
 const activeTabIndex = ref(0)
 const orders = ref([
   {
     name: 'Order #1',
-    products: [],
+    products: [createDefaultProduct()],
     specialInstructions: '',
     client: null
   }
@@ -669,13 +685,13 @@ const isFormValid = computed(() => {
   return true
 })
 
-// Function to create a new order
+// Function to create a new order - Updated to include one default product
 function createNewOrder() {
   if (!newOrderName.value) return
   
   orders.value.push({
     name: newOrderName.value,
-    products: [],
+    products: [createDefaultProduct()],
     specialInstructions: '',
     client: null
   })
@@ -685,7 +701,7 @@ function createNewOrder() {
   
   showNotification({
     title: 'New Order Created',
-    description: `Order "${orders.value[activeTabIndex.value].name}" has been created. You can now add products to it.`,
+    description: `Order "${orders.value[activeTabIndex.value].name}" has been created with one product row ready.`,
     color: 'green'
   })
 }
