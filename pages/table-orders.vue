@@ -78,8 +78,8 @@
                     </div>
                     <UButton
                       v-else
-                      class="px-3 py-0.5 rounded-full text-white text-xs font-medium pointer-events-auto"
-                      style="background-color: #9CA3AF; min-width: 120px;"
+                      class="px-3 py-0.5 rounded-full text-xs font-medium pointer-events-auto"
+                      style="background-color: #BFB7B0; color: #FFFFFF; min-width: 120px;"
                       @click="openOrderClientModal"
                     >
                       SELECT CLIENT
@@ -380,8 +380,8 @@
               <!-- Submit Order Button -->
               <div class="flex-shrink-0">
                 <UButton
-                  class="px-8 py-3 rounded-full text-white font-medium"
-                  style="background-color: #B8860B;"
+                  class="px-8 py-3 rounded-full font-medium"
+                  style="background-color: #8A7C59; color: #F7F7F5;"
                   :loading="isSubmitting"
                   :disabled="!isFormValid"
                   @click="submitCurrentOrder"
@@ -1315,7 +1315,7 @@ button[style*="background-color: #9CA3AF"] {
   background: transparent;
   border: none;
   border-radius: 20px;
-  color: #9CA3AF;
+  color: #BFB7B0;
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
