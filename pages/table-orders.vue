@@ -1,29 +1,29 @@
 <template>
-  <div class="min-h-screen bg-gray-50 dark:bg-gray-900">
+  <div class="min-h-screen" style="background-color: #F5F2E8;">
     <!-- Navigation -->
     <Navbar />
 
     <!-- Page Content -->
     <div class="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
       <div class="mb-6">
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Table Order Entry System</h1>
-        <p class="text-gray-600 dark:text-gray-400">
+        <h1 class="text-2xl font-bold mb-2" style="color: #2D2D2D;">Table Order Entry System</h1>
+        <p style="color: #6B6B6B;">
           Create and manage multiple orders with a spreadsheet-like interface.
         </p>
       </div>
       
       <div v-if="isLoading" class="flex justify-center items-center h-64">
-        <UIcon name="i-heroicons-arrow-path" class="w-8 h-8 animate-spin text-gray-500" />
+        <UIcon name="i-heroicons-arrow-path" class="w-8 h-8 animate-spin" style="color: #6B6B6B;" />
       </div>
       
       <div v-else-if="hasPermission" class="space-y-6">
         <!-- Information Banner -->
-        <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 p-4 rounded-lg mb-4">
+        <div class="border p-4 rounded-lg mb-4" style="background-color: #3A4A5C; border-color: #2D3748;">
           <div class="flex items-start">
-            <UIcon name="i-heroicons-information-circle" class="w-5 h-5 text-blue-500 mr-2 flex-shrink-0 mt-0.5" />
+            <UIcon name="i-heroicons-information-circle" class="w-5 h-5 mr-2 flex-shrink-0 mt-0.5 text-blue-300" />
             <div>
-              <h3 class="text-sm font-medium text-blue-800 dark:text-blue-300">Multiple Orders System</h3>
-              <p class="text-sm text-blue-700 dark:text-blue-400 mt-1">
+              <h3 class="text-sm font-medium text-white">Multiple Orders System</h3>
+              <p class="text-sm mt-1 text-gray-300">
                 You can create multiple separate orders using the tabs below. Each tab represents a different order with its own products.
                 Click the "+" tab to create a new order.
               </p>
@@ -31,75 +31,82 @@
           </div>
         </div>
 
-        <!-- Tabs for Multiple Orders -->
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-          <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-            <div class="flex gap-2 overflow-x-auto">
-              <UButton
-                v-for="(order, index) in orders"
-                :key="index"
-                :color="activeTabIndex === index ? 'primary' : 'gray'"
-                :variant="activeTabIndex === index ? 'soft' : 'ghost'"
-                class="px-4 py-2 whitespace-nowrap"
+        <!-- Connected Tabs Design -->
+        <div class="rounded-lg shadow-sm overflow-hidden" style="background-color: #3A4A5C;">
+          <div class="flex">
+            <!-- Order Tabs -->
+            <div v-for="(order, index) in orders" :key="index" class="relative">
+              <button
+                :class="[
+                  'px-6 py-3 text-sm font-medium transition-all duration-200 relative',
+                  activeTabIndex === index 
+                    ? 'bg-gray-600 text-white' 
+                    : 'text-gray-300 hover:text-white hover:bg-gray-700'
+                ]"
                 @click="activeTabIndex = index"
               >
                 <div class="flex items-center">
                   <UIcon name="i-heroicons-document-text" class="w-4 h-4 mr-2" />
                   {{ order.name }}
-                </div>
-                <template v-if="orders.length > 1" #trailing>
-              <UButton
-                color="gray"
-                variant="ghost"
-                icon="i-heroicons-x-mark"
-                size="xs"
+                  <UButton
+                    v-if="orders.length > 1"
+                    color="gray"
+                    variant="ghost"
+                    icon="i-heroicons-x-mark"
+                    size="xs"
+                    class="ml-2 opacity-60 hover:opacity-100"
                     @click.stop="removeOrder(index)"
                     aria-label="Remove order"
-              />
-                </template>
-              </UButton>
-              
-            <UButton
-                color="green"
-                variant="ghost"
-                class="px-4 py-2 whitespace-nowrap"
-                @click="activeTabIndex = -1"
-              >
-                <div class="flex items-center text-green-600 dark:text-green-400">
-                  <UIcon name="i-heroicons-plus-circle" class="w-4 h-4 mr-2" />
-                  Create New Order
+                  />
                 </div>
-            </UButton>
+              </button>
             </div>
+            
+            <!-- Create New Order Tab -->
+            <button
+              :class="[
+                'px-6 py-3 text-sm font-medium transition-all duration-200',
+                activeTabIndex === -1 
+                  ? 'bg-gray-500 text-white' 
+                  : 'text-gray-400 hover:text-gray-200 hover:bg-gray-600'
+              ]"
+              @click="activeTabIndex = -1"
+            >
+              <div class="flex items-center">
+                <UIcon name="i-heroicons-plus-circle" class="w-4 h-4 mr-2" />
+                Create New Order
+              </div>
+            </button>
           </div>
         </div>
         
         <!-- Current Active Order Content -->
-        <div v-if="activeTabIndex >= 0" class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
-          <!-- Add inside the Current Active Order Content div, at the top -->
-          <div class="p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
-            <div class="flex flex-col gap-2">
+        <div v-if="activeTabIndex >= 0" class="rounded-lg shadow overflow-hidden" style="background-color: #FFFFFF;">
+          <!-- Order Header -->
+          <div class="p-6" style="background-color: #FAFAFA;">
+            <div class="flex flex-col gap-4">
               <!-- Order header with name and info -->
               <div class="flex justify-between items-center">
                 <div class="flex items-center">
                   <!-- Order name (editable) -->
                   <div v-if="!isEditingOrderName" class="flex items-center cursor-pointer group" @click="startEditingOrderName">
-                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+                    <h3 class="text-xl font-medium" style="color: #2D2D2D;">
                       {{ orders[activeTabIndex].name }}
                     </h3>
                     <UIcon 
                       name="i-heroicons-pencil-square" 
-                      class="w-4 h-4 ml-2 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity"
+                      class="w-4 h-4 ml-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                      style="color: #6B6B6B;"
                       aria-label="Edit order name"
                     />
-                    <span class="text-sm text-gray-500 dark:text-gray-400 ml-2">({{ orders[activeTabIndex].products.length }} products)</span>
+                    <span class="text-sm ml-3" style="color: #6B6B6B;">({{ orders[activeTabIndex].products.length }} products)</span>
                   </div>
                   <!-- Order name editing form -->
                   <div v-else class="flex items-center">
                     <UInput
                       v-model="editedOrderName"
-                      size="sm"
-                      class="w-64"
+                      size="lg"
+                      class="w-64 input-rounded"
                       placeholder="Order name"
                       @keyup.enter="saveOrderName"
                       @keyup.esc="cancelEditingOrderName"
@@ -126,328 +133,336 @@
                     </div>
                   </div>
                 </div>
-                <UBadge color="blue" variant="soft">Order #{{ activeTabIndex + 1 }} of {{ orders.length }}</UBadge>
+                <div class="px-4 py-2 rounded-full text-sm font-medium" style="background-color: #E5E5E5; color: #2D2D2D;">
+                  Order #{{ activeTabIndex + 1 }} of {{ orders.length }}
+                </div>
               </div>
               
-              <!-- Customer selection for this order -->
-              <div class="flex items-center mt-2">
-                <div v-if="orders[activeTabIndex].client" class="flex items-center space-x-2 bg-blue-50 dark:bg-blue-900/20 px-3 py-1.5 rounded-md">
-                  <UIcon name="i-heroicons-user-circle" class="w-5 h-5 text-blue-500" />
-              <span class="font-medium text-gray-900 dark:text-white">
+              <!-- Customer selection and Submit button row -->
+              <div class="flex items-center justify-between">
+                <div v-if="orders[activeTabIndex].client" class="flex items-center space-x-3 px-4 py-2 rounded-full" style="background-color: #E5E5E5;">
+                  <UIcon name="i-heroicons-user-circle" class="w-5 h-5" style="color: #6B6B6B;" />
+                  <span class="font-medium" style="color: #2D2D2D;">
                     {{ orders[activeTabIndex].client.fields['First Name'] }} {{ orders[activeTabIndex].client.fields['Last Name'] }}
-              </span>
-              <UButton
-                color="gray"
-                variant="ghost"
-                icon="i-heroicons-x-mark"
-                size="xs"
+                  </span>
+                  <UButton
+                    color="gray"
+                    variant="ghost"
+                    icon="i-heroicons-x-mark"
+                    size="xs"
                     @click="removeOrderClient"
-              />
-            </div>
-            <UButton
-              v-else
-              color="primary"
-              variant="soft"
-                  size="sm"
+                  />
+                </div>
+                <UButton
+                  v-else
+                  class="px-6 py-3 rounded-full text-white font-medium"
+                  style="background-color: #B8A082;"
                   @click="openOrderClientModal"
-            >
-                  <UIcon name="i-heroicons-user-plus" class="w-4 h-4 mr-1" />
-                  Select Client for Order
-            </UButton>
-          </div>
-              <div class="flex justify-end mt-4">
-            <UButton
-              color="green"
+                >
+                  <UIcon name="i-heroicons-user-plus" class="w-4 h-4 mr-2" />
+                  SELECT CLIENT
+                </UButton>
+                
+                <UButton
+                  class="px-8 py-3 rounded-full text-white font-medium"
+                  style="background-color: #B8860B;"
                   icon="i-heroicons-paper-airplane"
                   :loading="isSubmitting"
                   :disabled="!isFormValid"
-              @click="submitCurrentOrder"
-            >
-              Submit Order
-            </UButton>
-          </div>
-        </div>
-          </div>
-          <!-- Product Table - With enhanced scrolling but no fixed headers -->
-          <div class="relative">
-            <!-- Scroll indicators -->
-            <div class="absolute left-0 top-1/2 -translate-y-1/2 z-10 pointer-events-none">
-              <div class="scroll-indicator-left opacity-0 transition-opacity duration-300 bg-gradient-to-r from-gray-100 dark:from-gray-800 to-transparent h-12 w-8 flex items-center justify-center">
-                <UIcon name="i-heroicons-chevron-left" class="w-5 h-5 text-gray-500 dark:text-gray-400" />
+                  @click="submitCurrentOrder"
+                >
+                  SUBMIT ORDER
+                </UButton>
               </div>
             </div>
-            <div class="absolute right-0 top-1/2 -translate-y-1/2 z-10 pointer-events-none">
-              <div class="scroll-indicator-right opacity-0 transition-opacity duration-300 bg-gradient-to-l from-gray-100 dark:from-gray-800 to-transparent h-12 w-8 flex items-center justify-center">
-                <UIcon name="i-heroicons-chevron-right" class="w-5 h-5 text-gray-500 dark:text-gray-400" />
-              </div>
-            </div>
+          </div>
 
-            <!-- Table container with improved scrolling but no fixed headers -->
-            <div class="overflow-x-auto scrollbar-track-rounded scrollbar-thumb-rounded scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-gray-100 dark:scrollbar-track-gray-800 scrollbar-thin" ref="tableContainer" @scroll="handleTableScroll">
-              <div class="bg-white dark:bg-gray-800">
-                <!-- Product rows -->
-                <div v-for="(product, pIndex) in orders[activeTabIndex].products" :key="pIndex" class="min-w-max flex border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
-                  <!-- Product Type Cell -->
-                  <div class="w-[120px] p-2">
-                    <USelect
-                      v-model="product.productType"
-                      :options="productTypes"
-                      placeholder="Type"
-                      class="w-full"
-                      size="sm"
-                    />
-                  </div>
+          <!-- Product Form Area -->
+          <div class="p-6">
+            <!-- Product rows -->
+            <div v-for="(product, pIndex) in orders[activeTabIndex].products" :key="pIndex" class="border-b border-gray-200 pb-6 mb-6 last:border-b-0 last:mb-0">
+              <div class="flex items-center justify-between mb-4">
+                <span class="text-lg font-medium" style="color: #2D2D2D;">{{ pIndex + 1 }}.</span>
+                <div class="flex space-x-2">
+                  <UButton
+                    color="red"
+                    icon="i-heroicons-trash"
+                    variant="ghost"
+                    size="sm"
+                    class="rounded-full"
+                    @click="removeProduct(pIndex)"
+                    aria-label="Delete product"
+                  />
+                  <UButton
+                    color="blue"
+                    icon="i-heroicons-pencil-square"
+                    variant="ghost"
+                    size="sm"
+                    class="rounded-full"
+                    @click="editProductDetails(pIndex)"
+                    aria-label="Edit product details"
+                  />
+                </div>
+              </div>
+
+              <!-- Form Fields Row -->
+              <div class="flex flex-wrap gap-4 items-center">
+                <!-- Product Type -->
+                <div class="flex-shrink-0">
+                  <USelect
+                    v-model="product.productType"
+                    :options="productTypes"
+                    placeholder="Type"
+                    class="select-rounded min-w-[140px]"
+                    size="lg"
+                  />
+                </div>
+                
+                <!-- Fabric Selection -->
+                <div class="flex items-center gap-2">
+                  <UButton
+                    size="sm"
+                    class="rounded-full px-4 py-2 text-sm font-medium"
+                    style="background-color: #B8A082; color: white;"
+                    @click="openFabricModal(pIndex)"
+                  >
+                    {{ product.fabricDetails ? 'FT - Change' : 'FT - Select' }}
+                  </UButton>
                   
-                  <!-- Fabric Selection Cell - Keep horizontal layout for fabric type, fix modal trigger -->
-                  <div class="w-[240px] p-2">
-                    <!-- Fabric Type Row -->
-                    <div class="flex items-center space-x-2 mb-1">
-                      <UButton
-                        size="xs"
-                        variant="soft"
-                        color="primary"
-                        @click="openFabricModal(pIndex)"
-                      >
-                        {{ product.fabricDetails ? 'FT - Change' : 'FT - Select' }}
-                      </UButton>
-                      
-                      <div v-if="product.fabricDetails" class="flex items-center overflow-hidden">
-                        <div 
-                          class="w-3 h-3 rounded-full mr-1 flex-shrink-0"
-                          :style="{ backgroundColor: product.fabricDetails.fields['Color Hex'] || '#64748b' }"
-                        ></div>
-                        <span class="text-xs font-medium text-gray-900 dark:text-white truncate">
-                          {{ product.fabricDetails.fields['Fabric Name'] }}
-                        </span>
-                      </div>
-                    </div>
-                    
-                    <!-- Fabric Color Row -->
-                    <div class="flex items-center space-x-2">
-                      <UButton
-                        size="xs"
-                        variant="soft"
-                        color="indigo"
-                        @click="openFabricColorModal(pIndex)"
-                        :disabled="!product.fabricDetails"
-                        class="whitespace-nowrap"
-                      >
-                        {{ product.fabricColorDetails ? 'FC - Change' : 'FC - Select' }}
-                      </UButton>
-                      
-                      <div v-if="product.fabricColorDetails" class="flex items-center overflow-hidden">
-                        <div 
-                          class="w-3 h-3 rounded-full mr-1 flex-shrink-0"
-                          :style="{ backgroundColor: product.fabricColorDetails.fields['Color Hex'] || '#64748b' }"
-                        ></div>
-                        <span class="text-xs text-gray-500 dark:text-gray-400 truncate">
-                          {{ product.fabricColorDetails.fields['Collection Name'] || '' }}
-                          <template v-if="product.fabricColorDetails.fields['Color Category']">
-                            - {{ product.fabricColorDetails.fields['Color Category'] }}
-                          </template>
-                          <template v-if="product.fabricColorDetails.fields['Color Specific']">
-                            - {{ product.fabricColorDetails.fields['Color Specific'] }}
-                          </template>
-                        </span>
-                      </div>
-                    </div>
+                  <div v-if="product.fabricDetails" class="flex items-center">
+                    <div 
+                      class="w-4 h-4 rounded-full mr-2"
+                      :style="{ backgroundColor: product.fabricDetails.fields['Color Hex'] || '#64748b' }"
+                    ></div>
+                    <span class="text-sm font-medium" style="color: #2D2D2D;">
+                      {{ product.fabricDetails.fields['Fabric Name'] }}
+                    </span>
                   </div>
+                </div>
+                
+                <!-- Fabric Color Selection -->
+                <div class="flex items-center gap-2">
+                  <UButton
+                    size="sm"
+                    class="rounded-full px-4 py-2 text-sm font-medium"
+                    style="background-color: #9CA3AF; color: white;"
+                    @click="openFabricColorModal(pIndex)"
+                    :disabled="!product.fabricDetails"
+                  >
+                    {{ product.fabricColorDetails ? 'Colour - Change' : 'Colour - Select' }}
+                  </UButton>
                   
-                  <!-- Width Cell -->
-                  <div class="w-[120px] p-2">
-                    <UInput
-                      v-model="product.width"
-                      type="number"
-                      placeholder="Width - mm"
-                      class="w-full"
-                      size="sm"
-                    />
+                  <div v-if="product.fabricColorDetails" class="flex items-center">
+                    <div 
+                      class="w-4 h-4 rounded-full mr-2"
+                      :style="{ backgroundColor: product.fabricColorDetails.fields['Color Hex'] || '#64748b' }"
+                    ></div>
+                    <span class="text-sm" style="color: #6B6B6B;">
+                      {{ product.fabricColorDetails.fields['Collection Name'] || '' }}
+                    </span>
                   </div>
-                  
-                  <!-- Height Cell -->
-                  <div class="w-[120px] p-2">
+                </div>
+
+                <!-- Dimensions with custom number controls -->
+                <div class="flex items-center gap-2">
+                  <div class="input-rounded number-input">
                     <UInput
                       v-model="product.height"
                       type="number"
-                      placeholder="Height - mm"
-                      class="w-full"
-                      size="sm"
+                      placeholder="Height"
+                      class="input-rounded w-24"
+                      size="lg"
                     />
+                    <div class="number-controls">
+                      <div class="number-btn" @mousedown="incrementValue(product, 'height', 1)">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <polyline points="18,15 12,9 6,15"></polyline>
+                        </svg>
+                      </div>
+                      <div class="number-btn" @mousedown="incrementValue(product, 'height', -1)">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <polyline points="6,9 12,15 18,9"></polyline>
+                        </svg>
+                      </div>
+                    </div>
                   </div>
-                  
-                  <!-- Quantity Cell -->
-                  <div class="w-[80px] p-2">
+                  <span style="color: #6B6B6B;">×</span>
+                  <div class="input-rounded number-input">
+                    <UInput
+                      v-model="product.width"
+                      type="number"
+                      placeholder="Width"
+                      class="input-rounded w-24"
+                      size="lg"
+                    />
+                    <div class="number-controls">
+                      <div class="number-btn" @mousedown="incrementValue(product, 'width', 1)">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <polyline points="18,15 12,9 6,15"></polyline>
+                        </svg>
+                      </div>
+                      <div class="number-btn" @mousedown="incrementValue(product, 'width', -1)">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <polyline points="6,9 12,15 18,9"></polyline>
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Quantity with custom number controls -->
+                <div class="flex items-center">
+                  <div class="input-rounded number-input">
                     <UInput
                       v-model="product.quantity"
                       type="number"
-                      placeholder="Qty"
+                      placeholder="1"
                       min="1"
-                      class="w-full"
-                      size="sm"
+                      class="input-rounded w-16"
+                      size="lg"
                     />
-                  </div>
-                  
-                  <!-- Motorized Cell -->
-                  <div class="w-[100px] p-2 flex items-center">
-                    <span class="text-xs text-gray-500 mr-2">Motor</span>
-                    <UCheckbox
-                      v-model="product.isMotorized"
-                      :disabled="!['Roller Shades', 'Roman Shades'].includes(product.productType)"
-                    />
-                  </div>
-                  
-                  <!-- Control Cell (changes based on motorization) -->
-                  <div class="w-[120px] p-2">
-                    <div v-if="product.isMotorized">
-                      <USelect
-                        v-model="product.motorType"
-                        :options="getMotorTypes(product.productType)"
-                        placeholder="Motor Type"
-                        size="sm"
-                        class="w-full"
-                      />
-                    </div>
-                    <div v-else>
-                      <USelect
-                        v-model="product.controlSide"
-                        :options="['Left', 'Right']"
-                        placeholder="Side"
-                        size="sm"
-                        class="w-full"
-                      />
-                    </div>
-                  </div>
-                  
-                  <!-- Mount Location Cell -->
-                  <div class="w-[120px] p-2">
-                    <USelect
-                      v-model="product.mountLocation"
-                      :options="['Inside', 'Outside', 'Ceiling']"
-                      placeholder="Mount"
-                      size="sm"
-                      class="w-full"
-                    />
-                  </div>
-                  
-                  <!-- Hardware Color Cell -->
-                  <div class="w-[120px] p-2">
-                    <USelect
-                      v-model="product.hardwareColor"
-                      :options="['White', 'Black', 'Silver', 'Bronze', 'Antique Gold']"
-                      placeholder="Color"
-                      size="sm"
-                      class="w-full"
-                    />
-                  </div>
-                  
-                  <!-- Roll Direction Cell (for roller shades) -->
-                  <div class="w-[140px] p-2">
-                    <USelect
-                      v-if="product.productType === 'Roller Shades'"
-                      v-model="product.rollDirection"
-                      :options="['Standard', 'Reverse']"
-                      placeholder="Roll Direction"
-                      size="sm"
-                      class="w-full"
-                    />
-                    <span v-else class="text-sm text-gray-400">N/A</span>
-                  </div>
-                  
-                  <!-- Notes Cell -->
-                  <div class="w-[200px] p-2">
-                    <UInput
-                      v-model="product.notes"
-                      placeholder="Notes"
-                      class="w-full"
-                      size="sm"
-                    />
-                  </div>
-                  
-                  <!-- Actions Cell -->
-                  <div class="w-[100px] p-2">
-                    <div class="flex space-x-1">
-                      <UButton
-                        color="red"
-                        icon="i-heroicons-trash"
-                        variant="ghost"
-                        size="xs"
-                        @click="removeProduct(pIndex)"
-                        aria-label="Delete product"
-                      />
-                      <UButton
-                        color="blue"
-                        icon="i-heroicons-pencil-square"
-                        variant="ghost"
-                        size="xs"
-                        @click="editProductDetails(pIndex)"
-                        aria-label="Edit product details"
-                      />
+                    <div class="number-controls">
+                      <div class="number-btn" @mousedown="incrementValue(product, 'quantity', 1)">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <polyline points="18,15 12,9 6,15"></polyline>
+                        </svg>
+                      </div>
+                      <div class="number-btn" @mousedown="incrementValue(product, 'quantity', -1)">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <polyline points="6,9 12,15 18,9"></polyline>
+                        </svg>
+                      </div>
                     </div>
                   </div>
                 </div>
                 
-                <!-- Empty state -->
-                <div v-if="orders[activeTabIndex].products.length === 0" class="text-center p-8 text-gray-500 dark:text-gray-400">
-                    No products added yet. Click the button below to add your first product.
+                <!-- Motor Checkbox -->
+                <div class="flex items-center gap-2">
+                  <UCheckbox
+                    v-model="product.isMotorized"
+                    :disabled="!['Roller Shades', 'Roman Shades'].includes(product.productType)"
+                  />
+                  <span class="text-sm" style="color: #6B6B6B;">Motor</span>
+                </div>
+                
+                <!-- Control/Motor Type -->
+                <div v-if="product.isMotorized">
+                  <USelect
+                    v-model="product.motorType"
+                    :options="getMotorTypes(product.productType)"
+                    placeholder="Motor Type"
+                    size="lg"
+                    class="select-rounded min-w-[140px]"
+                  />
+                </div>
+                <div v-else>
+                  <USelect
+                    v-model="product.controlSide"
+                    :options="['Left', 'Right']"
+                    placeholder="Side"
+                    size="lg"
+                    class="select-rounded min-w-[100px]"
+                  />
+                </div>
+                
+                <!-- Mount Location -->
+                <div>
+                  <USelect
+                    v-model="product.mountLocation"
+                    :options="['Inside', 'Outside', 'Ceiling']"
+                    placeholder="Rail"
+                    size="lg"
+                    class="select-rounded min-w-[120px]"
+                  />
+                </div>
+                
+                <!-- Hardware Color -->
+                <div>
+                  <USelect
+                    v-model="product.hardwareColor"
+                    :options="['White', 'Black', 'Silver', 'Bronze', 'Antique Gold']"
+                    placeholder="Hooks per Panel, total"
+                    size="lg"
+                    class="select-rounded min-w-[180px]"
+                  />
+                </div>
+                
+                <!-- Notes -->
+                <div class="flex-grow min-w-[200px]">
+                  <UInput
+                    v-model="product.notes"
+                    placeholder="Notes"
+                    class="input-rounded w-full"
+                    size="lg"
+                  />
                 </div>
               </div>
             </div>
+            
+            <!-- Empty state -->
+            <div v-if="orders[activeTabIndex].products.length === 0" class="text-center py-12" style="color: #6B6B6B;">
+              <p class="text-lg mb-4">No products added yet.</p>
+              <p>Click the button below to add your first product.</p>
+            </div>
           </div>
             
-            <!-- Add New Product Button -->
-            <div class="p-3 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">
-              <UButton
-                block
-                color="green"
-                variant="ghost"
-                icon="i-heroicons-plus"
+          <!-- Add New Product Button -->
+          <div class="px-6 pb-6">
+            <div class="flex justify-start">
+              <button
+                class="add-product-button"
                 @click="addNewProduct"
               >
+                <UIcon name="i-heroicons-plus" class="w-4 h-4 mr-2" />
                 Add New Product
-              </UButton>
+              </button>
+            </div>
           </div>
           
           <!-- Order Notes -->
-          <div class="p-4 border-t border-gray-200 dark:border-gray-700">
-            <UFormGroup label="Special Instructions" class="mb-0">
+          <div class="px-6 pb-6 border-t pt-6" style="border-color: #E5E5E5;">
+            <div class="rounded-2xl border p-4" style="border-color: #E5E5E5;">
+              <label class="block text-sm font-medium mb-2" style="color: #2D2D2D;">Special Instructions</label>
               <UTextarea
                 v-model="orders[activeTabIndex].specialInstructions"
                 placeholder="Enter any special instructions for this order"
-                :rows="2"
+                :rows="3"
+                class="textarea-rounded"
               />
-            </UFormGroup>
+            </div>
           </div>
         </div>
         
         <!-- "Add New Tab" View -->
-        <div v-else class="bg-white dark:bg-gray-800 rounded-lg shadow p-8">
+        <div v-else class="rounded-lg shadow p-8" style="background-color: #FFFFFF;">
           <div class="max-w-lg mx-auto text-center">
-            <UIcon name="i-heroicons-plus-circle" class="w-16 h-16 mx-auto text-green-500 mb-4" />
-            <h3 class="text-xl font-medium text-gray-900 dark:text-white mb-2">Create a New Order</h3>
-            <p class="text-gray-500 dark:text-gray-400 mb-6">
+            <UIcon name="i-heroicons-plus-circle" class="w-16 h-16 mx-auto mb-4" style="color: #B8A082;" />
+            <h3 class="text-xl font-medium mb-2" style="color: #2D2D2D;">Create a New Order</h3>
+            <p class="mb-6" style="color: #6B6B6B;">
               Each order can contain multiple products and has its own tab. You can switch between orders at any time using the tabs.
             </p>
           
-          <div class="max-w-md mx-auto">
-            <UFormGroup label="Order Name" class="mb-4">
-              <UInput v-model="newOrderName" placeholder="Enter a name for this order" />
-            </UFormGroup>
-            
+            <div class="max-w-md mx-auto">
+              <UFormGroup label="Order Name" class="mb-4">
+                <UInput v-model="newOrderName" placeholder="Enter a name for this order" class="input-rounded" size="lg" />
+              </UFormGroup>
+              
               <div class="flex justify-center">
-            <UButton
-                  color="green"
+                <UButton
+                  class="px-8 py-3 rounded-full text-white font-medium"
+                  style="background-color: #B8A082;"
                   icon="i-heroicons-plus-circle"
                   size="lg"
-              @click="createNewOrder"
-              :disabled="!newOrderName"
-            >
+                  @click="createNewOrder"
+                  :disabled="!newOrderName"
+                >
                   Create New Order
-            </UButton>
+                </UButton>
               </div>
             </div>
           </div>
         </div>
-        
+
         <!-- Product Details Modal -->
         <UModal v-model="showProductDetailsModal">
           <UCard>
@@ -470,6 +485,7 @@
                   v-model="editingProduct.mountLocation"
                   :options="['Inside', 'Outside', 'Ceiling']"
                   placeholder="Select mount location"
+                  class="select-rounded"
                 />
               </UFormGroup>
 
@@ -479,6 +495,7 @@
                   v-model="editingProduct.chainType"
                   :options="chainTypes"
                   placeholder="Select chain type"
+                  class="select-rounded"
                 />
               </UFormGroup>
 
@@ -488,6 +505,7 @@
                   v-model="editingProduct.rollDirection"
                   :options="['Standard', 'Reverse']"
                   placeholder="Select roll direction"
+                  class="select-rounded"
                 />
               </UFormGroup>
 
@@ -497,6 +515,7 @@
                   v-model="editingProduct.hardwareColor"
                   :options="['White', 'Black', 'Silver', 'Bronze', 'Antique Gold']"
                   placeholder="Select hardware color"
+                  class="select-rounded"
                 />
               </UFormGroup>
               
@@ -506,6 +525,7 @@
                   v-model="editingProduct.notes"
                   placeholder="Enter any special instructions for this item"
                   :rows="3"
+                  class="textarea-rounded"
                 />
               </UFormGroup>
             </div>
@@ -515,12 +535,14 @@
                 <UButton
                   color="gray"
                   variant="soft"
+                  class="rounded-full"
                   @click="showProductDetailsModal = false"
                 >
                   Cancel
                 </UButton>
                 <UButton
                   color="primary"
+                  class="rounded-full"
                   @click="saveProductDetails"
                 >
                   Save
@@ -568,10 +590,10 @@
       </div>
       
       <!-- Insufficient Permissions Message -->
-      <div v-else class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-6 rounded-lg shadow-sm text-center">
-        <UIcon name="i-heroicons-lock-closed" class="w-12 h-12 mx-auto text-red-500 mb-4" />
-        <h2 class="text-xl font-semibold text-red-700 dark:text-red-400 mb-2">Insufficient Permissions</h2>
-        <p class="text-red-600 dark:text-red-300 mb-4">
+      <div v-else class="border p-6 rounded-lg shadow-sm text-center" style="background-color: #FEF2F2; border-color: #FECACA;">
+        <UIcon name="i-heroicons-lock-closed" class="w-12 h-12 mx-auto mb-4" style="color: #DC2626;" />
+        <h2 class="text-xl font-semibold mb-2" style="color: #DC2626;">Insufficient Permissions</h2>
+        <p class="mb-4" style="color: #DC2626;">
           You don't have the necessary permissions to access the order entry system.
         </p>
         <UButton
@@ -1150,30 +1172,246 @@ function selectFabricColor(fabricColor) {
   // Reset editing product index
   editingProductIndex.value = null
 }
+
+// Add function to handle number input increments
+function incrementValue(product, field, increment) {
+  const currentValue = parseInt(product[field]) || 0;
+  const newValue = Math.max(field === 'quantity' ? 1 : 0, currentValue + increment);
+  product[field] = newValue;
+}
 </script>
 
 <style>
-/* Scrollbar styling for better UX */
-.scrollbar-thin::-webkit-scrollbar {
-  height: 8px;
+/* Rounded styling for all form elements with very light borders */
+.input-rounded input {
+  border: 1px solid #F3F4F6 !important;
+  background-color: #FFFFFF !important;
+  color: #2D2D2D !important;
+  border-radius: 24px !important;
+  font-size: 14px !important;
+  padding: 12px 16px !important;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
 }
 
-.scrollbar-thin::-webkit-scrollbar-track {
-  background-color: rgba(156, 163, 175, 0.1);
+.input-rounded input:focus {
+  border-color: #E5E7EB !important;
+  box-shadow: 0 0 0 1px #E5E7EB !important;
+}
+
+/* Custom styling for number input spinners */
+.input-rounded input[type="number"] {
+  -moz-appearance: textfield; /* Firefox */
+  padding-right: 40px !important; /* Make room for custom spinners */
+}
+
+/* Webkit browsers (Chrome, Safari, Edge) */
+.input-rounded input[type="number"]::-webkit-outer-spin-button,
+.input-rounded input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Custom spinner container */
+.input-rounded {
+  position: relative;
+}
+
+.input-rounded input[type="number"] + .spinner-buttons {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.input-rounded .spinner-btn {
+  width: 20px;
+  height: 12px;
+  background: #F9FAFB;
+  border: 1px solid #E5E7EB;
   border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-size: 10px;
+  color: #6B7280;
 }
 
-.scrollbar-thin::-webkit-scrollbar-thumb {
-  background-color: rgba(156, 163, 175, 0.5);
-  border-radius: 4px;
+.input-rounded .spinner-btn:hover {
+  background: #F3F4F6;
+  border-color: #D1D5DB;
+  color: #374151;
 }
 
-.scrollbar-thin::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(156, 163, 175, 0.7);
+.input-rounded .spinner-btn:active {
+  background: #E5E7EB;
+  transform: scale(0.95);
 }
 
-/* Ensure consistent cell heights */
-.min-w-max > div {
-  min-height: 44px;
+/* Alternative approach: Style the default spinners more elegantly */
+.input-rounded input[type="number"]::-webkit-outer-spin-button,
+.input-rounded input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+  width: 24px;
+  height: 12px;
+  background: #F9FAFB;
+  border: 1px solid #E5E7EB;
+  border-radius: 6px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.input-rounded input[type="number"]:hover::-webkit-outer-spin-button,
+.input-rounded input[type="number"]:hover::-webkit-inner-spin-button,
+.input-rounded input[type="number"]:focus::-webkit-outer-spin-button,
+.input-rounded input[type="number"]:focus::-webkit-inner-spin-button {
+  opacity: 1;
+}
+
+/* Even better approach: Custom styled number inputs */
+.input-rounded.number-input {
+  position: relative;
+  display: inline-block;
+}
+
+.input-rounded.number-input input[type="number"] {
+  padding-right: 32px !important;
+}
+
+.input-rounded.number-input .number-controls {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.input-rounded.number-input:hover .number-controls,
+.input-rounded.number-input input:focus + .number-controls {
+  opacity: 1;
+}
+
+.input-rounded.number-input .number-btn {
+  width: 16px;
+  height: 16px;
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.input-rounded.number-input .number-btn:hover {
+  background: rgba(184, 160, 130, 0.1);
+  transform: scale(1.1);
+}
+
+.input-rounded.number-input .number-btn:active {
+  background: rgba(184, 160, 130, 0.2);
+  transform: scale(0.95);
+}
+
+.input-rounded.number-input .number-btn svg {
+  width: 10px;
+  height: 10px;
+  color: #9CA3AF;
+  stroke-width: 2.5;
+}
+
+.input-rounded.number-input .number-btn:hover svg {
+  color: #B8A082;
+}
+
+.select-rounded select {
+  border: 1px solid #F3F4F6 !important;
+  background-color: #FFFFFF !important;
+  color: #2D2D2D !important;
+  border-radius: 24px !important;
+  font-size: 14px !important;
+  padding: 12px 16px !important;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+}
+
+.select-rounded select:focus {
+  border-color: #E5E7EB !important;
+  box-shadow: 0 0 0 1px #E5E7EB !important;
+}
+
+.textarea-rounded textarea {
+  border: 1px solid #F3F4F6 !important;
+  background-color: #FFFFFF !important;
+  color: #2D2D2D !important;
+  border-radius: 16px !important;
+  font-size: 14px !important;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+}
+
+.textarea-rounded textarea:focus {
+  border-color: #E5E7EB !important;
+  box-shadow: 0 0 0 1px #E5E7EB !important;
+}
+
+/* Enhanced rounded buttons with subtle borders */
+.rounded-full {
+  border-radius: 50px !important;
+}
+
+/* Override any button borders to be very light */
+button.rounded-full {
+  border: 1px solid #F3F4F6 !important;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Special handling for action buttons that shouldn't have visible borders */
+button[style*="background-color: #B8A082"],
+button[style*="background-color: #B8860B"],
+button[style*="background-color: #9CA3AF"] {
+  border: 1px solid transparent !important;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Minimal Add New Product button styling */
+.add-product-button {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  background: transparent;
+  border: none;
+  border-radius: 20px;
+  color: #9CA3AF;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.add-product-button:hover {
+  color: #B8A082;
+  background: rgba(184, 160, 130, 0.08);
+}
+
+.add-product-button:active {
+  background: rgba(184, 160, 130, 0.15);
+  transform: scale(0.98);
+}
+
+.add-product-button:focus {
+  outline: none;
+  box-shadow: none;
 }
 </style>

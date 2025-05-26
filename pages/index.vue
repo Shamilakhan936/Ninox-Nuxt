@@ -57,6 +57,10 @@
           Featured Products
         </h2>
         
+        <div class="w-48 h-12 px-16 py-4 bg-stone-500 rounded-[74px] inline-flex justify-center items-center gap-2.5">
+<div class="w-16 h-2.5 text-center justify-center text-neutral-100 text-xs font-normal font-['Albert_Sans'] uppercase leading-3 tracking-wider">default</div>
+</div>
+
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div class="bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-lg transition-transform duration-300 hover:transform hover:scale-105">
             <div class="h-48 bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
