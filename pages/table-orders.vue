@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen" style="background-color: #F5F2E8;">
+  <div class="min-h-screen" style="background-color: #f7f7f5;">
     <!-- Navigation -->
     <Navbar />
 
@@ -336,9 +336,6 @@
             <div class="max-w-lg mx-auto text-center">
               <UIcon name="i-heroicons-plus-circle" class="w-16 h-16 mx-auto mb-4" style="color: #B8A082;" />
               <h3 class="text-xl font-medium mb-2" style="color: #2D2D2D;">Create a New Order</h3>
-              <p class="mb-6" style="color: #6B6B6B;">
-                Each order can contain multiple products and has its own tab. You can switch between orders at any time using the tabs.
-              </p>
             
               <div class="max-w-md mx-auto">
                 <UFormGroup label="Order Name" class="mb-4">
@@ -1115,104 +1112,94 @@ function incrementValue(product, field, increment) {
 /* Import Albert Sans font */
 @import url('https://fonts.googleapis.com/css2?family=Albert+Sans:wght@100;200;300;400;500;600;700;800;900&display=swap');
 
-/* Product numbering with exact specifications - much lighter weight */
+/* Apply Albert Sans to entire component */
+.min-h-screen {
+  font-family: 'Albert Sans', sans-serif;
+}
+
+/* Product numbering with exact Figma specifications */
 .product-number {
   font-family: 'Albert Sans', sans-serif;
-  font-weight: 100;
+  font-weight: 300;
   font-size: 11.74px;
   line-height: 19.08px;
   letter-spacing: 0px;
-  color: #9CA3AF;
+  color: #000;
   margin-bottom: 8.81px;
   font-display: swap;
 }
 
-/* Smaller form elements styling */
+/* Form elements styling to match Figma exactly */
 .input-rounded input {
-  border: 1px solid #F3F4F6 !important;
+  border: 0.7px solid #DBDAD8 !important;
   background-color: #FFFFFF !important;
-  color: #2D2D2D !important;
-  border-radius: 20px !important;
-  font-size: 13px !important;
-  padding: 8px 12px !important;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+  color: #000 !important;
+  border-radius: 48.44px !important;
+  font-size: 11.74px !important;
+  line-height: 19.08px !important;
+  font-weight: 300 !important;
+  padding: 8.8px 16.1px !important;
+  height: 35px !important;
+  box-sizing: border-box !important;
+  font-family: 'Albert Sans', sans-serif !important;
 }
 
 .input-rounded input:focus {
-  border-color: #E5E7EB !important;
-  box-shadow: 0 0 0 1px #E5E7EB !important;
+  border-color: #DBDAD8 !important;
+  box-shadow: none !important;
 }
 
 .select-rounded select {
-  border: 1px solid #F3F4F6 !important;
+  border: 0.7px solid #DBDAD8 !important;
   background-color: #FFFFFF !important;
-  color: #2D2D2D !important;
-  border-radius: 20px !important;
-  font-size: 13px !important;
-  padding: 8px 12px !important;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+  color: #000 !important;
+  border-radius: 48.44px !important;
+  font-size: 11.74px !important;
+  line-height: 19.08px !important;
+  font-weight: 300 !important;
+  padding: 8.8px 16.1px !important;
+  height: 35px !important;
+  box-sizing: border-box !important;
+  font-family: 'Albert Sans', sans-serif !important;
 }
 
 .select-rounded select:focus {
-  border-color: #E5E7EB !important;
-  box-shadow: 0 0 0 1px #E5E7EB !important;
+  border-color: #DBDAD8 !important;
+  box-shadow: none !important;
 }
 
-/* Custom styling for number input spinners */
+/* Tab styling to match Figma */
+.tab-container {
+  border-radius: 6.49px 6.49px 0px 0px !important;
+  height: 61px !important;
+  font-size: 13px !important;
+  font-weight: 300 !important;
+}
+
+/* Active tab */
+.tab-active {
+  background-color: #fff !important;
+  color: #000 !important;
+}
+
+/* Inactive tab */
+.tab-inactive {
+  background-color: #EAEAEA !important;
+  color: #BFB7B0 !important;
+}
+
+/* Custom styling for number input spinners - updated colors */
 .input-rounded input[type="number"] {
   -moz-appearance: textfield;
   padding-right: 40px !important;
 }
 
-/* Webkit browsers (Chrome, Safari, Edge) */
 .input-rounded input[type="number"]::-webkit-outer-spin-button,
 .input-rounded input[type="number"]::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
 
-/* Custom spinner container */
-.input-rounded {
-  position: relative;
-}
-
-.input-rounded input[type="number"] + .spinner-buttons {
-  position: absolute;
-  right: 8px;
-  top: 50%;
-  transform: translateY(-50%);
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-}
-
-.input-rounded .spinner-btn {
-  width: 20px;
-  height: 12px;
-  background: #F9FAFB;
-  border: 1px solid #E5E7EB;
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  font-size: 10px;
-  color: #6B7280;
-}
-
-.input-rounded .spinner-btn:hover {
-  background: #F3F4F6;
-  border-color: #D1D5DB;
-  color: #374151;
-}
-
-.input-rounded .spinner-btn:active {
-  background: #E5E7EB;
-  transform: scale(0.95);
-}
-
-/* Even better approach: Custom styled number inputs */
 .input-rounded.number-input {
   position: relative;
   display: inline-block;
@@ -1254,60 +1241,54 @@ function incrementValue(product, field, increment) {
 }
 
 .input-rounded.number-input .number-btn:hover {
-  background: rgba(184, 160, 130, 0.1);
+  background: rgba(138, 124, 89, 0.1);
   transform: scale(1.1);
 }
 
 .input-rounded.number-input .number-btn:active {
-  background: rgba(184, 160, 130, 0.2);
+  background: rgba(138, 124, 89, 0.2);
   transform: scale(0.95);
 }
 
 .input-rounded.number-input .number-btn svg {
   width: 10px;
   height: 10px;
-  color: #9CA3AF;
+  color: #DBDAD8;
   stroke-width: 2.5;
 }
 
 .input-rounded.number-input .number-btn:hover svg {
-  color: #B8A082;
+  color: #8A7C59;
 }
 
 .textarea-rounded textarea {
-  border: 1px solid #F3F4F6 !important;
+  border: 0.7px solid #DBDAD8 !important;
   background-color: #FFFFFF !important;
-  color: #2D2D2D !important;
-  border-radius: 16px !important;
-  font-size: 14px !important;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+  color: #000 !important;
+  border-radius: 48.44px !important;
+  font-size: 11.74px !important;
+  line-height: 19.08px !important;
+  font-weight: 300 !important;
+  font-family: 'Albert Sans', sans-serif !important;
 }
 
 .textarea-rounded textarea:focus {
-  border-color: #E5E7EB !important;
-  box-shadow: 0 0 0 1px #E5E7EB !important;
+  border-color: #DBDAD8 !important;
+  box-shadow: none !important;
 }
 
-/* Enhanced rounded buttons with subtle borders */
+/* Enhanced rounded buttons to match Figma */
 .rounded-full {
-  border-radius: 50px !important;
+  border-radius: 74px !important;
 }
 
-/* Override any button borders to be very light */
+/* Override button styling */
 button.rounded-full {
-  border: 1px solid #F3F4F6 !important;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 
-/* Special handling for action buttons that shouldn't have visible borders */
-button[style*="background-color: #B8A082"],
-button[style*="background-color: #B8860B"],
-button[style*="background-color: #9CA3AF"] {
-  border: 1px solid transparent !important;
-  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1) !important;
-}
-
-/* Minimal Add New Product button styling */
+/* Minimal Add New Product button styling - updated to match Figma */
 .add-product-button {
   display: flex;
   align-items: center;
@@ -1316,20 +1297,21 @@ button[style*="background-color: #9CA3AF"] {
   border: none;
   border-radius: 20px;
   color: #BFB7B0;
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 13px;
+  font-weight: 300;
+  font-family: 'Albert Sans', sans-serif;
   cursor: pointer;
   transition: all 0.2s ease;
   outline: none;
 }
 
 .add-product-button:hover {
-  color: #B8A082;
-  background: rgba(184, 160, 130, 0.08);
+  color: #8A7C59;
+  background: rgba(138, 124, 89, 0.08);
 }
 
 .add-product-button:active {
-  background: rgba(184, 160, 130, 0.15);
+  background: rgba(138, 124, 89, 0.15);
   transform: scale(0.98);
 }
 
@@ -1348,7 +1330,7 @@ button[style*="background-color: #9CA3AF"] {
   background: transparent;
   border: none;
   border-radius: 50%;
-  color: #D1D5DB;
+  color: #DBDAD8;
   font-size: 16px;
   font-weight: 300;
   cursor: pointer;
@@ -1371,5 +1353,49 @@ button[style*="background-color: #9CA3AF"] {
 .delete-product-button:focus {
   outline: none;
   box-shadow: none;
+}
+
+/* Checkbox styling to match Figma */
+input[type="checkbox"] {
+  border: 1px solid #8A7C59 !important;
+  border-radius: 2px !important;
+  background-color: #fff !important;
+  width: 16px !important;
+  height: 16px !important;
+}
+
+/* Typography updates to match Figma exactly */
+.text-xs {
+  font-size: 11.74px !important;
+  line-height: 19.08px !important;
+  font-weight: 300 !important;
+  font-family: 'Albert Sans', sans-serif !important;
+}
+
+.text-sm {
+  font-size: 13px !important;
+  font-weight: 300 !important;
+  font-family: 'Albert Sans', sans-serif !important;
+}
+
+/* Motor checkbox label styling */
+.motor-label {
+  font-size: 16px !important;
+  line-height: 24px !important;
+  color: #3D3935 !important;
+  font-family: 'Albert Sans', sans-serif !important;
+}
+
+/* Special instructions field styling */
+.special-instructions {
+  border: 0.7px solid #DBDAD8 !important;
+  border-radius: 48.44px !important;
+  background-color: #fff !important;
+  height: 35px !important;
+  font-size: 11.74px !important;
+  line-height: 19.08px !important;
+  font-weight: 300 !important;
+  font-family: 'Albert Sans', sans-serif !important;
+  padding: 8.8px 16.1px !important;
 }
 </style>
