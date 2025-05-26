@@ -149,32 +149,23 @@
             <!-- Product Form Area -->
             <div class="p-6">
               <!-- Product rows -->
-              <div v-for="(product, pIndex) in orders[activeTabIndex].products" :key="pIndex" class="border-b border-gray-200 pb-6 mb-6 last:border-b-0 last:mb-0">
+              <div v-for="(product, pIndex) in orders[activeTabIndex].products" :key="pIndex" class="border-b border-gray-200 pb-4 mb-4 last:border-b-0 last:mb-0">
                 <!-- Form Fields Row with integrated numbering -->
-                <div class="flex flex-wrap gap-4 items-center">
+                <div class="flex flex-wrap gap-2 items-center">
+                  <!-- Elegant Delete Button -->
+                  <div class="flex-shrink-0">
+                    <button
+                      class="delete-product-button"
+                      @click="removeProduct(pIndex)"
+                      aria-label="Delete product"
+                    >
+                      ×
+                    </button>
+                  </div>
+                  
                   <!-- Compact Number -->
-                  <div class="flex-shrink-0 flex items-center gap-3">
-                    <span class="text-sm font-normal" style="color: #9CA3AF;">{{ pIndex + 1 }}.</span>
-                    <div class="flex space-x-1">
-                      <UButton
-                        color="red"
-                        icon="i-heroicons-trash"
-                        variant="ghost"
-                        size="xs"
-                        class="rounded-full"
-                        @click="removeProduct(pIndex)"
-                        aria-label="Delete product"
-                      />
-                      <UButton
-                        color="blue"
-                        icon="i-heroicons-pencil-square"
-                        variant="ghost"
-                        size="xs"
-                        class="rounded-full"
-                        @click="editProductDetails(pIndex)"
-                        aria-label="Edit product details"
-                      />
-                    </div>
+                  <div class="flex-shrink-0">
+                    <span class="product-number">{{ pIndex + 1 }}.</span>
                   </div>
                   
                   <!-- Product Type -->
@@ -183,65 +174,45 @@
                       v-model="product.productType"
                       :options="productTypes"
                       placeholder="Type"
-                      class="select-rounded min-w-[140px]"
-                      size="lg"
+                      class="select-rounded min-w-[120px]"
+                      size="sm"
                     />
                   </div>
                   
-                  <!-- Fabric Selection -->
-                  <div class="flex items-center gap-2">
-                    <UButton
+                  <!-- Fabric Selection - Simplified -->
+                  <div class="flex-shrink-0">
+                    <USelect
+                      :model-value="product.fabricDetails ? product.fabricDetails.fields['Fabric Name'] : ''"
+                      :options="[]"
+                      placeholder="Fabric"
+                      class="select-rounded min-w-[120px] cursor-pointer"
                       size="sm"
-                      class="rounded-full px-4 py-2 text-sm font-medium"
-                      style="background-color: #B8A082; color: white;"
                       @click="openFabricModal(pIndex)"
-                    >
-                      {{ product.fabricDetails ? 'FT - Change' : 'FT - Select' }}
-                    </UButton>
-                    
-                    <div v-if="product.fabricDetails" class="flex items-center">
-                      <div 
-                        class="w-4 h-4 rounded-full mr-2"
-                        :style="{ backgroundColor: product.fabricDetails.fields['Color Hex'] || '#64748b' }"
-                      ></div>
-                      <span class="text-sm font-medium" style="color: #2D2D2D;">
-                        {{ product.fabricDetails.fields['Fabric Name'] }}
-                      </span>
-                    </div>
+                    />
                   </div>
                   
-                  <!-- Fabric Color Selection -->
-                  <div class="flex items-center gap-2">
-                    <UButton
+                  <!-- Fabric Color Selection - Simplified -->
+                  <div class="flex-shrink-0">
+                    <USelect
+                      :model-value="product.fabricColorDetails ? product.fabricColorDetails.fields['Color Name'] : ''"
+                      :options="[]"
+                      placeholder="Colour"
+                      class="select-rounded min-w-[120px] cursor-pointer"
                       size="sm"
-                      class="rounded-full px-4 py-2 text-sm font-medium"
-                      style="background-color: #9CA3AF; color: white;"
-                      @click="openFabricColorModal(pIndex)"
                       :disabled="!product.fabricDetails"
-                    >
-                      {{ product.fabricColorDetails ? 'Colour - Change' : 'Colour - Select' }}
-                    </UButton>
-                    
-                    <div v-if="product.fabricColorDetails" class="flex items-center">
-                      <div 
-                        class="w-4 h-4 rounded-full mr-2"
-                        :style="{ backgroundColor: product.fabricColorDetails.fields['Color Hex'] || '#64748b' }"
-                      ></div>
-                      <span class="text-sm" style="color: #6B6B6B;">
-                        {{ product.fabricColorDetails.fields['Collection Name'] || '' }}
-                      </span>
-                    </div>
+                      @click="openFabricColorModal(pIndex)"
+                    />
                   </div>
 
                   <!-- Dimensions with custom number controls -->
-                  <div class="flex items-center gap-2">
+                  <div class="flex items-center gap-1">
                     <div class="input-rounded number-input">
                       <UInput
                         v-model="product.height"
                         type="number"
                         placeholder="Height"
-                        class="input-rounded w-24"
-                        size="lg"
+                        class="input-rounded w-20"
+                        size="sm"
                       />
                       <div class="number-controls">
                         <div class="number-btn" @mousedown="incrementValue(product, 'height', 1)">
@@ -256,14 +227,14 @@
                         </div>
                       </div>
                     </div>
-                    <span style="color: #6B6B6B;">×</span>
+                    <span class="text-xs" style="color: #6B6B6B;">×</span>
                     <div class="input-rounded number-input">
                       <UInput
                         v-model="product.width"
                         type="number"
                         placeholder="Width"
-                        class="input-rounded w-24"
-                        size="lg"
+                        class="input-rounded w-20"
+                        size="sm"
                       />
                       <div class="number-controls">
                         <div class="number-btn" @mousedown="incrementValue(product, 'width', 1)">
@@ -288,8 +259,8 @@
                         type="number"
                         placeholder="1"
                         min="1"
-                        class="input-rounded w-16"
-                        size="lg"
+                        class="input-rounded w-14"
+                        size="sm"
                       />
                       <div class="number-controls">
                         <div class="number-btn" @mousedown="incrementValue(product, 'quantity', 1)">
@@ -307,12 +278,13 @@
                   </div>
                   
                   <!-- Motor Checkbox -->
-                  <div class="flex items-center gap-2">
+                  <div class="flex items-center gap-1">
                     <UCheckbox
                       v-model="product.isMotorized"
                       :disabled="!['Roller Shades', 'Roman Shades'].includes(product.productType)"
+                      size="sm"
                     />
-                    <span class="text-sm" style="color: #6B6B6B;">Motor</span>
+                    <span class="text-xs" style="color: #6B6B6B;">Motor</span>
                   </div>
                   
                   <!-- Control/Motor Type -->
@@ -321,8 +293,8 @@
                       v-model="product.motorType"
                       :options="getMotorTypes(product.productType)"
                       placeholder="Motor Type"
-                      size="lg"
-                      class="select-rounded min-w-[140px]"
+                      size="sm"
+                      class="select-rounded min-w-[120px]"
                     />
                   </div>
                   <div v-else>
@@ -330,8 +302,8 @@
                       v-model="product.controlSide"
                       :options="['Left', 'Right']"
                       placeholder="Side"
-                      size="lg"
-                      class="select-rounded min-w-[100px]"
+                      size="sm"
+                      class="select-rounded min-w-[80px]"
                     />
                   </div>
                   
@@ -341,8 +313,8 @@
                       v-model="product.mountLocation"
                       :options="['Inside', 'Outside', 'Ceiling']"
                       placeholder="Rail"
-                      size="lg"
-                      class="select-rounded min-w-[120px]"
+                      size="sm"
+                      class="select-rounded min-w-[100px]"
                     />
                   </div>
                   
@@ -351,19 +323,19 @@
                     <USelect
                       v-model="product.hardwareColor"
                       :options="['White', 'Black', 'Silver', 'Bronze', 'Antique Gold']"
-                      placeholder="Hooks per Panel, total"
-                      size="lg"
-                      class="select-rounded min-w-[180px]"
+                      placeholder="Hooks"
+                      size="sm"
+                      class="select-rounded min-w-[100px]"
                     />
                   </div>
                   
-                  <!-- Notes -->
-                  <div class="flex-grow min-w-[200px]">
+                  <!-- Notes - Much smaller and at the end -->
+                  <div class="flex-shrink-0">
                     <UInput
                       v-model="product.notes"
                       placeholder="Notes"
-                      class="input-rounded w-full"
-                      size="lg"
+                      class="input-rounded w-24"
+                      size="sm"
                     />
                   </div>
                 </div>
@@ -1168,6 +1140,21 @@ function incrementValue(product, field, increment) {
 </script>
 
 <style>
+/* Import Albert Sans font */
+@import url('https://fonts.googleapis.com/css2?family=Albert+Sans:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+/* Product numbering with exact specifications - much lighter weight */
+.product-number {
+  font-family: 'Albert Sans', sans-serif;
+  font-weight: 100; /* Changed from 300 to 100 for much lighter appearance */
+  font-size: 11.74px;
+  line-height: 19.08px;
+  letter-spacing: 0px;
+  color: #9CA3AF;
+  margin-bottom: 8.81px; /* paragraph spacing */
+  font-display: swap; /* Ensures proper font loading */
+}
+
 /* Rounded styling for all form elements with very light borders */
 .input-rounded input {
   border: 1px solid #F3F4F6 !important;
@@ -1397,6 +1384,81 @@ button[style*="background-color: #9CA3AF"] {
 }
 
 .add-product-button:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+/* Smaller form elements styling */
+.input-rounded input {
+  border: 1px solid #F3F4F6 !important;
+  background-color: #FFFFFF !important;
+  color: #2D2D2D !important;
+  border-radius: 20px !important;
+  font-size: 13px !important;
+  padding: 8px 12px !important;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+}
+
+.select-rounded select {
+  border: 1px solid #F3F4F6 !important;
+  background-color: #FFFFFF !important;
+  color: #2D2D2D !important;
+  border-radius: 20px !important;
+  font-size: 13px !important;
+  padding: 8px 12px !important;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Make fabric and color selects look like regular selects */
+.select-rounded {
+  position: relative;
+}
+
+.select-rounded::after {
+  content: '';
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 4px solid #9CA3AF;
+  pointer-events: none;
+}
+
+/* Elegant delete button styling */
+.delete-product-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  color: #D1D5DB;
+  font-size: 16px;
+  font-weight: 300;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  outline: none;
+  line-height: 1;
+}
+
+.delete-product-button:hover {
+  color: #EF4444;
+  background: rgba(239, 68, 68, 0.08);
+  transform: scale(1.1);
+}
+
+.delete-product-button:active {
+  background: rgba(239, 68, 68, 0.15);
+  transform: scale(0.95);
+}
+
+.delete-product-button:focus {
   outline: none;
   box-shadow: none;
 }
