@@ -23,27 +23,27 @@
         <!-- Elegant Tab Design with Physical Tab Look -->
         <div class="space-y-0">
           <!-- Tab Headers with Integrated Content -->
-          <div class="flex items-end gap-1">
+          <div class="flex items-end gap-3">
             <!-- Order Tabs -->
             <div v-for="(order, index) in orders" :key="index" class="relative">
               <div
                 :class="[
-                  'transition-all duration-200 border-0 rounded-t-lg',
+                  'transition-all duration-200 border-0 rounded-t-lg cursor-pointer',
                   activeTabIndex === index 
-                    ? 'bg-white shadow-sm' 
+                    ? 'bg-white shadow-sm border-b-0' 
                     : 'bg-gray-100'
                 ]"
-                style="min-width: 220px; min-height: 65px;"
+                style="min-width: 200px; min-height: 55px;"
+                @click="activeTabIndex !== index ? (activeTabIndex = index) : null"
               >
                 <!-- Tab Header -->
                 <button
                   :class="[
-                    'w-full px-3 py-1.5 text-sm font-medium transition-all duration-200 flex items-center justify-center',
+                    'w-full px-3 py-1 text-sm font-medium transition-all duration-200 flex items-center justify-center pointer-events-none',
                     activeTabIndex === index 
                       ? 'text-black' 
                       : 'text-gray-600'
                   ]"
-                  @click="activeTabIndex = index"
                 >
                   <span>{{ order.name }}</span>
                   <UButton
@@ -52,16 +52,19 @@
                     variant="ghost"
                     icon="i-heroicons-x-mark"
                     size="xs"
-                    class="ml-2 opacity-60 hover:opacity-100"
+                    class="ml-2 opacity-60 hover:opacity-100 pointer-events-auto"
                     @click.stop="removeOrder(index)"
                     aria-label="Remove order"
                   />
                 </button>
                 
                 <!-- Client Selection Area (always present to maintain consistent height) -->
-                <div class="px-3 pb-1.5 flex justify-center min-h-[28px] items-center">
+                <div 
+                  class="px-3 pb-1 flex justify-center min-h-[24px] items-center"
+                  :class="{ 'pointer-events-none': activeTabIndex !== index }"
+                >
                   <div v-if="activeTabIndex === index">
-                    <div v-if="orders[activeTabIndex].client" class="flex items-center space-x-1 px-2 py-0.5 rounded-full text-xs" style="background-color: #E5E5E5;">
+                    <div v-if="orders[activeTabIndex].client" class="flex items-center space-x-1 px-2 py-0.5 rounded-full text-xs pointer-events-auto" style="background-color: #E5E5E5;">
                       <span class="font-medium" style="color: #2D2D2D;">
                         {{ orders[activeTabIndex].client.fields['First Name'] }} {{ orders[activeTabIndex].client.fields['Last Name'] }}
                       </span>
@@ -75,7 +78,7 @@
                     </div>
                     <UButton
                       v-else
-                      class="px-3 py-0.5 rounded-full text-white text-xs font-medium"
+                      class="px-3 py-0.5 rounded-full text-white text-xs font-medium pointer-events-auto"
                       style="background-color: #9CA3AF; min-width: 120px;"
                       @click="openOrderClientModal"
                     >
@@ -83,41 +86,7 @@
                     </UButton>
                   </div>
                   <!-- Empty space for inactive tabs to maintain consistent height -->
-                  <div v-else class="h-[20px]"></div>
-                </div>
-                
-                <!-- Order editing controls (if needed) -->
-                <div v-if="isEditingOrderName && activeTabIndex === index" class="px-3 pb-1.5">
-                  <div class="flex items-center">
-                    <UInput
-                      v-model="editedOrderName"
-                      size="sm"
-                      class="w-full input-rounded"
-                      placeholder="Order name"
-                      @keyup.enter="saveOrderName"
-                      @keyup.esc="cancelEditingOrderName"
-                      ref="orderNameInputRef"
-                    />
-                    <div class="flex ml-2">
-                      <UButton
-                        color="green"
-                        variant="soft"
-                        size="xs"
-                        icon="i-heroicons-check"
-                        @click="saveOrderName"
-                        aria-label="Save order name"
-                      />
-                      <UButton
-                        color="gray"
-                        variant="soft"
-                        size="xs"
-                        icon="i-heroicons-x-mark"
-                        class="ml-1"
-                        @click="cancelEditingOrderName"
-                        aria-label="Cancel editing"
-                      />
-                    </div>
-                  </div>
+                  <div v-else class="h-[18px]"></div>
                 </div>
               </div>
             </div>
@@ -126,12 +95,12 @@
             <div class="relative">
               <button
                 :class="[
-                  'px-3 py-1.5 text-sm font-medium transition-all duration-200 border-0 rounded-t-lg',
+                  'px-3 py-1 text-sm font-medium transition-all duration-200 border-0 rounded-t-lg',
                   activeTabIndex === -1 
-                    ? 'bg-white text-black shadow-sm' 
+                    ? 'bg-white text-black shadow-sm border-b-0' 
                     : 'bg-gray-50 text-gray-400'
                 ]"
-                style="min-height: 65px; min-width: 160px;"
+                style="min-height: 55px; min-width: 140px;"
                 @click="activeTabIndex = -1"
               >
                 <div class="flex items-center justify-center h-full">
@@ -144,8 +113,8 @@
             </div>
           </div>
           
-          <!-- Tab Content Area (connected but extends further left) -->
-          <div v-if="activeTabIndex >= 0" class="bg-white rounded-b-lg shadow-sm border border-gray-100 -ml-12 pl-12 rounded-tl-lg">
+          <!-- Tab Content Area (seamlessly connected) -->
+          <div v-if="activeTabIndex >= 0" class="bg-white rounded-b-lg shadow-sm border border-gray-100 -ml-12 pl-12 rounded-tl-lg relative -mt-px">
             <!-- Product Form Area -->
             <div class="p-6">
               <!-- Product rows -->
@@ -360,34 +329,6 @@
                 </button>
               </div>
             </div>
-            
-            <!-- Special Instructions and Submit Order -->
-            <div class="px-6 pb-6 border-t pt-6" style="border-color: #F3F4F6;">
-              <div class="flex items-center gap-4">
-                <!-- Special Instructions Field -->
-                <div class="flex-grow">
-                  <UInput
-                    v-model="orders[activeTabIndex].specialInstructions"
-                    placeholder="Special instructions"
-                    class="input-rounded"
-                    size="lg"
-                  />
-                </div>
-                
-                <!-- Submit Order Button -->
-                <div class="flex-shrink-0">
-                  <UButton
-                    class="px-8 py-3 rounded-full text-white font-medium"
-                    style="background-color: #B8860B;"
-                    :loading="isSubmitting"
-                    :disabled="!isFormValid"
-                    @click="submitCurrentOrder"
-                  >
-                    SUBMIT ORDER
-                  </UButton>
-                </div>
-              </div>
-            </div>
           </div>
           
           <!-- "Add New Tab" View -->
@@ -416,6 +357,37 @@
                     Create New Order
                   </UButton>
                 </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Special Instructions and Submit Order - Only show for active orders with added separation -->
+          <div v-if="activeTabIndex >= 0" class="mt-12 -ml-12 pl-12">
+            <!-- Separator line for visual separation -->
+            <div class="border-t border-gray-200 mb-8"></div>
+            
+            <div class="flex items-center gap-4">
+              <!-- Special Instructions Field - No background -->
+              <div class="flex-grow">
+                <UInput
+                  v-model="orders[activeTabIndex].specialInstructions"
+                  placeholder="Special instructions"
+                  class="input-rounded"
+                  size="lg"
+                />
+              </div>
+              
+              <!-- Submit Order Button -->
+              <div class="flex-shrink-0">
+                <UButton
+                  class="px-8 py-3 rounded-full text-white font-medium"
+                  style="background-color: #B8860B;"
+                  :loading="isSubmitting"
+                  :disabled="!isFormValid"
+                  @click="submitCurrentOrder"
+                >
+                  SUBMIT ORDER
+                </UButton>
               </div>
             </div>
           </div>
@@ -1146,23 +1118,23 @@ function incrementValue(product, field, increment) {
 /* Product numbering with exact specifications - much lighter weight */
 .product-number {
   font-family: 'Albert Sans', sans-serif;
-  font-weight: 100; /* Changed from 300 to 100 for much lighter appearance */
+  font-weight: 100;
   font-size: 11.74px;
   line-height: 19.08px;
   letter-spacing: 0px;
   color: #9CA3AF;
-  margin-bottom: 8.81px; /* paragraph spacing */
-  font-display: swap; /* Ensures proper font loading */
+  margin-bottom: 8.81px;
+  font-display: swap;
 }
 
-/* Rounded styling for all form elements with very light borders */
+/* Smaller form elements styling */
 .input-rounded input {
   border: 1px solid #F3F4F6 !important;
   background-color: #FFFFFF !important;
   color: #2D2D2D !important;
-  border-radius: 24px !important;
-  font-size: 14px !important;
-  padding: 12px 16px !important;
+  border-radius: 20px !important;
+  font-size: 13px !important;
+  padding: 8px 12px !important;
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
 }
 
@@ -1171,10 +1143,25 @@ function incrementValue(product, field, increment) {
   box-shadow: 0 0 0 1px #E5E7EB !important;
 }
 
+.select-rounded select {
+  border: 1px solid #F3F4F6 !important;
+  background-color: #FFFFFF !important;
+  color: #2D2D2D !important;
+  border-radius: 20px !important;
+  font-size: 13px !important;
+  padding: 8px 12px !important;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+}
+
+.select-rounded select:focus {
+  border-color: #E5E7EB !important;
+  box-shadow: 0 0 0 1px #E5E7EB !important;
+}
+
 /* Custom styling for number input spinners */
 .input-rounded input[type="number"] {
-  -moz-appearance: textfield; /* Firefox */
-  padding-right: 40px !important; /* Make room for custom spinners */
+  -moz-appearance: textfield;
+  padding-right: 40px !important;
 }
 
 /* Webkit browsers (Chrome, Safari, Edge) */
@@ -1223,28 +1210,6 @@ function incrementValue(product, field, increment) {
 .input-rounded .spinner-btn:active {
   background: #E5E7EB;
   transform: scale(0.95);
-}
-
-/* Alternative approach: Style the default spinners more elegantly */
-.input-rounded input[type="number"]::-webkit-outer-spin-button,
-.input-rounded input[type="number"]::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-  width: 24px;
-  height: 12px;
-  background: #F9FAFB;
-  border: 1px solid #E5E7EB;
-  border-radius: 6px;
-  cursor: pointer;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-}
-
-.input-rounded input[type="number"]:hover::-webkit-outer-spin-button,
-.input-rounded input[type="number"]:hover::-webkit-inner-spin-button,
-.input-rounded input[type="number"]:focus::-webkit-outer-spin-button,
-.input-rounded input[type="number"]:focus::-webkit-inner-spin-button {
-  opacity: 1;
 }
 
 /* Even better approach: Custom styled number inputs */
@@ -1309,21 +1274,6 @@ function incrementValue(product, field, increment) {
   color: #B8A082;
 }
 
-.select-rounded select {
-  border: 1px solid #F3F4F6 !important;
-  background-color: #FFFFFF !important;
-  color: #2D2D2D !important;
-  border-radius: 24px !important;
-  font-size: 14px !important;
-  padding: 12px 16px !important;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
-}
-
-.select-rounded select:focus {
-  border-color: #E5E7EB !important;
-  box-shadow: 0 0 0 1px #E5E7EB !important;
-}
-
 .textarea-rounded textarea {
   border: 1px solid #F3F4F6 !important;
   background-color: #FFFFFF !important;
@@ -1386,46 +1336,6 @@ button[style*="background-color: #9CA3AF"] {
 .add-product-button:focus {
   outline: none;
   box-shadow: none;
-}
-
-/* Smaller form elements styling */
-.input-rounded input {
-  border: 1px solid #F3F4F6 !important;
-  background-color: #FFFFFF !important;
-  color: #2D2D2D !important;
-  border-radius: 20px !important;
-  font-size: 13px !important;
-  padding: 8px 12px !important;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
-}
-
-.select-rounded select {
-  border: 1px solid #F3F4F6 !important;
-  background-color: #FFFFFF !important;
-  color: #2D2D2D !important;
-  border-radius: 20px !important;
-  font-size: 13px !important;
-  padding: 8px 12px !important;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
-}
-
-/* Make fabric and color selects look like regular selects */
-.select-rounded {
-  position: relative;
-}
-
-.select-rounded::after {
-  content: '';
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 0;
-  height: 0;
-  border-left: 4px solid transparent;
-  border-right: 4px solid transparent;
-  border-top: 4px solid #9CA3AF;
-  pointer-events: none;
 }
 
 /* Elegant delete button styling */
