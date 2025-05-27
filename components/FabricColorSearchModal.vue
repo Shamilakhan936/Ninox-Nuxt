@@ -1,108 +1,137 @@
 <template>
-  <UModal :model-value="modelValue" @update:model-value="$emit('update:model-value', $event)">
-    <UCard>
-      <template #header>
-        <div class="flex justify-between items-center">
-          <h3 class="text-lg font-medium">Select Fabric Color</h3>
-          <UButton
-            icon="i-heroicons-x-mark"
-            color="gray"
-            variant="ghost"
-            @click="$emit('update:model-value', false)"
-          />
-        </div>
-      </template>
+  <UModal v-model="isOpen" :ui="{ width: 'max-w-4xl' }">
+    <div class="fabric-search-container">
+      <!-- Close button - properly positioned -->
+      <button
+        class="close-button"
+        @click="close"
+      >
+        ×
+      </button>
       
-      <!-- Search and Filters -->
-      <div class="mb-4">
-        <UInput
+      <!-- Title -->
+      <div class="search-title">Select Fabric Color</div>
+      
+      <!-- Subtitle -->
+      <div class="search-subtitle">Choose a color for {{ fabricName }}</div>
+      
+      <!-- Divider line -->
+      <div class="search-divider" />
+      
+      <!-- Search form container -->
+      <div class="search-form-container">
+        <!-- Search input -->
+        <input
           v-model="searchQuery"
           placeholder="Search by color name..."
-          icon="i-heroicons-magnifying-glass"
-          class="mb-2"
-          @input="debouncedSearch"
+          class="search-input"
+          @keyup.enter="debouncedSearch"
+          autofocus
         />
         
-        <div class="text-sm text-gray-500 dark:text-gray-400 mb-2">
-          Showing fabric colors for: <span class="font-medium">{{ fabricName }}</span>
-        </div>
-      </div>
-      
-      <!-- Loading state -->
-      <div v-if="isLoading" class="flex justify-center py-8">
-        <UIcon name="i-heroicons-arrow-path" class="w-8 h-8 animate-spin text-gray-500" />
-      </div>
-      
-      <!-- Error state -->
-      <div v-else-if="error" class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-4 rounded-lg">
-        <div class="flex">
-          <UIcon name="i-heroicons-exclamation-triangle" class="w-5 h-5 text-red-500 mr-2 flex-shrink-0" />
-          <div>
-            <h3 class="text-sm font-medium text-red-800 dark:text-red-300">Error loading fabric colors</h3>
-            <p class="text-sm text-red-700 dark:text-red-400 mt-1">{{ error }}</p>
-          </div>
-        </div>
-      </div>
-      
-      <!-- No results state -->
-      <div v-else-if="fabricColors.length === 0" class="text-center py-8 text-gray-500 dark:text-gray-400">
-        <UIcon name="i-heroicons-swatch" class="w-12 h-12 mx-auto mb-2 text-gray-400" />
-        <p>No fabric colors found for this fabric type.</p>
-      </div>
-      
-      <!-- Results grid -->
-      <div v-else class="grid grid-cols-2 gap-2 max-h-[400px] overflow-y-auto">
-        <div
-          v-for="color in fabricColors"
-          :key="color.id"
-          class="border border-gray-200 dark:border-gray-700 rounded-lg p-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
-          @click="selectColor(color)"
+        <!-- Search button -->
+        <button
+          class="search-button"
+          :disabled="isLoading"
+          @click="debouncedSearch"
         >
-          <div class="flex items-center space-x-3">
-            <div 
-              class="w-6 h-6 rounded-full"
-              :style="{ backgroundColor: color.fields['Color Hex'] || '#64748b' }"
-            ></div>
-            <div class="overflow-hidden">
-              <div class="text-sm font-medium text-gray-900 dark:text-white truncate">
-                {{ color.fields['Color Name'] }}
-              </div>
-              <div class="text-xs text-gray-500 dark:text-gray-400 truncate">
-                {{ color.fields['Collection Name'] || props.fabricName }}
-                <template v-if="color.fields['Color Category']">
-                  - {{ color.fields['Color Category'] }}
-                </template>
+          <span v-if="!isLoading">SEARCH</span>
+          <span v-else>SEARCHING...</span>
+        </button>
+      </div>
+      
+      <!-- Helper text -->
+      <div class="search-helper-text">
+        Search for specific color names or browse all available colors for this fabric.
+      </div>
+      
+      <!-- Results section -->
+      <div class="results-section">
+        <!-- Loading state -->
+        <div v-if="isLoading" class="flex justify-center py-8">
+          <UIcon name="i-heroicons-arrow-path" class="w-6 h-6 animate-spin text-gray-500" />
+        </div>
+        
+        <!-- Error state -->
+        <UAlert
+          v-if="error"
+          color="red"
+          variant="soft"
+          icon="i-heroicons-exclamation-triangle"
+          class="mb-4"
+        >
+          {{ error }}
+        </UAlert>
+        
+        <!-- Results grid -->
+        <div v-if="fabricColors.length > 0" class="border rounded-lg overflow-hidden">
+          <div class="bg-gray-50 p-2 flex justify-between items-center">
+            <span class="text-sm text-gray-600">
+              Found {{ fabricColors.length }} color(s) for {{ fabricName }}
+            </span>
+            
+            <!-- Load more button if there are more results -->
+            <UButton
+              v-if="hasMore"
+              size="xs"
+              color="gray"
+              variant="ghost"
+              @click="loadMore"
+              :disabled="isLoading"
+            >
+              Load More
+            </UButton>
+          </div>
+          
+          <!-- Color grid -->
+          <div class="p-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 max-h-[400px] overflow-y-auto">
+            <div
+              v-for="color in fabricColors"
+              :key="color.id"
+              class="border border-gray-200 rounded-lg p-3 cursor-pointer hover:bg-gray-50 transition-colors"
+              @click="selectColor(color)"
+            >
+              <div class="flex items-center space-x-3">
+                <div 
+                  class="w-8 h-8 rounded-full border border-gray-300"
+                  :style="{ backgroundColor: color.fields['Color Hex'] || '#64748b' }"
+                ></div>
+                <div class="overflow-hidden flex-1">
+                  <div class="text-sm font-medium text-gray-900 truncate">
+                    {{ color.fields['Color Name'] }}
+                  </div>
+                  <div class="text-xs text-gray-500 truncate">
+                    {{ color.fields['Collection Name'] || fabricName }}
+                    <template v-if="color.fields['Color Category']">
+                      - {{ color.fields['Color Category'] }}
+                    </template>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-      
-      <template #footer>
-        <div class="flex justify-between">
-          <UButton
-            color="gray"
-            variant="ghost"
-            @click="$emit('update:model-value', false)"
-          >
+        
+        <!-- Footer buttons -->
+        <div class="flex justify-between mt-4">
+          <UButton color="gray" variant="soft" @click="close">
             Cancel
           </UButton>
-          <UButton
-            v-if="fabricColors.length > 0"
-            color="indigo"
-            @click="loadMore"
-            :disabled="!hasMore || isLoading"
+          <UButton 
+            v-if="fabricColors.length > 0" 
+            color="primary" 
+            @click="close"
           >
-            {{ isLoading ? 'Loading...' : 'Load More' }}
+            Done
           </UButton>
         </div>
-      </template>
-    </UCard>
+      </div>
+    </div>
   </UModal>
 </template>
 
 <script setup>
-import { ref, watch, computed, onMounted } from 'vue';
+import { ref, watch, computed } from 'vue';
 import debounce from 'lodash/debounce';
 
 // Props
@@ -128,6 +157,12 @@ const props = defineProps({
 // Emits
 const emit = defineEmits(['update:model-value', 'select', 'notification']);
 
+// Computed for modal state
+const isOpen = computed({
+  get: () => props.modelValue,
+  set: (value) => emit('update:model-value', value)
+});
+
 // State
 const searchQuery = ref('');
 const fabricColors = ref([]);
@@ -135,6 +170,7 @@ const isLoading = ref(false);
 const error = ref(null);
 const page = ref(1);
 const hasMore = ref(true);
+const hasSearched = ref(false);
 
 // Methods
 const debouncedSearch = debounce(() => {
@@ -149,6 +185,7 @@ function reset() {
   error.value = null;
   page.value = 1;
   hasMore.value = true;
+  hasSearched.value = false;
 }
 
 // Load more results
@@ -160,7 +197,12 @@ function loadMore() {
 // Select a fabric color
 function selectColor(color) {
   emit('select', color);
-  emit('update:model-value', false);
+  close();
+}
+
+// Close modal
+function close() {
+  isOpen.value = false;
 }
 
 // Fetch fabric colors
@@ -172,6 +214,7 @@ async function fetchFabricColors(append = false) {
   
   isLoading.value = true;
   error.value = null;
+  hasSearched.value = true;
   
   try {
     const response = await fetch(`/api/ninox/fabric-colors?fabricId=${props.fabricId}&search=${searchQuery.value}&page=${page.value}`);
@@ -205,11 +248,12 @@ async function fetchFabricColors(append = false) {
 watch(() => props.modelValue, (newVal) => {
   if (newVal && props.fabricId) {
     reset();
+    // Auto-fetch colors when modal opens
     fetchFabricColors();
   }
 });
 
-// Watch for fabric type changes
+// Watch for fabric ID changes
 watch(() => props.fabricId, (newVal) => {
   if (props.modelValue && newVal) {
     reset();
@@ -222,3 +266,180 @@ defineExpose({
   reset
 });
 </script>
+
+<style scoped>
+/* Import Albert Sans font */
+@import url('https://fonts.googleapis.com/css2?family=Albert+Sans:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+.fabric-search-container {
+  width: 100%;
+  position: relative;
+  min-height: 330px;
+  max-width: 860px;
+  margin: 0 auto;
+  text-align: left;
+  font-size: 12px;
+  color: #000;
+  font-family: 'Albert Sans', sans-serif;
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 60px 56px 60px 56px;
+}
+
+.close-button {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid #E5E5E5;
+  background-color: #fff;
+  color: #666;
+  font-size: 18px;
+  font-weight: 300;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  font-family: 'Albert Sans', sans-serif;
+}
+
+.close-button:hover {
+  background-color: #f5f5f5;
+  border-color: #ccc;
+}
+
+.search-title {
+  text-align: center;
+  font-size: 30px;
+  line-height: 40px;
+  font-weight: 300;
+  color: #000;
+  margin-bottom: 16px;
+}
+
+.search-subtitle {
+  text-align: center;
+  letter-spacing: 0.2em;
+  line-height: 14px;
+  text-transform: uppercase;
+  color: #3d3935;
+  font-size: 12px;
+  margin-bottom: 20px;
+}
+
+.search-divider {
+  background-color: rgba(61, 57, 53, 0.15);
+  width: 100%;
+  height: 1px;
+  margin-bottom: 40px;
+}
+
+.search-form-container {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.search-input {
+  border-radius: 66px;
+  background-color: #fff;
+  border: 1px solid #c9c7c5;
+  padding: 12px 24px;
+  font-size: 16px;
+  line-height: 26px;
+  font-weight: 300;
+  flex: 1;
+  max-width: 500px;
+  font-family: 'Albert Sans', sans-serif;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.search-input:focus {
+  border-color: #8a7c59;
+}
+
+.search-input::placeholder {
+  color: #9CA3AF;
+}
+
+.search-button {
+  border-radius: 74px;
+  background-color: #8a7c59;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 48px;
+  text-align: center;
+  font-size: 13px;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  letter-spacing: 0.1em;
+  line-height: 13px;
+  text-transform: uppercase;
+  font-family: 'Albert Sans', sans-serif;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.search-button:hover:not(:disabled) {
+  background-color: #6B5B42;
+}
+
+.search-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.search-helper-text {
+  text-align: center;
+  line-height: 16px;
+  color: #6f6259;
+  font-size: 12px;
+  margin-bottom: 20px;
+}
+
+.results-section {
+  margin-top: 40px;
+  padding: 0;
+}
+
+/* Reset text selection to browser default */
+::selection {
+  background-color: Highlight !important;
+  color: HighlightText !important;
+}
+
+::-moz-selection {
+  background-color: Highlight !important;
+  color: HighlightText !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .fabric-search-container {
+    padding: 40px 24px;
+  }
+  
+  .search-form-container {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .search-input {
+    max-width: 100%;
+  }
+  
+  .search-button {
+    padding: 12px 32px;
+  }
+}
+</style>
