@@ -27,8 +27,15 @@
     <!-- Auth Section with hover underline -->
     <div class="nav-item-container auth-container">
       <div class="hover-underline auth-underline"></div>
-      <template v-if="$auth.loggedIn">
-        <NuxtLink to="/account" class="nav-link login">{{ $auth.user.given_name || 'Account' }}</NuxtLink>
+      <template v-if="isLoggedIn">
+        <CrastinoDropdown
+          :model-value="truncatedUserName"
+          :options="userMenuOptions"
+          :placeholder="truncatedUserName"
+          min-width="auto"
+          @update:model-value="handleUserMenuSelection"
+          class="navbar-dropdown"
+        />
       </template>
       <template v-else>
         <LoginLink to="/api/login" external class="nav-link login">Login</LoginLink>
@@ -59,10 +66,67 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
+import CrastinoDropdown from './CrastinoDropdown.vue';
 
 // Cart count - you can replace this with actual cart state
 const cartCount = ref(0);
+
+// Get Kinde client for authentication
+const kindeClient = useKindeClient();
+
+// Create a safe way to access auth
+const auth = computed(() => {
+  try {
+    const nuxtApp = useNuxtApp();
+    return nuxtApp.$auth || null;
+  } catch (e) {
+    console.error("Error accessing auth:", e);
+    return null;
+  }
+});
+
+// Create a computed property for auth state
+const isLoggedIn = computed(() => {
+  return !!auth.value?.loggedIn;
+});
+
+// Create a computed property for user
+const user = computed(() => {
+  return auth.value?.user || {};
+});
+
+// User menu options for the dropdown
+const userMenuOptions = computed(() => [
+  'Profile',
+  'Table Orders',
+  'Sign Out'
+]);
+
+// Truncate user name if too long
+const truncatedUserName = computed(() => {
+  const userName = user.value?.given_name || 'Account';
+  if (userName.length > 8) {
+    return userName.substring(0, 8) + '...';
+  }
+  return userName;
+});
+
+// Handle user menu selection
+function handleUserMenuSelection(selectedOption) {
+  switch (selectedOption) {
+    case 'Profile':
+      navigateTo('/account');
+      break;
+    case 'Table Orders':
+      navigateTo('/table-orders');
+      break;
+    case 'Sign Out':
+      // Use Kinde logout
+      window.location.href = '/api/logout';
+      break;
+  }
+}
 </script>
 
 <style scoped>
@@ -101,13 +165,15 @@ const cartCount = ref(0);
 .customer-service-container {
   top: 49px;
   left: calc(50% + 280.01px);
-  width: 160px; /* Increased width to prevent text wrapping */
+  width: 150px; /* Increased from 120px to better match "Customer Service" text length */
 }
 
 .auth-container {
-  top: 49px; /* Aligned with other nav items */
+  top: 44px; /* Aligned with other nav items */
   left: calc(50% + 445.01px);
-  width: 70px; /* Added width for proper underline sizing */
+  width: fit-content; /* Dynamic width based on content */
+  max-width: 75px; /* Maximum width to prevent overlap */
+  min-width: 50px; /* Minimum width for "Login" */
   z-index: 50;
   height: 22px; /* Same height as other containers for consistent underline thickness */
 }
@@ -115,16 +181,16 @@ const cartCount = ref(0);
 .cart-container {
   top: 49px; /* Aligned with other nav items */
   left: calc(50% + 520.01px);
-  width: 90px; /* Width to accommodate "CART (0)" */
+  width: 65px; /* Reduced from 90px to better match "Cart (0)" text */
 }
 
 /* Hover Underline */
 .hover-underline {
   position: absolute;
   height: 9.09%;
-  width: 91.1%;
+  width: 90%; /* Reduced from 100% to better match text content */
   top: 90.91%;
-  right: 8.9%;
+  right: 0%;
   bottom: 0%;
   left: 0%;
   border-radius: 4px;
@@ -135,9 +201,10 @@ const cartCount = ref(0);
   transition: all 0.3s ease;
 }
 
-/* Special positioning for auth container underline */
+/* Special underline for auth container - more precise width */
 .auth-underline {
-  top: 90.91%; /* Adjusted positioning to place underline below the text with same container height */
+  width: 105%; /* Increased from 85% to better match client name text */
+  top: 90.91%;
 }
 
 /* Navigation Link Styles */
@@ -159,6 +226,60 @@ const cartCount = ref(0);
   white-space: nowrap; /* Prevent text wrapping */
 }
 
+/* Navbar dropdown styling - minimal overrides */
+.navbar-dropdown {
+  position: absolute;
+  width: 100%;
+  top: 0%;
+  left: 0%;
+}
+
+/* Light styling to integrate dropdown with navbar */
+.navbar-dropdown :deep(.top-box) {
+  background: transparent !important;
+  border: none !important;
+  height: 22px !important;
+  padding: 0 !important;
+  font-size: 12px !important;
+  line-height: 12px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.1em !important;
+  font-weight: 300 !important;
+  color: #3d3935 !important;
+  text-shadow: 1px 0 0 #ebe6dc, 0 1px 0 #ebe6dc, -1px 0 0 #ebe6dc, 0 -1px 0 #ebe6dc !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  width: fit-content !important;
+  max-width: 75px !important;
+}
+
+.navbar-dropdown :deep(.top-box:hover) {
+  color: #8A7C59 !important;
+}
+
+.navbar-dropdown :deep(.dropdown-arrow) {
+  width: 6px !important;
+  height: 3px !important;
+  color: #6B6B6B !important;
+  margin-left: 4px !important;
+  flex-shrink: 0 !important;
+}
+
+.navbar-dropdown :deep(.selected-text) {
+  color: inherit !important;
+  font-size: inherit !important;
+  line-height: inherit !important;
+  font-weight: inherit !important;
+  text-transform: inherit !important;
+  letter-spacing: inherit !important;
+  text-shadow: inherit !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  max-width: 60px !important; /* Leave space for arrow */
+}
+
 /* Hover Effects */
 .nav-item-container:hover .hover-underline {
   opacity: 1;
@@ -167,6 +288,16 @@ const cartCount = ref(0);
 
 .nav-item-container:hover .nav-link {
   color: #8A7C59;
+}
+
+/* Trigger hover effect for auth container when dropdown is hovered */
+.auth-container:hover .auth-underline {
+  opacity: 1;
+  transform: scaleX(1);
+}
+
+.auth-container:hover .navbar-dropdown :deep(.top-box) {
+  color: #8A7C59 !important;
 }
 
 /* Specific styling for login link to maintain existing behavior */
