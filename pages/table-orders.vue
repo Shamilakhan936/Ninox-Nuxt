@@ -46,16 +46,16 @@
                   ]"
                 >
                   <span>{{ order.name }}</span>
-                  <UButton
+              <UButton
                     v-if="orders.length > 1"
-                    color="gray"
-                    variant="ghost"
-                    icon="i-heroicons-x-mark"
-                    size="xs"
+                color="gray"
+                variant="ghost"
+                icon="i-heroicons-x-mark"
+                size="xs"
                     class="ml-2 opacity-60 hover:opacity-100 pointer-events-auto"
                     @click.stop="removeOrder(index)"
                     aria-label="Remove order"
-                  />
+              />
                 </button>
                 
                 <!-- Client Selection Area (always present to maintain consistent height) -->
@@ -66,33 +66,33 @@
                   <div v-if="activeTabIndex === index">
                     <div v-if="orders[activeTabIndex].client" class="flex items-center space-x-1 px-2 py-0.5 rounded-full text-xs pointer-events-auto" style="background-color: #E5E5E5;">
                       <span class="font-medium" style="color: #2D2D2D;">
-                        {{ orders[activeTabIndex].client.fields['First Name'] }} {{ orders[activeTabIndex].client.fields['Last Name'] }}
-                      </span>
-                      <UButton
-                        color="gray"
-                        variant="ghost"
-                        icon="i-heroicons-x-mark"
-                        size="xs"
-                        @click="removeOrderClient"
-                      />
-                    </div>
-                    <UButton
-                      v-else
+                    {{ orders[activeTabIndex].client.fields['First Name'] }} {{ orders[activeTabIndex].client.fields['Last Name'] }}
+              </span>
+              <UButton
+                color="gray"
+                variant="ghost"
+                icon="i-heroicons-x-mark"
+                size="xs"
+                    @click="removeOrderClient"
+              />
+            </div>
+            <UButton
+              v-else
                       class="px-3 py-0.5 rounded-full text-xs font-medium pointer-events-auto"
                       style="background-color: #BFB7B0; color: #FFFFFF; min-width: 120px;"
-                      @click="openOrderClientModal"
-                    >
+                  @click="openOrderClientModal"
+            >
                       SELECT CLIENT
-                    </UButton>
-                  </div>
+            </UButton>
+          </div>
                   <!-- Empty space for inactive tabs to maintain consistent height -->
                   <div v-else class="h-[18px]"></div>
-                </div>
-              </div>
-            </div>
+          </div>
+        </div>
+          </div>
             
             <!-- Create New Order Tab -->
-            <div class="relative">
+          <div class="relative">
               <button
                 :class="[
                   'px-3 py-1 text-sm font-medium transition-all duration-200 border-0 rounded-t-lg',
@@ -107,17 +107,17 @@
                   <div class="flex items-center">
                     <UIcon name="i-heroicons-plus" class="w-4 h-4 mr-2" />
                     New Order
-                  </div>
-                </div>
-              </button>
+              </div>
             </div>
-          </div>
-          
+              </button>
+              </div>
+            </div>
+
           <!-- Tab Content Area (seamlessly connected) -->
           <div v-if="activeTabIndex >= 0" class="bg-white rounded-b-lg shadow-sm border border-gray-100 -ml-12 pl-12 rounded-tl-lg relative -mt-px">
             <!-- Product Form Area -->
             <div class="p-6">
-              <!-- Product rows -->
+                <!-- Product rows -->
               <div v-for="(product, pIndex) in orders[activeTabIndex].products" :key="pIndex" class="border-b border-gray-200 pb-4 mb-4 last:border-b-0 last:mb-0">
                 <!-- Form Fields Row with integrated numbering -->
                 <div class="flex flex-wrap gap-2 items-center">
@@ -139,56 +139,53 @@
                   
                   <!-- Product Type -->
                   <div class="flex-shrink-0">
-                    <USelect
+                    <CrastinoDropdown
                       v-model="product.productType"
                       :options="productTypes"
                       placeholder="Type"
-                      class="select-rounded min-w-[120px]"
-                      size="sm"
+                      min-width="120px"
                     />
                   </div>
                   
                   <!-- Fabric Selection - Simplified -->
                   <div class="flex-shrink-0">
-                    <USelect
+                    <CrastinoDropdown
                       :model-value="product.fabricDetails ? product.fabricDetails.fields['Fabric Name'] : ''"
                       :options="[]"
                       placeholder="Fabric"
-                      class="select-rounded min-w-[120px] cursor-pointer"
-                      size="sm"
-                      @click="openFabricModal(pIndex)"
+                      min-width="120px"
+                        @click="openFabricModal(pIndex)"
                     />
-                  </div>
-                  
+                    </div>
+                    
                   <!-- Fabric Color Selection - Simplified -->
                   <div class="flex-shrink-0">
-                    <USelect
+                    <CrastinoDropdown
                       :model-value="product.fabricColorDetails ? product.fabricColorDetails.fields['Color Name'] : ''"
                       :options="[]"
                       placeholder="Colour"
-                      class="select-rounded min-w-[120px] cursor-pointer"
-                      size="sm"
-                      :disabled="!product.fabricDetails"
+                      min-width="120px"
+                        :disabled="!product.fabricDetails"
                       @click="openFabricColorModal(pIndex)"
                     />
                   </div>
-
+                  
                   <!-- Dimensions with custom number controls -->
                   <div class="flex items-center gap-1">
                     <div class="input-rounded number-input">
-                      <UInput
+                    <UInput
                         v-model="product.height"
-                        type="number"
+                      type="number"
                         placeholder="Height"
                         class="input-rounded w-20"
-                        size="sm"
-                      />
+                      size="sm"
+                    />
                       <div class="number-controls">
                         <div class="number-btn" @mousedown="incrementValue(product, 'height', 1)">
                           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <polyline points="18,15 12,9 6,15"></polyline>
                           </svg>
-                        </div>
+                  </div>
                         <div class="number-btn" @mousedown="incrementValue(product, 'height', -1)">
                           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <polyline points="6,9 12,15 18,9"></polyline>
@@ -198,13 +195,13 @@
                     </div>
                     <span class="text-xs" style="color: #6B6B6B;">×</span>
                     <div class="input-rounded number-input">
-                      <UInput
+                    <UInput
                         v-model="product.width"
-                        type="number"
+                      type="number"
                         placeholder="Width"
                         class="input-rounded w-20"
-                        size="sm"
-                      />
+                      size="sm"
+                    />
                       <div class="number-controls">
                         <div class="number-btn" @mousedown="incrementValue(product, 'width', 1)">
                           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -219,18 +216,18 @@
                       </div>
                     </div>
                   </div>
-
+                  
                   <!-- Quantity with custom number controls -->
                   <div class="flex items-center">
                     <div class="input-rounded number-input">
-                      <UInput
-                        v-model="product.quantity"
-                        type="number"
+                    <UInput
+                      v-model="product.quantity"
+                      type="number"
                         placeholder="1"
-                        min="1"
+                      min="1"
                         class="input-rounded w-14"
-                        size="sm"
-                      />
+                      size="sm"
+                    />
                       <div class="number-controls">
                         <div class="number-btn" @mousedown="incrementValue(product, 'quantity', 1)">
                           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -257,44 +254,40 @@
                   </div>
                   
                   <!-- Control/Motor Type -->
-                  <div v-if="product.isMotorized">
-                    <USelect
-                      v-model="product.motorType"
-                      :options="getMotorTypes(product.productType)"
-                      placeholder="Motor Type"
-                      size="sm"
-                      class="select-rounded min-w-[120px]"
-                    />
-                  </div>
-                  <div v-else>
-                    <USelect
-                      v-model="product.controlSide"
-                      :options="['Left', 'Right']"
-                      placeholder="Side"
-                      size="sm"
-                      class="select-rounded min-w-[80px]"
-                    />
+                    <div v-if="product.isMotorized">
+                      <CrastinoDropdown
+                        v-model="product.motorType"
+                        :options="getMotorTypes(product.productType)"
+                        placeholder="Motor Type"
+                        min-width="120px"
+                      />
+                    </div>
+                    <div v-else>
+                      <CrastinoDropdown
+                        v-model="product.controlSide"
+                        :options="['Left', 'Right']"
+                        placeholder="Side"
+                        min-width="80px"
+                      />
                   </div>
                   
                   <!-- Mount Location -->
                   <div>
-                    <USelect
+                    <CrastinoDropdown
                       v-model="product.mountLocation"
                       :options="['Inside', 'Outside', 'Ceiling']"
                       placeholder="Rail"
-                      size="sm"
-                      class="select-rounded min-w-[100px]"
+                      min-width="100px"
                     />
                   </div>
                   
                   <!-- Hardware Color -->
                   <div>
-                    <USelect
+                    <CrastinoDropdown
                       v-model="product.hardwareColor"
                       :options="['White', 'Black', 'Silver', 'Bronze', 'Antique Gold']"
                       placeholder="Hooks"
-                      size="sm"
-                      class="select-rounded min-w-[100px]"
+                      min-width="100px"
                     />
                   </div>
                   
@@ -306,46 +299,46 @@
                       class="input-rounded w-24"
                       size="sm"
                     />
-                  </div>
                 </div>
               </div>
             </div>
+          </div>
             
             <!-- Add New Product Button -->
             <div class="px-6 pb-6">
               <div class="flex justify-start">
                 <button
                   class="add-product-button"
-                  @click="addNewProduct"
-                >
+                @click="addNewProduct"
+              >
                   <UIcon name="i-heroicons-plus" class="w-4 h-4 mr-2" />
-                  Add New Product
+                Add New Product
                 </button>
-              </div>
-            </div>
           </div>
-          
-          <!-- "Add New Tab" View -->
+          </div>
+        </div>
+        
+        <!-- "Add New Tab" View -->
           <div v-else class="bg-white rounded-lg shadow-sm border border-gray-100 p-8 -ml-12 pl-20">
-            <div class="max-w-lg mx-auto text-center">
+          <div class="max-w-lg mx-auto text-center">
               <UIcon name="i-heroicons-plus-circle" class="w-16 h-16 mx-auto mb-4" style="color: #B8A082;" />
               <h3 class="text-xl font-medium mb-2" style="color: #2D2D2D;">Create a New Order</h3>
-            
-              <div class="max-w-md mx-auto">
-                <UFormGroup label="Order Name" class="mb-4">
+          
+          <div class="max-w-md mx-auto">
+            <UFormGroup label="Order Name" class="mb-4">
                   <UInput v-model="newOrderName" placeholder="Enter a name for this order" class="input-rounded" size="lg" />
-                </UFormGroup>
-                
-                <div class="flex justify-center">
-                  <UButton
+            </UFormGroup>
+            
+              <div class="flex justify-center">
+            <UButton
                     class="px-8 py-3 rounded-full text-white font-medium"
                     style="background-color: #B8A082;"
-                    icon="i-heroicons-plus-circle"
-                    size="lg"
-                    @click="createNewOrder"
-                    :disabled="!newOrderName"
-                  >
-                    Create New Order
+                  icon="i-heroicons-plus-circle"
+                  size="lg"
+              @click="createNewOrder"
+              :disabled="!newOrderName"
+            >
+                  Create New Order
                   </UButton>
                 </div>
               </div>
@@ -378,12 +371,12 @@
                   @click="submitCurrentOrder"
                 >
                   SUBMIT ORDER
-                </UButton>
+            </UButton>
               </div>
             </div>
           </div>
         </div>
-
+        
         <!-- Product Details Modal -->
         <UModal v-model="showProductDetailsModal">
           <UCard>
@@ -537,6 +530,7 @@ import ClientSearchModal from '../components/ClientSearchModal.vue'
 import FabricSearchModal from '../components/FabricSearchModal.vue'
 import FabricColorSearchModal from '../components/FabricColorSearchModal.vue'
 import NotificationSystem from '../components/NotificationSystem.vue'
+import CrastinoDropdown from '../components/CrastinoDropdown.vue'
 
 // Check user permissions
 const client = useKindeClient();
@@ -1145,9 +1139,25 @@ function incrementValue(product, field, increment) {
   font-display: swap;
 }
 
-/* Form elements styling to match Figma exactly */
-.input-rounded input {
-  border: 0.7px solid #DBDAD8 !important;
+/* More comprehensive targeting with higher specificity - Default state */
+.input-rounded input,
+.input-rounded .ui-input input,
+.input-rounded div input,
+.select-rounded select,
+.select-rounded .ui-select select,
+.select-rounded div select,
+.select-rounded button,
+.select-rounded .ui-select button,
+.select-rounded div button,
+[data-headlessui-state] input,
+[data-headlessui-state] select,
+[data-headlessui-state] button,
+.ui-input input,
+.ui-select select,
+.ui-select button,
+div[class*="select"] button,
+div[class*="input"] input {
+  border: 0.5px solid #E5E5E5 !important; /* Lighter default border */
   background-color: #FFFFFF !important;
   color: #000 !important;
   border-radius: 48.44px !important;
@@ -1158,30 +1168,238 @@ function incrementValue(product, field, increment) {
   height: 35px !important;
   box-sizing: border-box !important;
   font-family: 'Albert Sans', sans-serif !important;
+  transition: border 0.2s ease !important;
 }
 
-.input-rounded input:focus {
-  border-color: #DBDAD8 !important;
+/* Focus state with even higher specificity */
+.input-rounded input:focus,
+.input-rounded .ui-input input:focus,
+.input-rounded div input:focus,
+.select-rounded select:focus,
+.select-rounded .ui-select select:focus,
+.select-rounded div select:focus,
+.select-rounded button:focus,
+.select-rounded .ui-select button:focus,
+.select-rounded div button:focus,
+.select-rounded button:focus-visible,
+.select-rounded .ui-select button:focus-visible,
+.select-rounded div button:focus-visible,
+[data-headlessui-state] input:focus,
+[data-headlessui-state] select:focus,
+[data-headlessui-state] button:focus,
+[data-headlessui-state="open"] button,
+[data-headlessui-state*="focus"] button,
+.ui-input input:focus,
+.ui-select select:focus,
+.ui-select button:focus,
+.ui-select button:focus-visible,
+div[class*="select"] button:focus,
+div[class*="select"] button:focus-visible,
+div[class*="input"] input:focus,
+/* Target any active/open dropdown states */
+.ui-select[data-headlessui-state="open"] button,
+.ui-select[data-headlessui-state*="open"] button,
+button[data-headlessui-state="open"],
+button[data-headlessui-state*="open"] {
+  border: 1.5px solid #2D2D2D !important; /* Thicker BLACK border on focus */
   box-shadow: none !important;
+  outline: none !important;
 }
 
-.select-rounded select {
-  border: 0.7px solid #DBDAD8 !important;
+/* Ensure focus-within also works for container elements */
+.input-rounded:focus-within,
+.select-rounded:focus-within {
+  /* This will apply to the container when any child has focus */
+}
+
+.input-rounded:focus-within input,
+.input-rounded:focus-within .ui-input input,
+.input-rounded:focus-within div input,
+.select-rounded:focus-within select,
+.select-rounded:focus-within .ui-select select,
+.select-rounded:focus-within div select,
+.select-rounded:focus-within button,
+.select-rounded:focus-within .ui-select button,
+.select-rounded:focus-within div button {
+  border: 1.5px solid #2D2D2D !important;
+}
+
+/* Custom Dropdown Menu Styling */
+[role="listbox"],
+[role="menu"],
+.ui-select-options,
+.ui-select [role="listbox"],
+div[data-headlessui-state] [role="listbox"],
+div[data-headlessui-state] ul,
+.select-rounded [role="listbox"],
+.select-rounded ul {
+  background-color: #FFFFFF !important;
+  border: 0.5px solid #E5E5E5 !important;
+  border-radius: 16px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+  padding: 8px !important;
+  margin-top: 4px !important;
+  font-family: 'Albert Sans', sans-serif !important;
+  max-height: 200px !important;
+  overflow-y: auto !important;
+  z-index: 50 !important;
+}
+
+/* Individual dropdown option styling */
+[role="option"],
+.ui-select-option,
+.ui-select [role="option"],
+div[data-headlessui-state] [role="option"],
+div[data-headlessui-state] li,
+.select-rounded [role="option"],
+.select-rounded li {
+  padding: 8px 12px !important;
+  font-size: 11.74px !important;
+  line-height: 19.08px !important;
+  font-weight: 300 !important;
+  font-family: 'Albert Sans', sans-serif !important;
+  color: #2D2D2D !important;
+  border-radius: 8px !important;
+  margin: 2px 0 !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+  background-color: transparent !important;
+  border: none !important;
+}
+
+/* Dropdown option hover state */
+[role="option"]:hover,
+.ui-select-option:hover,
+.ui-select [role="option"]:hover,
+div[data-headlessui-state] [role="option"]:hover,
+div[data-headlessui-state] li:hover,
+.select-rounded [role="option"]:hover,
+.select-rounded li:hover,
+[data-headlessui-state="active"] {
+  background-color: #F5F5F5 !important;
+  color: #2D2D2D !important;
+}
+
+/* Selected/active dropdown option */
+[role="option"][aria-selected="true"],
+.ui-select-option[aria-selected="true"],
+.ui-select [role="option"][aria-selected="true"],
+div[data-headlessui-state] [role="option"][aria-selected="true"],
+div[data-headlessui-state] li[aria-selected="true"],
+.select-rounded [role="option"][aria-selected="true"],
+.select-rounded li[aria-selected="true"],
+[data-headlessui-state*="selected"] {
+  background-color: #8A7C59 !important;
+  color: #FFFFFF !important;
+  font-weight: 400 !important;
+}
+
+/* Selected option hover state */
+[role="option"][aria-selected="true"]:hover,
+.ui-select-option[aria-selected="true"]:hover,
+.ui-select [role="option"][aria-selected="true"]:hover,
+div[data-headlessui-state] [role="option"][aria-selected="true"]:hover,
+div[data-headlessui-state] li[aria-selected="true"]:hover,
+.select-rounded [role="option"][aria-selected="true"]:hover,
+.select-rounded li[aria-selected="true"]:hover,
+[data-headlessui-state*="selected"]:hover {
+  background-color: #6B5B42 !important;
+  color: #FFFFFF !important;
+}
+
+/* Custom scrollbar for dropdown if needed */
+[role="listbox"]::-webkit-scrollbar,
+.ui-select-options::-webkit-scrollbar,
+.select-rounded [role="listbox"]::-webkit-scrollbar {
+  width: 4px !important;
+}
+
+[role="listbox"]::-webkit-scrollbar-track,
+.ui-select-options::-webkit-scrollbar-track,
+.select-rounded [role="listbox"]::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+
+[role="listbox"]::-webkit-scrollbar-thumb,
+.ui-select-options::-webkit-scrollbar-thumb,
+.select-rounded [role="listbox"]::-webkit-scrollbar-thumb {
+  background-color: #E5E5E5 !important;
+  border-radius: 2px !important;
+}
+
+[role="listbox"]::-webkit-scrollbar-thumb:hover,
+.ui-select-options::-webkit-scrollbar-thumb:hover,
+.select-rounded [role="listbox"]::-webkit-scrollbar-thumb:hover {
+  background-color: #DBDAD8 !important;
+}
+
+/* Dropdown arrow styling */
+.select-rounded svg,
+.ui-select svg,
+.select-rounded .ui-select svg {
+  color: #6B6B6B !important;
+  width: 14px !important;
+  height: 14px !important;
+  transition: transform 0.2s ease !important;
+}
+
+.select-rounded[data-headlessui-state="open"] svg,
+.ui-select[data-headlessui-state="open"] svg,
+.select-rounded .ui-select[data-headlessui-state="open"] svg {
+  transform: rotate(180deg) !important;
+}
+
+/* Special instructions field styling - Updated border behavior */
+.special-instructions,
+.special-instructions input,
+.special-instructions .ui-input input {
+  border: 0.5px solid #E5E5E5 !important; /* Lighter default border */
+  border-radius: 48.44px !important;
+  background-color: #fff !important;
+  height: 35px !important;
+  font-size: 11.74px !important;
+  line-height: 19.08px !important;
+  font-weight: 300 !important;
+  font-family: 'Albert Sans', sans-serif !important;
+  padding: 8.8px 16.1px !important;
+  transition: border 0.2s ease !important;
+}
+
+.special-instructions:focus,
+.special-instructions input:focus,
+.special-instructions .ui-input input:focus,
+.special-instructions:focus-within input {
+  border: 1.5px solid #2D2D2D !important; /* Thicker BLACK border on focus */
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+/* Textarea styling - Updated border behavior */
+.textarea-rounded textarea {
+  border: 0.5px solid #E5E5E5 !important; /* Lighter default border */
   background-color: #FFFFFF !important;
   color: #000 !important;
   border-radius: 48.44px !important;
   font-size: 11.74px !important;
   line-height: 19.08px !important;
   font-weight: 300 !important;
-  padding: 8.8px 16.1px !important;
-  height: 35px !important;
-  box-sizing: border-box !important;
   font-family: 'Albert Sans', sans-serif !important;
+  transition: border 0.2s ease !important;
 }
 
-.select-rounded select:focus {
-  border-color: #DBDAD8 !important;
+.textarea-rounded textarea:focus {
+  border: 1.5px solid #2D2D2D !important; /* Thicker BLACK border on focus */
   box-shadow: none !important;
+  outline: none !important;
+}
+
+/* Override any conflicting Nuxt UI styles with highest specificity */
+.min-h-screen .input-rounded input:focus,
+.min-h-screen .select-rounded button:focus,
+.min-h-screen .select-rounded select:focus {
+  border: 1.5px solid #2D2D2D !important;
+  box-shadow: none !important;
+  outline: none !important;
 }
 
 /* Tab styling to match Figma */
@@ -1275,22 +1493,6 @@ function incrementValue(product, field, increment) {
 
 .input-rounded.number-input .number-btn:hover svg {
   color: #8A7C59;
-}
-
-.textarea-rounded textarea {
-  border: 0.7px solid #DBDAD8 !important;
-  background-color: #FFFFFF !important;
-  color: #000 !important;
-  border-radius: 48.44px !important;
-  font-size: 11.74px !important;
-  line-height: 19.08px !important;
-  font-weight: 300 !important;
-  font-family: 'Albert Sans', sans-serif !important;
-}
-
-.textarea-rounded textarea:focus {
-  border-color: #DBDAD8 !important;
-  box-shadow: none !important;
 }
 
 /* Enhanced rounded buttons to match Figma */
@@ -1400,18 +1602,5 @@ input[type="checkbox"] {
   line-height: 24px !important;
   color: #3D3935 !important;
   font-family: 'Albert Sans', sans-serif !important;
-}
-
-/* Special instructions field styling */
-.special-instructions {
-  border: 0.7px solid #DBDAD8 !important;
-  border-radius: 48.44px !important;
-  background-color: #fff !important;
-  height: 35px !important;
-  font-size: 11.74px !important;
-  line-height: 19.08px !important;
-  font-weight: 300 !important;
-  font-family: 'Albert Sans', sans-serif !important;
-  padding: 8.8px 16.1px !important;
 }
 </style>
