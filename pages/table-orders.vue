@@ -1603,4 +1603,15 @@ input[type="checkbox"] {
   color: #3D3935 !important;
   font-family: 'Albert Sans', sans-serif !important;
 }
+
+/* Reset text selection to default browser blue */
+::selection {
+  background-color: #0ea5e9 !important; /* Default browser blue */
+  color: white !important;
+}
+
+::-moz-selection {
+  background-color: #0ea5e9 !important; /* Default browser blue for Firefox */
+  color: white !important;
+}
 </style>
