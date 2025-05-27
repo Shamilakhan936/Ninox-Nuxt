@@ -47,7 +47,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onUnmounted } from 'vue'
+import { ref, computed, watch, onUnmounted, nextTick } from 'vue'
 
 const props = defineProps({
   modelValue: {
@@ -75,6 +75,7 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue', 'click'])
 
 const isOpen = ref(false)
+const containerRef = ref(null)
 
 // Computed property for display value
 const displayValue = computed(() => {
@@ -126,9 +127,21 @@ function toggleDropdown() {
   isOpen.value = !isOpen.value
   console.log('Dropdown isOpen now:', isOpen.value)
   
-  // Emit click event for special cases (like fabric/color modals)
+  // Calculate position when opening
   if (isOpen.value) {
+    nextTick(() => {
+      updateDropdownPosition()
+    })
     emit('click')
+  }
+}
+
+function updateDropdownPosition() {
+  const container = document.querySelector('.custom-dropdown-container')
+  if (container) {
+    const rect = container.getBoundingClientRect()
+    document.documentElement.style.setProperty('--trigger-bottom', `${rect.bottom}px`)
+    document.documentElement.style.setProperty('--trigger-left', `${rect.left}px`)
   }
 }
 
@@ -240,18 +253,20 @@ onUnmounted(() => {
 }
 
 .dropdown-menu {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  margin-top: 4px;
+  position: fixed;
+  top: calc(var(--trigger-bottom, 0px) + 4px);
+  left: var(--trigger-left, 0px);
+  margin-top: 0;
   border-radius: 26px;
   background-color: #fff;
   border: 1px solid #8a7c59;
   box-sizing: border-box;
   max-height: 244px;
   overflow-y: auto;
-  z-index: 9999;
+  z-index: 10000;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  width: max-content;
+  min-width: 200px;
 }
 
 .dropdown-content {

@@ -327,9 +327,9 @@ function handleUserMenuSelection(selectedOption) {
 .bg {
   position: absolute;
   top: 0px;
-  left: calc(50% - 719.99px);
+  left: 0;
   background-color: #f7f7f5;
-  width: 1440px;
+  width: 100%;
   height: 120px;
 }
 
@@ -382,10 +382,10 @@ function handleUserMenuSelection(selectedOption) {
 .menu-border {
   position: absolute;
   top: 117.79px;
-  left: calc(50% - 720.5px);
+  left: 0;
   border-top: 1px solid #bfb7b0;
   box-sizing: border-box;
-  width: 1441px;
+  width: 100%;
   height: 1px;
 }
 
@@ -406,6 +406,9 @@ function handleUserMenuSelection(selectedOption) {
   font-size: 16px;
   color: #000;
   font-family: 'Albert Sans', sans-serif;
+  max-width: 100vw;
+  overflow: visible; /* Changed from overflow-x: hidden to allow dropdown to show */
+  z-index: 100; /* Ensure navbar has proper stacking context */
 }
 
 /* Responsive adjustments for smaller screens */
