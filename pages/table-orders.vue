@@ -147,27 +147,33 @@
                     />
                   </div>
                   
-                  <!-- Fabric Selection - Simplified -->
+                  <!-- Fabric Selection - Modal Button -->
                   <div class="flex-shrink-0">
-                    <CrastinoDropdown
-                      :model-value="product.fabricDetails ? product.fabricDetails.fields['Fabric Name'] : ''"
-                      :options="[]"
-                      placeholder="Fabric"
-                      min-width="120px"
-                        @click="openFabricModal(pIndex)"
-                    />
-                    </div>
+                    <button
+                      class="select-rounded fabric-button"
+                      style="min-width: 120px;"
+                      @click="openFabricModal(pIndex)"
+                    >
+                      <span class="flex-1 text-left">
+                        {{ product.fabricDetails ? product.fabricDetails.fields['Fabric Name'] : 'Fabric' }}
+                      </span>
+                      <UIcon name="i-heroicons-chevron-down" class="w-4 h-4 flex-shrink-0" />
+                    </button>
+                  </div>
                     
-                  <!-- Fabric Color Selection - Simplified -->
+                  <!-- Fabric Color Selection - Modal Button -->
                   <div class="flex-shrink-0">
-                    <CrastinoDropdown
-                      :model-value="product.fabricColorDetails ? product.fabricColorDetails.fields['Color Name'] : ''"
-                      :options="[]"
-                      placeholder="Colour"
-                      min-width="120px"
-                        :disabled="!product.fabricDetails"
+                    <button
+                      class="select-rounded fabric-button"
+                      style="min-width: 120px;"
+                      :disabled="!product.fabricDetails"
                       @click="openFabricColorModal(pIndex)"
-                    />
+                    >
+                      <span class="flex-1 text-left">
+                        {{ product.fabricColorDetails ? product.fabricColorDetails.fields['Color Name'] : 'Colour' }}
+                      </span>
+                      <UIcon name="i-heroicons-chevron-down" class="w-4 h-4 flex-shrink-0" />
+                    </button>
                   </div>
                   
                   <!-- Dimensions with custom number controls -->
@@ -1613,5 +1619,63 @@ input[type="checkbox"] {
 ::-moz-selection {
   background-color: #0ea5e9 !important; /* Default browser blue for Firefox */
   color: white !important;
+}
+
+/* Fabric button styling to match CrastinoDropdown exactly */
+.fabric-button {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  border: 0.5px solid #E5E5E5 !important;
+  background-color: #FFFFFF !important;
+  color: #000 !important;
+  border-radius: 48.44px !important;
+  font-size: 11.74px !important;
+  line-height: 19.08px !important;
+  font-weight: 300 !important;
+  padding: 8.8px 16.1px !important;
+  height: 35px !important;
+  box-sizing: border-box !important;
+  font-family: 'Albert Sans', sans-serif !important;
+  transition: border 0.2s ease !important;
+  cursor: pointer !important;
+  outline: none !important;
+}
+
+.fabric-button:hover {
+  border: 1px solid #BFB7B0 !important;
+}
+
+.fabric-button:focus,
+.fabric-button:focus-visible {
+  border: 1.5px solid #2D2D2D !important;
+  box-shadow: none !important;
+}
+
+.fabric-button:disabled {
+  background-color: #F9F9F9 !important;
+  color: #DBDAD8 !important;
+  cursor: not-allowed !important;
+  border: 0.5px solid #E5E5E5 !important;
+}
+
+.fabric-button:disabled:hover {
+  border: 0.5px solid #E5E5E5 !important;
+}
+
+.fabric-button span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fabric-button svg {
+  color: #6B6B6B !important;
+  transition: transform 0.2s ease !important;
+}
+
+.fabric-button:disabled svg {
+  color: #DBDAD8 !important;
 }
 </style>
