@@ -1,5 +1,5 @@
 <template>
-  <div class="custom-dropdown-container" :style="{ minWidth: minWidth }">
+  <div ref="containerRef" class="custom-dropdown-container" :style="{ minWidth: minWidth }">
     <!-- Top Box (Trigger) -->
     <div 
       :class="[
@@ -19,7 +19,11 @@
       v-if="isOpen" 
       class="dropdown-menu"
       @click.stop
-      :style="{ minWidth: minWidth }"
+      :style="{ 
+        minWidth: minWidth,
+        top: dropdownPosition.top + 'px',
+        left: dropdownPosition.left + 'px'
+      }"
     >
       <div class="dropdown-content">
         <div 
@@ -76,6 +80,7 @@ const emit = defineEmits(['update:modelValue', 'click'])
 
 const isOpen = ref(false)
 const containerRef = ref(null)
+const dropdownPosition = ref({ top: 0, left: 0 })
 
 // Computed property for display value
 const displayValue = computed(() => {
@@ -137,11 +142,12 @@ function toggleDropdown() {
 }
 
 function updateDropdownPosition() {
-  const container = document.querySelector('.custom-dropdown-container')
-  if (container) {
-    const rect = container.getBoundingClientRect()
-    document.documentElement.style.setProperty('--trigger-bottom', `${rect.bottom}px`)
-    document.documentElement.style.setProperty('--trigger-left', `${rect.left}px`)
+  if (containerRef.value) {
+    const rect = containerRef.value.getBoundingClientRect()
+    dropdownPosition.value = {
+      top: rect.bottom + 4, // 4px spacing below the trigger
+      left: rect.left
+    }
   }
 }
 
@@ -253,10 +259,7 @@ onUnmounted(() => {
 }
 
 .dropdown-menu {
-  position: fixed;
-  top: calc(var(--trigger-bottom, 0px) + 4px);
-  left: var(--trigger-left, 0px);
-  margin-top: 0;
+  position: fixed; /* Keep fixed positioning for proper z-index layering */
   border-radius: 26px;
   background-color: #fff;
   border: 1px solid #8a7c59;

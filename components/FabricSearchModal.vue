@@ -1,175 +1,171 @@
 <template>
   <UModal v-model="isOpen" :ui="{ width: 'max-w-4xl' }">
-    <UCard>
-      <template #header>
-        <div class="flex items-center justify-between">
-          <h3 class="text-lg font-semibold">Select Fabric</h3>
-          <UButton
-            icon="i-heroicons-x-mark"
-            color="gray"
-            variant="ghost"
-            @click="close"
-          />
-        </div>
-      </template>
+    <div class="fabric-search-container">
+      <!-- Close button - properly positioned -->
+      <button
+        class="close-button"
+        @click="close"
+      >
+        ×
+      </button>
       
-      <!-- Search input -->
-      <div class="mb-4">
-        <div class="flex flex-col gap-2">
-          <div class="flex gap-2">
-            <UInputGroup class="flex-grow">
-              <UInput
-                v-model="searchTerm"
-                placeholder="Search by fabric name, color or type..."
-                @keyup.enter="search"
-                autofocus
-              />
-              <UButton
-                color="gray"
-                @click="searchTerm = ''"
-                v-if="searchTerm"
-                icon="i-heroicons-x-mark"
-              />
-            </UInputGroup>
-            <UButton
-              icon="i-heroicons-magnifying-glass"
-              color="primary"
-              :loading="isLoading"
-              @click="search"
-            >
-              Search
-            </UButton>
-          </div>
-          <p class="text-xs text-gray-500">
-            Search will be filtered by the selected product type: {{ productType }}
-          </p>
-        </div>
+      <!-- Title -->
+      <div class="search-title">Find Fabric</div>
+      
+      <!-- Subtitle -->
+      <div class="search-subtitle">Enter a search term and click "search" to find fabrics</div>
+      
+      <!-- Divider line -->
+      <div class="search-divider" />
+      
+      <!-- Search form container -->
+      <div class="search-form-container">
+        <!-- Search input -->
+        <input
+          v-model="searchTerm"
+          placeholder="Search by fabric name, color or type..."
+          class="search-input"
+          @keyup.enter="search"
+          autofocus
+        />
+        
+        <!-- Search button -->
+        <button
+          class="search-button"
+          :disabled="isLoading"
+          @click="search"
+        >
+          <span v-if="!isLoading">SEARCH</span>
+          <span v-else>SEARCHING...</span>
+        </button>
       </div>
       
-      <!-- Loading state -->
-      <div v-if="isLoading" class="flex justify-center py-8">
-        <ULoader />
+      <!-- Helper text -->
+      <div class="search-helper-text">
+        Enter at least 3 characters to search. More specific searches will yield better results.
       </div>
       
-      <!-- Error message -->
-      <UAlert
-        v-else-if="error"
-        color="red"
-        variant="soft"
-        icon="i-heroicons-exclamation-triangle"
-        class="mb-4"
-      >
-        {{ error }}
-      </UAlert>
-      
-      <!-- No results message -->
-      <UAlert
-        v-else-if="showResults && fabrics.length === 0 && searchTerm"
-        color="amber"
-        variant="soft"
-        icon="i-heroicons-exclamation-triangle"
-        class="mb-4"
-      >
-        No fabrics found matching "{{ searchTerm }}" for product type "{{ productType }}". Try a different search term.
-      </UAlert>
-      
-      <!-- Search results -->
-      <div v-if="showResults && fabrics.length > 0" class="border rounded-lg overflow-hidden">
-        <div class="bg-gray-50 p-2 flex justify-between items-center">
-          <span class="text-sm text-gray-600">
-            Found {{ pagination.total }} fabric(s)
-            <span v-if="pagination.total > pagination.limit">
-              (showing {{ fabrics.length }} of {{ pagination.total }})
-            </span>
-          </span>
-          
-          <!-- Add pagination controls -->
-          <div class="flex items-center space-x-2" v-if="pagination.totalPages > 1">
-            <UButton 
-              icon="i-heroicons-chevron-left" 
-              size="xs" 
-              color="gray" 
-              variant="ghost"
-              :disabled="pagination.page === 1"
-              @click="changePage(pagination.page - 1)"
-            />
-            <span class="text-sm text-gray-600">
-              Page {{ pagination.page }} of {{ pagination.totalPages }}
-            </span>
-            <UButton 
-              icon="i-heroicons-chevron-right" 
-              size="xs" 
-              color="gray" 
-              variant="ghost"
-              :disabled="pagination.page === pagination.totalPages"
-              @click="changePage(pagination.page + 1)"
-            />
-          </div>
+      <!-- Results section - shown after search -->
+      <div v-if="showResults" class="results-section">
+        <!-- Loading state -->
+        <div v-if="isLoading" class="flex justify-center py-8">
+          <UIcon name="i-heroicons-arrow-path" class="w-6 h-6 animate-spin text-gray-500" />
         </div>
         
-        <UTable
-          :columns="[
-            { key: 'preview', label: '' },
-            { key: 'name', label: 'Name', sortable: true },
-            { key: 'type', label: 'Type' },
-            { key: 'color', label: 'Color' },
-            { key: 'actions', label: '' }
-          ]"
-          :rows="formattedFabrics"
-          hover
-          :sort="{ column: 'name', direction: 'asc' }"
+        <!-- Error message -->
+        <UAlert
+          v-else-if="error"
+          color="red"
+          variant="soft"
+          icon="i-heroicons-exclamation-triangle"
+          class="mb-4"
         >
-          <template #preview-data="{ row }">
-            <div class="w-10 h-10 rounded-md overflow-hidden">
-              <img 
-                v-if="row.imageUrl" 
-                :src="row.imageUrl" 
-                :alt="row.name" 
-                class="w-full h-full object-cover"
+          {{ error }}
+        </UAlert>
+        
+        <!-- No results message -->
+        <UAlert
+          v-else-if="fabrics.length === 0 && searchTerm"
+          color="amber"
+          variant="soft"
+          icon="i-heroicons-exclamation-triangle"
+          class="mb-4"
+        >
+          No fabrics found matching "{{ searchTerm }}" for product type "{{ productType }}". Try a different search term.
+        </UAlert>
+        
+        <!-- Search results -->
+        <div v-if="fabrics.length > 0" class="border rounded-lg overflow-hidden">
+          <div class="bg-gray-50 p-2 flex justify-between items-center">
+            <span class="text-sm text-gray-600">
+              Found {{ pagination.total }} fabric(s)
+              <span v-if="pagination.total > pagination.limit">
+                (showing {{ fabrics.length }} of {{ pagination.total }})
+              </span>
+            </span>
+            
+            <!-- Pagination controls -->
+            <div class="flex items-center space-x-2" v-if="pagination.totalPages > 1">
+              <UButton 
+                icon="i-heroicons-chevron-left" 
+                size="xs" 
+                color="gray" 
+                variant="ghost"
+                :disabled="pagination.page === 1"
+                @click="changePage(pagination.page - 1)"
               />
-              <div 
-                v-else 
-                class="w-full h-full flex items-center justify-center bg-gray-200"
-                :style="{ backgroundColor: row.color || '#f3f4f6' }"
-              >
-                <UIcon name="i-heroicons-swatch" class="h-6 w-6 text-white opacity-75" />
+              <span class="text-sm text-gray-600">
+                Page {{ pagination.page }} of {{ pagination.totalPages }}
+              </span>
+              <UButton 
+                icon="i-heroicons-chevron-right" 
+                size="xs" 
+                color="gray" 
+                variant="ghost"
+                :disabled="pagination.page === pagination.totalPages"
+                @click="changePage(pagination.page + 1)"
+              />
+            </div>
+          </div>
+          
+          <UTable
+            :columns="[
+              { key: 'preview', label: '' },
+              { key: 'name', label: 'Name', sortable: true },
+              { key: 'type', label: 'Type' },
+              { key: 'color', label: 'Color' },
+              { key: 'actions', label: '' }
+            ]"
+            :rows="formattedFabrics"
+            hover
+            :sort="{ column: 'name', direction: 'asc' }"
+          >
+            <template #preview-data="{ row }">
+              <div class="w-10 h-10 rounded-md overflow-hidden">
+                <img 
+                  v-if="row.imageUrl" 
+                  :src="row.imageUrl" 
+                  :alt="row.name" 
+                  class="w-full h-full object-cover"
+                />
+                <div 
+                  v-else 
+                  class="w-full h-full flex items-center justify-center bg-gray-200"
+                  :style="{ backgroundColor: row.color || '#f3f4f6' }"
+                >
+                  <UIcon name="i-heroicons-swatch" class="h-6 w-6 text-white opacity-75" />
+                </div>
               </div>
-            </div>
-          </template>
-          <template #type-data="{ row }">
-            <UBadge color="blue" variant="subtle" size="sm">
-              {{ row.type }}
-            </UBadge>
-          </template>
-          <template #color-data="{ row }">
-            <div class="flex items-center">
-              <span 
-                class="w-4 h-4 rounded-full mr-2" 
-                :style="{ backgroundColor: row.hex || '#f3f4f6' }"
-              ></span>
-              {{ row.color }}
-            </div>
-          </template>
-          <template #actions-data="{ row }">
-            <UButton
-              color="primary"
-              variant="ghost"
-              size="xs"
-              @click="selectFabric(row._original)"
-            >
-              Select
-            </UButton>
-          </template>
-        </UTable>
-      </div>
-      
-      <!-- Initial state message - only show if no search has been performed -->
-      <div v-if="!showResults && !isLoading && !error" class="py-8 text-center text-gray-500">
-        Search for fabrics compatible with {{ productType }}
-      </div>
-      
-      <template #footer>
-        <div class="flex justify-between">
+            </template>
+            <template #type-data="{ row }">
+              <UBadge color="blue" variant="subtle" size="sm">
+                {{ row.type }}
+              </UBadge>
+            </template>
+            <template #color-data="{ row }">
+              <div class="flex items-center">
+                <span 
+                  class="w-4 h-4 rounded-full mr-2" 
+                  :style="{ backgroundColor: row.hex || '#f3f4f6' }"
+                ></span>
+                {{ row.color }}
+              </div>
+            </template>
+            <template #actions-data="{ row }">
+              <UButton
+                color="primary"
+                variant="ghost"
+                size="xs"
+                @click="selectFabric(row._original)"
+              >
+                Select
+              </UButton>
+            </template>
+          </UTable>
+        </div>
+        
+        <!-- Footer buttons for results view -->
+        <div class="flex justify-between mt-4">
           <UButton color="gray" variant="soft" @click="close">
             Cancel
           </UButton>
@@ -181,8 +177,8 @@
             Done
           </UButton>
         </div>
-      </template>
-    </UCard>
+      </div>
+    </div>
   </UModal>
 </template>
 
@@ -250,6 +246,11 @@ async function search() {
     return
   }
   
+  if (searchTerm.value.length < 3) {
+    error.value = 'Please enter at least 3 characters to search'
+    return
+  }
+  
   error.value = ''
   isLoading.value = true
   showResults.value = true
@@ -292,7 +293,6 @@ function changePage(newPage) {
 
 // Function to select a fabric
 function selectFabric(fabric) {
-  // Looking at the logs, we can see the Fabric ID is in fields['Fabric ID']
   const fabricId = fabric.fields['Fabric ID'];
   
   console.log('Selected fabric with fabricId:', fabricId);
@@ -304,7 +304,7 @@ function selectFabric(fabric) {
   
   emit('select', {
     ...fabric,
-    fabricId: fabricId // Add this explicit property
+    fabricId: fabricId
   });
   
   emit('notification', {
@@ -319,6 +319,7 @@ function selectFabric(fabric) {
 // Function to close the modal
 function close() {
   isOpen.value = false
+  showResults.value = false
 }
 
 // Reset state when opening modal
@@ -330,19 +331,186 @@ function reset() {
   pagination.value.page = 1
 }
 
-// Auto-search when modal opens
-watch(isOpen, (newValue) => {
-  if (newValue && props.productType) {
-    // Slight delay to ensure DOM is ready
-    setTimeout(() => {
-      search()
-    }, 100)
-  }
-})
-
 // Expose functions to parent
 defineExpose({
   reset,
   search
 })
 </script>
+
+<style scoped>
+/* Import Albert Sans font */
+@import url('https://fonts.googleapis.com/css2?family=Albert+Sans:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+.fabric-search-container {
+  width: 100%;
+  position: relative;
+  min-height: 330px;
+  max-width: 860px;
+  margin: 0 auto;
+  text-align: left;
+  font-size: 12px;
+  color: #000;
+  font-family: 'Albert Sans', sans-serif;
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 60px 56px 60px 56px;
+}
+
+.close-button {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid #E5E5E5;
+  background-color: #fff;
+  color: #666;
+  font-size: 18px;
+  font-weight: 300;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  font-family: 'Albert Sans', sans-serif;
+}
+
+.close-button:hover {
+  background-color: #f5f5f5;
+  border-color: #ccc;
+}
+
+.search-title {
+  text-align: center;
+  font-size: 30px;
+  line-height: 40px;
+  font-weight: 300;
+  color: #000;
+  margin-bottom: 16px;
+}
+
+.search-subtitle {
+  text-align: center;
+  letter-spacing: 0.2em;
+  line-height: 14px;
+  text-transform: uppercase;
+  color: #3d3935;
+  font-size: 12px;
+  margin-bottom: 20px;
+}
+
+.search-divider {
+  background-color: rgba(61, 57, 53, 0.15);
+  width: 100%;
+  height: 1px;
+  margin-bottom: 40px;
+}
+
+.search-form-container {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.search-input {
+  border-radius: 66px;
+  background-color: #fff;
+  border: 1px solid #c9c7c5;
+  padding: 12px 24px;
+  font-size: 16px;
+  line-height: 26px;
+  font-weight: 300;
+  flex: 1;
+  max-width: 500px;
+  font-family: 'Albert Sans', sans-serif;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.search-input:focus {
+  border-color: #8a7c59;
+}
+
+.search-input::placeholder {
+  color: #9CA3AF;
+}
+
+.search-button {
+  border-radius: 74px;
+  background-color: #8a7c59;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 48px;
+  text-align: center;
+  font-size: 13px;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  letter-spacing: 0.1em;
+  line-height: 13px;
+  text-transform: uppercase;
+  font-family: 'Albert Sans', sans-serif;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.search-button:hover:not(:disabled) {
+  background-color: #6B5B42;
+}
+
+.search-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.search-helper-text {
+  text-align: center;
+  line-height: 16px;
+  color: #6f6259;
+  font-size: 12px;
+  margin-bottom: 20px;
+}
+
+.results-section {
+  margin-top: 40px;
+  padding: 0;
+}
+
+/* Reset text selection to browser default */
+::selection {
+  background-color: Highlight !important;
+  color: HighlightText !important;
+}
+
+::-moz-selection {
+  background-color: Highlight !important;
+  color: HighlightText !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .fabric-search-container {
+    padding: 40px 24px;
+  }
+  
+  .search-form-container {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .search-input {
+    max-width: 100%;
+  }
+  
+  .search-button {
+    padding: 12px 32px;
+  }
+}
+</style>
