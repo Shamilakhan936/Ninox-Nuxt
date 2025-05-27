@@ -28,9 +28,7 @@
     <div class="nav-item-container auth-container">
       <div class="hover-underline auth-underline"></div>
       <template v-if="$auth.loggedIn">
-        <UDropdown :items="userMenuItems" :popper="{ placement: 'bottom-end' }">
-          <span class="nav-link login cursor-pointer">{{ $auth.user.given_name || 'Account' }}</span>
-        </UDropdown>
+        <NuxtLink to="/account" class="nav-link login">{{ $auth.user.given_name || 'Account' }}</NuxtLink>
       </template>
       <template v-else>
         <LoginLink to="/api/login" external class="nav-link login">Login</LoginLink>
@@ -61,38 +59,10 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref } from 'vue';
 
 // Cart count - you can replace this with actual cart state
 const cartCount = ref(0);
-
-const userMenuItems = computed(() => [
-  [
-    {
-      label: 'My Account',
-      icon: 'i-heroicons-user-circle',
-      to: '/account'
-    },
-    {
-      label: 'My Orders',
-      icon: 'i-heroicons-shopping-cart',
-      to: '/orders'
-    },
-    {
-      label: 'Table Orders',
-      icon: 'i-heroicons-table-cells',
-      to: '/table-orders'
-    }
-  ],
-  [
-    {
-      label: 'Sign Out',
-      icon: 'i-heroicons-arrow-right-on-rectangle',
-      to: '/api/logout',
-      external: true
-    }
-  ]
-]);
 </script>
 
 <style scoped>
@@ -135,7 +105,7 @@ const userMenuItems = computed(() => [
 }
 
 .auth-container {
-  top: 36px; /* Aligned with other nav items */
+  top: 49px; /* Aligned with other nav items */
   left: calc(50% + 445.01px);
   width: 70px; /* Added width for proper underline sizing */
   z-index: 50;
@@ -167,7 +137,7 @@ const userMenuItems = computed(() => [
 
 /* Special positioning for auth container underline */
 .auth-underline {
-  top: 150%; /* Adjusted positioning to place underline below the text with same container height */
+  top: 90.91%; /* Adjusted positioning to place underline below the text with same container height */
 }
 
 /* Navigation Link Styles */
