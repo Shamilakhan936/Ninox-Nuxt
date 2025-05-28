@@ -169,13 +169,13 @@ function handleUserMenuSelection(selectedOption) {
 }
 
 .auth-container {
-  top: 44px; /* Aligned with other nav items */
+  top: 49px; /* Standard position for logged out state */
   left: calc(50% + 445.01px);
-  width: fit-content; /* Dynamic width based on content */
-  max-width: 75px; /* Maximum width to prevent overlap */
-  min-width: 50px; /* Minimum width for "Login" */
+  width: fit-content;
+  max-width: 75px;
+  min-width: 50px;
   z-index: 50;
-  height: 22px; /* Same height as other containers for consistent underline thickness */
+  height: 22px;
 }
 
 .cart-container {
@@ -230,7 +230,7 @@ function handleUserMenuSelection(selectedOption) {
 .navbar-dropdown {
   position: absolute;
   width: 100%;
-  top: 0%;
+  top: -5px; /* Move dropdown up 5px to compensate for its internal positioning */
   left: 0%;
 }
 
