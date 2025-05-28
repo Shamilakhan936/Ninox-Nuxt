@@ -183,7 +183,7 @@
                         v-model="product.height"
                       type="number"
                         placeholder="Height"
-                        class="input-rounded w-20"
+                        class="input-rounded w-24"
                       size="sm"
                     />
                       <div class="number-controls">
@@ -205,7 +205,7 @@
                         v-model="product.width"
                       type="number"
                         placeholder="Width"
-                        class="input-rounded w-20"
+                        class="input-rounded w-24"
                       size="sm"
                     />
                       <div class="number-controls">
