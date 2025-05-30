@@ -117,234 +117,340 @@
           <div v-if="activeTabIndex >= 0" class="bg-white rounded-b-lg shadow-sm border border-gray-100 -ml-12 pl-12 rounded-tl-lg relative -mt-px">
             <!-- Product Form Area -->
             <div class="p-6">
-                <!-- Product rows -->
+                <!-- Product rows with horizontal scrolling -->
               <div v-for="(product, pIndex) in orders[activeTabIndex].products" :key="pIndex" class="border-b border-gray-200 pb-4 mb-4 last:border-b-0 last:mb-0">
-                <!-- Form Fields Row with integrated numbering -->
-                <div class="flex flex-wrap gap-2 items-center">
-                  <!-- Elegant Delete Button -->
-                  <div class="flex-shrink-0">
-                    <button
-                      class="delete-product-button"
-                      @click="removeProduct(pIndex)"
-                      aria-label="Delete product"
-                    >
-                      ×
-                    </button>
-                  </div>
-                  
-                  <!-- Compact Number -->
-                  <div class="flex-shrink-0">
-                    <span class="product-number">{{ pIndex + 1 }}.</span>
-                  </div>
-                  
-                  <!-- Product Type -->
-                  <div class="flex-shrink-0">
-                    <CrastinoDropdown
-                      v-model="product.productType"
-                      :options="productTypes"
-                      placeholder="Type"
-                      min-width="120px"
-                    />
-                  </div>
-                  
-                  <!-- Fabric Selection - Modal Button -->
-                  <div class="flex-shrink-0">
-                    <button
-                      class="select-rounded fabric-button"
-                      style="min-width: 120px;"
-                      @click="openFabricModal(pIndex)"
-                    >
-                      <span class="flex-1 text-left">
-                        {{ product.fabricDetails ? product.fabricDetails.fields['Fabric Name'] : 'Fabric' }}
-                      </span>
-                      <UIcon name="i-heroicons-chevron-down" class="w-4 h-4 flex-shrink-0" />
-                    </button>
-                  </div>
+                <!-- Horizontal scrollable form fields container -->
+                <div class="product-form-container">
+                  <div class="product-form-scroll">
+                    <!-- Delete Button - Fixed at start -->
+                    <div class="form-field-fixed">
+                      <button
+                        class="delete-product-button"
+                        @click="removeProduct(pIndex)"
+                        aria-label="Delete product"
+                      >
+                        ×
+                      </button>
+                    </div>
                     
-                  <!-- Fabric Color Selection - Modal Button -->
-                  <div class="flex-shrink-0">
-                    <button
-                      class="select-rounded fabric-button"
-                      style="min-width: 120px;"
-                      :disabled="!product.fabricDetails"
-                      @click="openFabricColorModal(pIndex)"
+                    <!-- Number - Fixed at start -->
+                    <div class="form-field-fixed">
+                      <span class="product-number">{{ pIndex + 1 }}.</span>
+                    </div>
+                    
+                    <!-- Scrollable fields -->
+                    <div 
+                      class="form-fields-scroll"
+                      :data-ref="`scrollContainer_${pIndex}`"
+                      @scroll="updateCustomScrollbar($event, pIndex)"
                     >
-                      <span class="flex-1 text-left">
-                        {{ product.fabricColorDetails ? product.fabricColorDetails.fields['Color Name'] : 'Colour' }}
-                      </span>
-                      <UIcon name="i-heroicons-chevron-down" class="w-4 h-4 flex-shrink-0" />
-                    </button>
-                  </div>
-                  
-                  <!-- Dimensions with custom number controls -->
-                  <div class="flex items-center gap-1">
-                    <div class="input-rounded number-input">
-                    <UInput
-                        v-model="product.height"
-                      type="number"
-                        placeholder="Height"
-                        class="input-rounded w-24"
-                      size="sm"
-                    />
-                      <div class="number-controls">
-                        <div class="number-btn" @mousedown="incrementValue(product, 'height', 1)">
-                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="18,15 12,9 6,15"></polyline>
-                          </svg>
-                  </div>
-                        <div class="number-btn" @mousedown="incrementValue(product, 'height', -1)">
-                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="6,9 12,15 18,9"></polyline>
-                          </svg>
+                      <!-- Product Type -->
+                      <div class="form-field">
+                        <CrastinoDropdown
+                          v-model="product.productType"
+                          :options="productTypes"
+                          placeholder="Type"
+                          min-width="120px"
+                        />
+                      </div>
+                      
+                      <!-- Fabric Selection -->
+                      <div class="form-field">
+                        <button
+                          class="select-rounded fabric-button"
+                          style="min-width: 120px;"
+                          @click="openFabricModal(pIndex)"
+                        >
+                          <span class="flex-1 text-left">
+                            {{ product.fabricDetails ? product.fabricDetails.fields['Fabric Name'] : 'Fabric' }}
+                          </span>
+                          <UIcon name="i-heroicons-chevron-down" class="w-4 h-4 flex-shrink-0" />
+                        </button>
+                      </div>
+                        
+                      <!-- Fabric Color Selection -->
+                      <div class="form-field">
+                        <button
+                          class="select-rounded fabric-button"
+                          style="min-width: 120px;"
+                          :disabled="!product.fabricDetails"
+                          @click="openFabricColorModal(pIndex)"
+                        >
+                          <span class="flex-1 text-left">
+                            {{ product.fabricColorDetails ? product.fabricColorDetails.fields['Color Name'] : 'Colour' }}
+                          </span>
+                          <UIcon name="i-heroicons-chevron-down" class="w-4 h-4 flex-shrink-0" />
+                        </button>
+                      </div>
+                      
+                      <!-- Dimensions -->
+                      <div class="form-field-group">
+                        <div class="input-rounded number-input">
+                          <UInput
+                            v-model="product.height"
+                            type="number"
+                            placeholder="Height"
+                            class="input-rounded w-24"
+                            size="sm"
+                          />
+                          <div class="number-controls">
+                            <div class="number-btn" @mousedown="incrementValue(product, 'height', 1)">
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="18,15 12,9 6,15"></polyline>
+                              </svg>
+                            </div>
+                            <div class="number-btn" @mousedown="incrementValue(product, 'height', -1)">
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="6,9 12,15 18,9"></polyline>
+                              </svg>
+                            </div>
+                          </div>
+                        </div>
+                        <span class="text-xs mx-1" style="color: #6B6B6B;">×</span>
+                        <div class="input-rounded number-input">
+                          <UInput
+                            v-model="product.width"
+                            type="number"
+                            placeholder="Width"
+                            class="input-rounded w-24"
+                            size="sm"
+                          />
+                          <div class="number-controls">
+                            <div class="number-btn" @mousedown="incrementValue(product, 'width', 1)">
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="18,15 12,9 6,15"></polyline>
+                              </svg>
+                            </div>
+                            <div class="number-btn" @mousedown="incrementValue(product, 'width', -1)">
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="6,9 12,15 18,9"></polyline>
+                              </svg>
+                            </div>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                    <span class="text-xs" style="color: #6B6B6B;">×</span>
-                    <div class="input-rounded number-input">
-                    <UInput
-                        v-model="product.width"
-                      type="number"
-                        placeholder="Width"
-                        class="input-rounded w-24"
-                      size="sm"
-                    />
-                      <div class="number-controls">
-                        <div class="number-btn" @mousedown="incrementValue(product, 'width', 1)">
-                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="18,15 12,9 6,15"></polyline>
-                          </svg>
+                      
+                      <!-- Quantity -->
+                      <div class="form-field">
+                        <div class="input-rounded number-input">
+                          <UInput
+                            v-model="product.quantity"
+                            type="number"
+                            placeholder="1"
+                            min="1"
+                            class="input-rounded w-14"
+                            size="sm"
+                          />
+                          <div class="number-controls">
+                            <div class="number-btn" @mousedown="incrementValue(product, 'quantity', 1)">
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="18,15 12,9 6,15"></polyline>
+                              </svg>
+                            </div>
+                            <div class="number-btn" @mousedown="incrementValue(product, 'quantity', -1)">
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="6,9 12,15 18,9"></polyline>
+                              </svg>
+                            </div>
+                          </div>
                         </div>
-                        <div class="number-btn" @mousedown="incrementValue(product, 'width', -1)">
-                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="6,9 12,15 18,9"></polyline>
-                          </svg>
+                      </div>
+                      
+                      <!-- Conditional Fields for Curtains -->
+                      <template v-if="product.productType === 'Curtains'">
+                        <!-- Room -->
+                        <div class="form-field">
+                          <CrastinoDropdown
+                            v-model="product.room"
+                            :options="curtainOptions.rooms"
+                            placeholder="Room"
+                            min-width="120px"
+                          />
                         </div>
+                        
+                        <!-- Curtain Style -->
+                        <div class="form-field">
+                          <CrastinoDropdown
+                            v-model="product.curtainStyle"
+                            :options="curtainOptions.curtainStyles"
+                            placeholder="Style"
+                            min-width="120px"
+                          />
+                        </div>
+                        
+                        <!-- Bottom Style -->
+                        <div class="form-field">
+                          <CrastinoDropdown
+                            v-model="product.bottomStyle"
+                            :options="curtainOptions.bottomStyles"
+                            placeholder="Bottom"
+                            min-width="100px"
+                          />
+                        </div>
+                        
+                        <!-- Heading Height -->
+                        <div class="form-field">
+                          <div class="input-rounded number-input">
+                            <UInput
+                              v-model="product.headingHeight"
+                              type="number"
+                              placeholder="Head Height"
+                              class="input-rounded w-28"
+                              size="sm"
+                            />
+                            <div class="number-controls">
+                              <div class="number-btn" @mousedown="incrementValue(product, 'headingHeight', 1)">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                  <polyline points="18,15 12,9 6,15"></polyline>
+                                </svg>
+                              </div>
+                              <div class="number-btn" @mousedown="incrementValue(product, 'headingHeight', -1)">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                  <polyline points="6,9 12,15 18,9"></polyline>
+                                </svg>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <!-- 2-Sided Checkbox -->
+                        <div class="form-field">
+                          <div class="flex items-center gap-1">
+                            <UCheckbox
+                              v-model="product.isTwoSided"
+                              size="sm"
+                            />
+                            <span class="text-xs whitespace-nowrap" style="color: #6B6B6B;">2-Sided</span>
+                          </div>
+                        </div>
+                        
+                        <!-- Lining -->
+                        <div class="form-field">
+                          <CrastinoDropdown
+                            v-model="product.lining"
+                            :options="curtainOptions.liningOptions"
+                            placeholder="Lining"
+                            min-width="120px"
+                          />
+                        </div>
+                      </template>
+                      
+                      <!-- Fields for Shades (Non-curtain products) -->
+                      <template v-else-if="['Roller Shades', 'Roman Shades'].includes(product.productType)">
+                        <!-- Motor Checkbox -->
+                        <div class="form-field">
+                          <div class="flex items-center gap-1">
+                            <UCheckbox
+                              v-model="product.isMotorized"
+                              :disabled="!['Roller Shades', 'Roman Shades'].includes(product.productType)"
+                              size="sm"
+                            />
+                            <span class="text-xs whitespace-nowrap" style="color: #6B6B6B;">Motor</span>
+                          </div>
+                        </div>
+                        
+                        <!-- Control/Motor Type -->
+                        <div class="form-field">
+                          <CrastinoDropdown
+                            v-if="product.isMotorized"
+                            v-model="product.motorType"
+                            :options="getMotorTypes(product.productType)"
+                            placeholder="Motor Type"
+                            min-width="120px"
+                          />
+                          <CrastinoDropdown
+                            v-else
+                            v-model="product.controlSide"
+                            :options="['Left', 'Right']"
+                            placeholder="Side"
+                            min-width="80px"
+                          />
+                        </div>
+                        
+                        <!-- Mount Location -->
+                        <div class="form-field">
+                          <CrastinoDropdown
+                            v-model="product.mountLocation"
+                            :options="['Inside', 'Outside', 'Ceiling']"
+                            placeholder="Rail"
+                            min-width="100px"
+                          />
+                        </div>
+                        
+                        <!-- Hardware Color -->
+                        <div class="form-field">
+                          <CrastinoDropdown
+                            v-model="product.hardwareColor"
+                            :options="['White', 'Black', 'Silver', 'Bronze', 'Antique Gold']"
+                            placeholder="Hooks"
+                            min-width="100px"
+                          />
+                        </div>
+                      </template>
+                      
+                      <!-- Notes - Always present at the end -->
+                      <div class="form-field">
+                        <UInput
+                          v-model="product.notes"
+                          placeholder="Notes"
+                          class="input-rounded w-24"
+                          size="sm"
+                        />
                       </div>
                     </div>
                   </div>
                   
-                  <!-- Quantity with custom number controls -->
-                  <div class="flex items-center">
-                    <div class="input-rounded number-input">
-                    <UInput
-                      v-model="product.quantity"
-                      type="number"
-                        placeholder="1"
-                      min="1"
-                        class="input-rounded w-14"
-                      size="sm"
-                    />
-                      <div class="number-controls">
-                        <div class="number-btn" @mousedown="incrementValue(product, 'quantity', 1)">
-                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="18,15 12,9 6,15"></polyline>
-                          </svg>
-                        </div>
-                        <div class="number-btn" @mousedown="incrementValue(product, 'quantity', -1)">
-                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="6,9 12,15 18,9"></polyline>
-                          </svg>
-                        </div>
-                      </div>
-                    </div>
+                  <!-- Custom Scrollbar Track (only show when needed) -->
+                  <div 
+                    v-if="scrollbarData[pIndex]?.isNeeded" 
+                    class="custom-scrollbar-track"
+                    @click="scrollToPosition($event, pIndex)"
+                  >
+                    <div 
+                      class="custom-scrollbar-thumb"
+                      :style="getScrollThumbStyle(pIndex)"
+                      @mousedown="startScrollbarDrag($event, pIndex)"
+                    ></div>
                   </div>
-                  
-                  <!-- Motor Checkbox -->
-                  <div class="flex items-center gap-1">
-                    <UCheckbox
-                      v-model="product.isMotorized"
-                      :disabled="!['Roller Shades', 'Roman Shades'].includes(product.productType)"
-                      size="sm"
-                    />
-                    <span class="text-xs" style="color: #6B6B6B;">Motor</span>
-                  </div>
-                  
-                  <!-- Control/Motor Type -->
-                    <div v-if="product.isMotorized">
-                      <CrastinoDropdown
-                        v-model="product.motorType"
-                        :options="getMotorTypes(product.productType)"
-                        placeholder="Motor Type"
-                        min-width="120px"
-                      />
-                    </div>
-                    <div v-else>
-                      <CrastinoDropdown
-                        v-model="product.controlSide"
-                        :options="['Left', 'Right']"
-                        placeholder="Side"
-                        min-width="80px"
-                      />
-                  </div>
-                  
-                  <!-- Mount Location -->
-                  <div>
-                    <CrastinoDropdown
-                      v-model="product.mountLocation"
-                      :options="['Inside', 'Outside', 'Ceiling']"
-                      placeholder="Rail"
-                      min-width="100px"
-                    />
-                  </div>
-                  
-                  <!-- Hardware Color -->
-                  <div>
-                    <CrastinoDropdown
-                      v-model="product.hardwareColor"
-                      :options="['White', 'Black', 'Silver', 'Bronze', 'Antique Gold']"
-                      placeholder="Hooks"
-                      min-width="100px"
-                    />
-                  </div>
-                  
-                  <!-- Notes - Much smaller and at the end -->
-                  <div class="flex-shrink-0">
-                    <UInput
-                      v-model="product.notes"
-                      placeholder="Notes"
-                      class="input-rounded w-24"
-                      size="sm"
-                    />
                 </div>
               </div>
             </div>
-          </div>
-            
+
             <!-- Add New Product Button -->
             <div class="px-6 pb-6">
               <div class="flex justify-start">
                 <button
                   class="add-product-button"
-                @click="addNewProduct"
-              >
+                  @click="addNewProduct"
+                >
                   <UIcon name="i-heroicons-plus" class="w-4 h-4 mr-2" />
-                Add New Product
+                  Add New Product
                 </button>
+              </div>
+            </div>
           </div>
-          </div>
-        </div>
-        
-        <!-- "Add New Tab" View -->
+          
+          <!-- "Add New Tab" View -->
           <div v-else class="bg-white rounded-lg shadow-sm border border-gray-100 p-8 -ml-12 pl-20">
-          <div class="max-w-lg mx-auto text-center">
+            <div class="max-w-lg mx-auto text-center">
               <UIcon name="i-heroicons-plus-circle" class="w-16 h-16 mx-auto mb-4" style="color: #B8A082;" />
               <h3 class="text-xl font-medium mb-2" style="color: #2D2D2D;">Create a New Order</h3>
           
-          <div class="max-w-md mx-auto">
-            <UFormGroup label="Order Name" class="mb-4">
+              <div class="max-w-md mx-auto">
+                <UFormGroup label="Order Name" class="mb-4">
                   <UInput v-model="newOrderName" placeholder="Enter a name for this order" class="input-rounded" size="lg" />
-            </UFormGroup>
-            
-              <div class="flex justify-center">
-            <UButton
+                </UFormGroup>
+                
+                <div class="flex justify-center">
+                  <UButton
                     class="px-8 py-3 rounded-full text-white font-medium"
                     style="background-color: #B8A082;"
-                  icon="i-heroicons-plus-circle"
-                  size="lg"
-              @click="createNewOrder"
-              :disabled="!newOrderName"
-            >
-                  Create New Order
+                    icon="i-heroicons-plus-circle"
+                    size="lg"
+                    @click="createNewOrder"
+                    :disabled="!newOrderName"
+                  >
+                    Create New Order
                   </UButton>
                 </div>
               </div>
@@ -576,7 +682,14 @@ function createDefaultProduct() {
     mountLocation: 'Inside',
     rollDirection: 'Standard',
     hardwareColor: 'White',
-    notes: ''
+    notes: '',
+    // Curtain-specific fields
+    room: '',
+    curtainStyle: '',
+    bottomStyle: '',
+    headingHeight: null,
+    isTwoSided: false,
+    lining: ''
   }
 }
 
@@ -646,6 +759,42 @@ const motorTypes = {
     'WiFi Motor',
     'Battery Motor',
     'Hard-Wired Motor'
+  ]
+}
+
+// Add curtain-specific options
+const curtainOptions = {
+  rooms: [
+    'Living Room',
+    'Bedroom', 
+    'Dining Room',
+    'Kitchen',
+    'Office',
+    'Bathroom',
+    'Guest Room',
+    'Other'
+  ],
+  curtainStyles: [
+    'Tab Top',
+    'Eyelet',
+    'Pencil Pleat',
+    'Pinch Pleat',
+    'Wave',
+    'Rod Pocket',
+    'Grommet'
+  ],
+  bottomStyles: [
+    'Straight',
+    'Scalloped',
+    'Pointed',
+    'Rounded'
+  ],
+  liningOptions: [
+    'No Lining',
+    'Standard Lining',
+    'Blackout Lining',
+    'Thermal Lining',
+    'Interlining'
   ]
 }
 
@@ -752,7 +901,14 @@ function addNewProduct() {
     mountLocation: 'Inside',
     rollDirection: 'Standard',
     hardwareColor: 'White',
-    notes: ''
+    notes: '',
+    // Curtain-specific fields
+    room: '',
+    curtainStyle: '',
+    bottomStyle: '',
+    headingHeight: null,
+    isTwoSided: false,
+    lining: ''
   })
 }
 
@@ -1122,6 +1278,159 @@ function incrementValue(product, field, increment) {
   const newValue = Math.max(field === 'quantity' ? 1 : 0, currentValue + increment);
   product[field] = newValue;
 }
+
+// Reactive data for scrollbar
+const scrollbarData = ref({})
+
+// Update custom scrollbar position and visibility
+function updateCustomScrollbar(event, productIndex) {
+  const container = event.target
+  const scrollLeft = container.scrollLeft
+  const scrollWidth = container.scrollWidth
+  const clientWidth = container.clientWidth
+  
+  // Check if scrolling is needed
+  const isNeeded = scrollWidth > clientWidth
+  
+  if (!isNeeded) {
+    scrollbarData.value[productIndex] = { isNeeded: false }
+    return
+  }
+  
+  const trackWidth = clientWidth - 12 // Account for padding in track
+  const thumbWidth = Math.max(20, (clientWidth / scrollWidth) * trackWidth)
+  const maxThumbPosition = trackWidth - thumbWidth
+  const thumbPosition = (scrollLeft / (scrollWidth - clientWidth)) * maxThumbPosition
+  
+  scrollbarData.value[productIndex] = {
+    isNeeded: true,
+    width: thumbWidth,
+    left: thumbPosition + 6 // 6px offset from track edge
+  }
+}
+
+// Get scroll thumb style
+function getScrollThumbStyle(productIndex) {
+  const data = scrollbarData.value[productIndex]
+  if (!data || !data.isNeeded) return { display: 'none' }
+  
+  return {
+    width: `${data.width}px`,
+    left: `${data.left}px`
+  }
+}
+
+// Click on track to scroll to position
+function scrollToPosition(event, productIndex) {
+  const container = getCurrentScrollContainer(productIndex)
+  if (!container) return
+  
+  const track = event.currentTarget
+  const trackRect = track.getBoundingClientRect()
+  const clickX = event.clientX - trackRect.left
+  
+  const scrollWidth = container.scrollWidth
+  const clientWidth = container.clientWidth
+  const trackWidth = trackRect.width - 12
+  
+  const scrollRatio = (clickX - 6) / trackWidth // 6px offset
+  const newScrollLeft = scrollRatio * (scrollWidth - clientWidth)
+  
+  container.scrollLeft = Math.max(0, Math.min(scrollWidth - clientWidth, newScrollLeft))
+}
+
+// Handle scrollbar drag
+let isDragging = false
+let dragStartX = 0
+let dragStartScrollLeft = 0
+let currentProductIndex = null
+
+function startScrollbarDrag(event, productIndex) {
+  isDragging = true
+  currentProductIndex = productIndex
+  dragStartX = event.clientX
+  
+  const container = getCurrentScrollContainer(productIndex)
+  if (container) {
+    dragStartScrollLeft = container.scrollLeft
+  }
+  
+  document.addEventListener('mousemove', handleScrollbarDrag)
+  document.addEventListener('mouseup', stopScrollbarDrag)
+  event.preventDefault()
+  event.stopPropagation() // Prevent track click
+}
+
+function handleScrollbarDrag(event) {
+  if (!isDragging || currentProductIndex === null) return
+  
+  const container = getCurrentScrollContainer(currentProductIndex)
+  if (!container) return
+  
+  const deltaX = event.clientX - dragStartX
+  const containerWidth = container.clientWidth
+  const scrollWidth = container.scrollWidth
+  const trackWidth = containerWidth - 12
+  
+  const scrollRatio = deltaX / trackWidth
+  const newScrollLeft = dragStartScrollLeft + (scrollRatio * (scrollWidth - containerWidth))
+  
+  container.scrollLeft = Math.max(0, Math.min(scrollWidth - containerWidth, newScrollLeft))
+}
+
+function stopScrollbarDrag() {
+  isDragging = false
+  currentProductIndex = null
+  document.removeEventListener('mousemove', handleScrollbarDrag)
+  document.removeEventListener('mouseup', stopScrollbarDrag)
+}
+
+function getCurrentScrollContainer(productIndex) {
+  return document.querySelector(`[data-ref="scrollContainer_${productIndex}"]`)
+}
+
+// Initialize scrollbars on mount and when content changes
+onMounted(() => {
+  nextTick(() => {
+    initializeScrollbars()
+  })
+})
+
+// Watch for changes that might affect scrollbar
+watch(orders, () => {
+  nextTick(() => {
+    initializeScrollbars()
+  })
+}, { deep: true })
+
+function initializeScrollbars() {
+  if (activeTabIndex.value >= 0 && orders.value[activeTabIndex.value]) {
+    orders.value[activeTabIndex.value].products.forEach((_, index) => {
+      const container = getCurrentScrollContainer(index)
+      if (container) {
+        updateCustomScrollbar({ target: container }, index)
+      }
+    })
+  }
+}
+
+// Add resize observer to handle window resizing
+onMounted(() => {
+  const resizeObserver = new ResizeObserver(() => {
+    initializeScrollbars()
+  })
+  
+  // Observe the main container
+  const mainContainer = document.querySelector('.product-form-container')
+  if (mainContainer) {
+    resizeObserver.observe(mainContainer)
+  }
+  
+  // Cleanup on unmount
+  onUnmounted(() => {
+    resizeObserver.disconnect()
+  })
+})
 </script>
 
 <style>
@@ -1677,5 +1986,105 @@ input[type="checkbox"] {
 
 .fabric-button:disabled svg {
   color: #DBDAD8 !important;
+}
+
+/* Horizontal scrolling form container */
+.product-form-container {
+  position: relative;
+  width: 100%;
+  padding-bottom: 0; /* Remove default padding */
+}
+
+.product-form-scroll {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.form-field-fixed {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.form-fields-scroll {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  flex: 1;
+  padding-bottom: 2px;
+  scroll-behavior: smooth;
+  
+  /* Hide default scrollbar */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.form-fields-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.form-field {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.form-field-group {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Custom scrollbar track - Only shows when needed */
+.custom-scrollbar-track {
+  position: relative;
+  width: 100%;
+  height: 9px;
+  border-radius: 10px;
+  border: 1px solid #d9d9d9;
+  box-sizing: border-box;
+  background-color: transparent;
+  margin-top: 8px;
+  cursor: pointer;
+}
+
+/* Custom scrollbar thumb - Figma design with perfect centering */
+.custom-scrollbar-thumb {
+  position: absolute;
+  top: 1.5px; /* Adjusted for perfect vertical centering */
+  border-radius: 10px;
+  background-color: #d9d9d9;
+  height: 5px;
+  transition: background-color 0.2s ease;
+  cursor: grab;
+  min-width: 20px;
+}
+
+.custom-scrollbar-thumb:hover {
+  background-color: #bfb7b0;
+}
+
+.custom-scrollbar-thumb:active {
+  cursor: grabbing;
+  background-color: #8a7c59;
+}
+
+/* Add padding to container when scrollbar is present */
+.product-form-container:has(.custom-scrollbar-track) {
+  padding-bottom: 17px; /* Space for scrollbar */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .form-fields-scroll {
+    gap: 6px;
+  }
+  
+  .form-field {
+    min-width: fit-content;
+  }
 }
 </style>
