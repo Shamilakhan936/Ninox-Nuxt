@@ -1,255 +1,205 @@
 <template>
-  <div>
+  <div class="homepage-vol1">
+    <!-- Video Background -->
+    <video 
+      class="video-background" 
+      autoplay 
+      muted 
+      loop 
+      playsinline
+    >
+      <source src="/2024-fall-video-6-horizontal.mp4" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+    
+    <!-- Video Overlay Gradients -->
+    <div class="video-overlay" />
+    <div class="content-overlay" />
+    
     <!-- Navigation -->
     <Navbar />
     
-    <!-- Hero Section -->
-    <div class="bg-gradient-to-r from-blue-500 to-indigo-600 py-16">
-      <div class="container mx-auto px-4 text-center">
-        <h1 class="text-4xl md:text-5xl font-bold text-white mb-4">
-          Premium Window Treatments for Professionals
-        </h1>
-        <p class="text-xl text-blue-100 mb-8 max-w-3xl mx-auto">
-          Quality window coverings and accessories for contractors, designers and industry professionals.
-        </p>
-        <div class="flex flex-col sm:flex-row gap-4 justify-center">
-          <template v-if="$auth.loggedIn">
-            <UButton 
-              to="/orders" 
-              size="xl" 
-              color="white"
-              variant="solid"
-              icon="i-heroicons-shopping-cart"
-            >
-              Place an Order
-            </UButton>
-          </template>
-          <template v-else>
-            <LoginLink to="/api/login" external>
-              <UButton 
-                size="xl" 
-                color="white"
-                variant="solid"
-                icon="i-heroicons-lock-closed"
-              >
-                Sign in to Order
-              </UButton>
-            </LoginLink>
-            <RegisterLink to="/api/register" external>
-              <UButton 
-                size="xl" 
-                color="white"
-                variant="outline"
-                icon="i-heroicons-user-plus"
-              >
-                Create Account
-              </UButton>
-            </RegisterLink>
-          </template>
-        </div>
-      </div>
-    </div>
+    <!-- Main Hero Text -->
+    <div class="hero-text">A World of Window Coverings</div>
     
-    <!-- Featured Products Section -->
-    <div class="py-16 bg-gray-50 dark:bg-gray-900">
-      <div class="container mx-auto px-4">
-        <h2 class="text-3xl font-bold text-center text-gray-900 dark:text-white mb-12">
-          Featured Products
-        </h2>
-        
-        <div class="w-48 h-12 px-16 py-4 bg-stone-500 rounded-[74px] inline-flex justify-center items-center gap-2.5">
-<div class="w-16 h-2.5 text-center justify-center text-neutral-100 text-xs font-normal font-['Albert_Sans'] uppercase leading-3 tracking-wider">default</div>
-</div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div class="bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-lg transition-transform duration-300 hover:transform hover:scale-105">
-            <div class="h-48 bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-              <UIcon name="i-heroicons-squares-2x2" class="w-16 h-16 text-gray-400 dark:text-gray-500" />
-            </div>
-            <div class="p-6">
-              <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">Roller Shades</h3>
-              <p class="text-gray-600 dark:text-gray-400 mb-4">
-                Modern design with various opacity options for perfect light control.
-              </p>
-              <UButton color="primary" variant="ghost" icon="i-heroicons-arrow-right" iconRight to="/orders">
-                Order Now
-              </UButton>
-            </div>
-          </div>
-          
-          <div class="bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-lg transition-transform duration-300 hover:transform hover:scale-105">
-            <div class="h-48 bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-              <UIcon name="i-heroicons-rectangle-stack" class="w-16 h-16 text-gray-400 dark:text-gray-500" />
-            </div>
-            <div class="p-6">
-              <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">Roman Shades</h3>
-              <p class="text-gray-600 dark:text-gray-400 mb-4">
-                Elegant fabric options with classic folding design for a timeless look.
-              </p>
-              <UButton color="primary" variant="ghost" icon="i-heroicons-arrow-right" iconRight to="/orders">
-                Order Now
-              </UButton>
-            </div>
-          </div>
-          
-          <div class="bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-lg transition-transform duration-300 hover:transform hover:scale-105">
-            <div class="h-48 bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-              <UIcon name="i-heroicons-bars-3-bottom-left" class="w-16 h-16 text-gray-400 dark:text-gray-500" />
-            </div>
-            <div class="p-6">
-              <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">Curtains</h3>
-              <p class="text-gray-600 dark:text-gray-400 mb-4">
-                Premium fabrics in various styles to complement any interior design.
-              </p>
-              <UButton color="primary" variant="ghost" icon="i-heroicons-arrow-right" iconRight to="/orders">
-                Order Now
-              </UButton>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    
-    <!-- Benefits Section -->
-    <div class="py-16 bg-white dark:bg-gray-800">
-      <div class="container mx-auto px-4">
-        <h2 class="text-3xl font-bold text-center text-gray-900 dark:text-white mb-12">
-          Why Choose Us
-        </h2>
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          <div class="text-center p-6">
-            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 mb-4">
-              <UIcon name="i-heroicons-truck" class="w-8 h-8" />
-            </div>
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Fast Shipping</h3>
-            <p class="text-gray-600 dark:text-gray-400">
-              Quick turnaround times with reliable shipping options.
-            </p>
-          </div>
-          
-          <div class="text-center p-6">
-            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 mb-4">
-              <UIcon name="i-heroicons-shield-check" class="w-8 h-8" />
-            </div>
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Quality Guaranteed</h3>
-            <p class="text-gray-600 dark:text-gray-400">
-              Premium materials and expert craftsmanship in every product.
-            </p>
-          </div>
-          
-          <div class="text-center p-6">
-            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 mb-4">
-              <UIcon name="i-heroicons-currency-dollar" class="w-8 h-8" />
-            </div>
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Wholesale Pricing</h3>
-            <p class="text-gray-600 dark:text-gray-400">
-              Competitive pricing for industry professionals.
-            </p>
-          </div>
-          
-          <div class="text-center p-6">
-            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 mb-4">
-              <UIcon name="i-heroicons-chat-bubble-left-right" class="w-8 h-8" />
-            </div>
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Expert Support</h3>
-            <p class="text-gray-600 dark:text-gray-400">
-              Dedicated customer service team to assist with your needs.
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-    
-    <!-- CTA Section -->
-    <div class="py-16 bg-gray-100 dark:bg-gray-900">
-      <div class="container mx-auto px-4 text-center">
-        <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-          Ready to Place Your Order?
-        </h2>
-        <p class="text-xl text-gray-600 dark:text-gray-400 mb-8 max-w-3xl mx-auto">
-          Join our wholesale platform for exclusive pricing and premium products.
-        </p>
-        <div v-if="$auth.loggedIn">
-          <UButton 
-            to="/orders" 
-            size="xl" 
-            color="primary"
-            icon="i-heroicons-shopping-cart"
-          >
-            Start Ordering Now
-          </UButton>
-        </div>
-        <div v-else class="flex flex-col sm:flex-row gap-4 justify-center">
-          <LoginLink to="/api/login" external>
-            <UButton 
-              size="xl" 
-              color="primary"
-              icon="i-heroicons-lock-closed"
-            >
-              Sign in to Start
-            </UButton>
-          </LoginLink>
-        </div>
-      </div>
+    <!-- Reseller Portal Banner -->
+    <div class="reseller-banner">
+      <div class="banner-background" />
+      <div class="banner-text">Reseller Portal Coming Soon...</div>
     </div>
     
     <!-- Footer -->
-    <footer class="bg-gray-800 text-white py-12">
-      <div class="container mx-auto px-4">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-          <div>
-            <h3 class="text-lg font-semibold mb-4">About Us</h3>
-            <p class="text-gray-400">
-              Premium window treatment wholesale supplier for industry professionals.
-            </p>
-          </div>
-          <div>
-            <h3 class="text-lg font-semibold mb-4">Products</h3>
-            <ul class="space-y-2 text-gray-400">
-              <li><a href="#" class="hover:text-white">Roller Shades</a></li>
-              <li><a href="#" class="hover:text-white">Roman Shades</a></li>
-              <li><a href="#" class="hover:text-white">Curtains</a></li>
-              <li><a href="#" class="hover:text-white">Accessories</a></li>
-            </ul>
-          </div>
-          <div>
-            <h3 class="text-lg font-semibold mb-4">Quick Links</h3>
-            <ul class="space-y-2 text-gray-400">
-              <li><a href="#" class="hover:text-white">Home</a></li>
-              <li><a href="#" class="hover:text-white">Orders</a></li>
-              <li><a href="#" class="hover:text-white">About</a></li>
-              <li><a href="#" class="hover:text-white">Contact</a></li>
-            </ul>
-          </div>
-          <div>
-            <h3 class="text-lg font-semibold mb-4">Contact</h3>
-            <ul class="space-y-2 text-gray-400">
-              <li class="flex items-center space-x-2">
-                <UIcon name="i-heroicons-envelope" class="w-5 h-5" />
-                <span>contact@windowtreatment.com</span>
-              </li>
-              <li class="flex items-center space-x-2">
-                <UIcon name="i-heroicons-phone" class="w-5 h-5" />
-                <span>+1 (555) 123-4567</span>
-              </li>
-            </ul>
-          </div>
-        </div>
-        <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-500">
-          &copy; {{ new Date().getFullYear() }} Window Treatment Wholesale. All rights reserved.
-        </div>
-      </div>
-    </footer>
+    <div class="footer-wrapper">
+      <Footer />
+    </div>
   </div>
 </template>
 
 <script setup>
-import Navbar from '../components/Navbar.vue';
+import Navbar from '../components/Navbar.vue'
+import Footer from '../components/Footer.vue'
 
 // Define meta data for SEO
 definePageMeta({
-  title: 'Home - Window Treatment Wholesale',
-  description: 'Premium window treatments for industry professionals at wholesale prices.'
+  title: 'Home - Crastino Window Treatments',
+  description: 'A world of window coverings - Premium window treatments and solutions.'
 })
 </script>
+
+<style scoped>
+/* Import Albert Sans font */
+@import url('https://fonts.googleapis.com/css2?family=Albert+Sans:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+.homepage-vol1 {
+  width: 100%;
+  position: relative;
+  background-color: #fff;
+  height: 1024px;
+  overflow: hidden;
+  text-align: left;
+  font-size: 16px;
+  color: #fff;
+  font-family: 'Albert Sans', sans-serif;
+}
+
+/* Video Background */
+.video-background {
+  position: absolute;
+  top: 119px;
+  left: calc(50% - 733px);
+  width: 1465px;
+  height: 824px;
+  object-fit: cover;
+  z-index: 1;
+}
+
+/* Video Overlay - First gradient */
+.video-overlay {
+  position: absolute;
+  top: calc(50% - 393px);
+  left: calc(50% - 736px);
+  background: linear-gradient(180deg, rgba(61, 57, 53, 0), rgba(61, 57, 53, 0.3));
+  width: 1471px;
+  height: 828px;
+  z-index: 2;
+}
+
+/* Content Overlay - Second gradient */
+.content-overlay {
+  position: absolute;
+  top: 106px;
+  left: calc(50% - 733px);
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.2), rgba(102, 102, 102, 0.2));
+  width: 1466px;
+  height: 847px;
+  z-index: 3;
+}
+
+/* Hero Text */
+.hero-text {
+  position: absolute;
+  top: 390px;
+  left: calc(50% - 386px);
+  font-size: 56.63px;
+  letter-spacing: 0.2em;
+  line-height: 68px;
+  text-transform: uppercase;
+  text-align: center;
+  display: inline-block;
+  width: 772px;
+  text-shadow: 0px 3px 7px rgba(0, 0, 0, 0.25);
+  z-index: 4;
+  color: #fff;
+}
+
+/* Reseller Portal Banner */
+.reseller-banner {
+  position: absolute;
+  top: 574px;
+  left: 408px;
+  width: 624px;
+  height: 59px;
+  text-align: center;
+  font-size: 24px;
+  color: #8a7c59;
+  z-index: 4;
+}
+
+.banner-background {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  border-radius: 37px;
+  background-color: #f7f7f5;
+  width: 624px;
+  height: 59px;
+}
+
+.banner-text {
+  position: absolute;
+  top: 23px;
+  left: calc(50% - 275px);
+  letter-spacing: 0.2em;
+  line-height: 14px;
+  text-transform: uppercase;
+}
+
+/* Footer Wrapper */
+.footer-wrapper {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  z-index: 4;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1440px) {
+  .video-background {
+    width: 100%;
+    left: 0;
+  }
+  
+  .video-overlay,
+  .content-overlay {
+    width: 100%;
+    left: 0;
+  }
+  
+  .hero-text {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
+  .reseller-banner {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-text {
+    font-size: 32px;
+    line-height: 40px;
+    width: 90%;
+    left: 5%;
+    transform: none;
+  }
+  
+  .reseller-banner {
+    width: 90%;
+    left: 5%;
+    transform: none;
+  }
+  
+  .banner-background {
+    width: 100%;
+  }
+  
+  .banner-text {
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 18px;
+  }
+}
+</style>
