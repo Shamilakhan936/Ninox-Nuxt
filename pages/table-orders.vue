@@ -357,6 +357,49 @@
                               min-width="120px"
                             />
                           </div>
+                          
+                          <!-- # of Panels -->
+                          <div class="form-field">
+                            <CrastinoDropdown
+                              v-model="product.numberOfPanels"
+                              :options="[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]"
+                              placeholder="# Panels"
+                              min-width="90px"
+                              @update:modelValue="calculateHooksTotal(product)"
+                            />
+                          </div>
+                          
+                          <!-- Hooks PP -->
+                          <div class="form-field">
+                            <CrastinoDropdown
+                              v-model="product.hooksPp"
+                              :options="[1, 2, 3, 4, 5, 6, 7]"
+                              placeholder="Hooks PP"
+                              min-width="90px"
+                              @update:modelValue="calculateHooksTotal(product)"
+                            />
+                          </div>
+                          
+                          <!-- Hooks Total -->
+                          <div class="form-field">
+                            <CrastinoDropdown
+                              v-model="product.hooksTotal"
+                              :options="[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 25, 30, 35, 40, 45, 50, 60, 70]"
+                              placeholder="Hooks Total"
+                              min-width="100px"
+                              :disabled="true"
+                            />
+                          </div>
+                          
+                          <!-- Delivery -->
+                          <div class="form-field">
+                            <CrastinoDropdown
+                              v-model="product.delivery"
+                              :options="curtainOptions.deliveryOptions"
+                              placeholder="Delivery"
+                              min-width="120px"
+                            />
+                          </div>
                         </template>
                         
                         <!-- Fields for Shades (Non-curtain products) -->
@@ -655,6 +698,49 @@
                               v-model="product.lining"
                               :options="curtainOptions.liningOptions"
                               placeholder="Lining"
+                              min-width="120px"
+                            />
+                          </div>
+                          
+                          <!-- # of Panels -->
+                          <div class="form-field">
+                            <CrastinoDropdown
+                              v-model="product.numberOfPanels"
+                              :options="[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]"
+                              placeholder="# Panels"
+                              min-width="90px"
+                              @update:modelValue="calculateHooksTotal(product)"
+                            />
+                          </div>
+                          
+                          <!-- Hooks PP -->
+                          <div class="form-field">
+                            <CrastinoDropdown
+                              v-model="product.hooksPp"
+                              :options="[1, 2, 3, 4, 5, 6, 7]"
+                              placeholder="Hooks PP"
+                              min-width="90px"
+                              @update:modelValue="calculateHooksTotal(product)"
+                            />
+                          </div>
+                          
+                          <!-- Hooks Total -->
+                          <div class="form-field">
+                            <CrastinoDropdown
+                              v-model="product.hooksTotal"
+                              :options="[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 25, 30, 35, 40, 45, 50, 60, 70]"
+                              placeholder="Hooks Total"
+                              min-width="100px"
+                              :disabled="true"
+                            />
+                          </div>
+                          
+                          <!-- Delivery -->
+                          <div class="form-field">
+                            <CrastinoDropdown
+                              v-model="product.delivery"
+                              :options="curtainOptions.deliveryOptions"
+                              placeholder="Delivery"
                               min-width="120px"
                             />
                           </div>
@@ -1013,7 +1099,11 @@ function createDefaultProduct() {
     bottomStyle: '',
     headingHeight: null,
     isTwoSided: false,
-    lining: ''
+    lining: '',
+    numberOfPanels: null,  // Add this new field
+    hooksPp: null,
+    hooksTotal: null,
+    delivery: ''
   }
 }
 
@@ -1119,6 +1209,12 @@ const curtainOptions = {
     'Blackout Lining',
     'Thermal Lining',
     'Interlining'
+  ],
+  deliveryOptions: [
+    'Standard',
+    'Express',
+    'Rush',
+    'Next Day'
   ]
 }
 
@@ -1232,7 +1328,11 @@ function addNewProduct() {
     bottomStyle: '',
     headingHeight: null,
     isTwoSided: false,
-    lining: ''
+    lining: '',
+    numberOfPanels: null,  // Add this new field
+    hooksPp: null,
+    hooksTotal: null,
+    delivery: ''
   })
 }
 
@@ -1990,6 +2090,25 @@ watch(isUnifiedScroll, (newValue) => {
     })
   }
 })
+
+function calculateHooksTotal(product) {
+  const hooksPp = parseInt(product.hooksPp) || 0
+  const numberOfPanels = parseInt(product.numberOfPanels) || 0
+  product.hooksTotal = hooksPp * numberOfPanels
+}
+
+// Add this function to the JavaScript section:
+function incrementHooksValue(product, field, increment) {
+  const currentValue = parseInt(product[field]) || 0
+  const newValue = Math.max(0, currentValue + increment)
+  product[field] = newValue
+  
+  // Recalculate total if hooks pp or number of panels was changed
+  if (field === 'hooksPp' || field === 'numberOfPanels') {
+    calculateHooksTotal(product)
+  }
+}
+
 </script>
 
 <style>
@@ -2788,6 +2907,115 @@ input[type="checkbox"] {
 
 /* Remove individual scrollbars when in unified mode */
 .product-form-container.unified-mode .custom-scrollbar-track:not(.unified-scrollbar) {
+  display: none;
+}
+
+.hooks-group-child {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  border-radius: 60px;
+  background-color: #fff;
+  border: 0.5px dashed #bfb7b0;
+  box-sizing: border-box;
+  width: 130px;
+  height: 36px;
+}
+
+.hooks-group-item {
+  position: absolute;
+  top: 17.75px;
+  left: 4.75px;
+  border-top: 0.5px dashed #bfb7b0;
+  box-sizing: border-box;
+  width: 120.5px;
+  height: 0.5px;
+}
+
+.hooks-pp-label {
+  position: absolute;
+  top: 3px;
+  left: 16px;
+  font-weight: 300;
+  pointer-events: none;
+  font-size: 11.74px;
+  color: #000;
+}
+
+.hooks-total-label {
+  position: absolute;
+  top: 19px;
+  left: 12px;
+  font-weight: 300;
+  pointer-events: none;
+  font-size: 11.74px;
+  color: #000;
+}
+
+.hooks-rectangle-parent {
+  width: 130px;
+  position: relative;
+  height: 36px;
+  text-align: left;
+  font-size: 11.74px;
+  color: #000;
+  font-family: 'Albert Sans', sans-serif;
+  flex-shrink: 0;
+}
+
+/* Position the dropdown containers */
+.hooks-pp-dropdown {
+  position: absolute;
+  top: 1px;
+  right: 8px;
+  width: 45px;
+  height: 14px;
+}
+
+.hooks-total-dropdown {
+  position: absolute;
+  top: 17px;
+  right: 8px;
+  width: 45px;
+  height: 14px;
+}
+
+/* Style the select elements to blend with the sandwiched field */
+.hooks-select {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: transparent;
+  font-size: 10px;
+  font-weight: 300;
+  font-family: 'Albert Sans', sans-serif;
+  color: #000;
+  outline: none;
+  cursor: pointer;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  text-align: center;
+  padding: 0;
+}
+
+.hooks-select:focus {
+  outline: none;
+  background: rgba(138, 124, 89, 0.1);
+}
+
+/* Style for disabled total select */
+.hooks-total-select {
+  color: #6B6B6B;
+  cursor: default;
+}
+
+.hooks-total-select:hover {
+  background: transparent;
+}
+
+/* Remove dropdown arrow */
+.hooks-select::-ms-expand {
   display: none;
 }
 </style>
