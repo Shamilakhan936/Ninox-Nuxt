@@ -2525,25 +2525,28 @@ div[data-headlessui-state] li[aria-selected="true"]:hover,
 
 .price-tooltip-text {
   position: absolute;
-  top: 9px;
-  left: calc(50% - 26px);
-  line-height: 2px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   font-weight: 300;
-  display: inline-block;
-  width: 53px;
-  height: 13px;
   text-align: center;
   font-size: 7.08px;
   color: #fff;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .price-breakdown-line {
   margin: 0;
-  line-height: 1.2;
+  line-height: 8px;
+  white-space: nowrap;
 }
 
 .price-breakdown-line:first-child {
-  margin-bottom: 5.31px;
+  margin-bottom: 1px;
 }
 
 /* Remove the old tooltip styles */
