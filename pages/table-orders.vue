@@ -437,6 +437,26 @@
                           />
                         </div>
                         
+                        <!-- Lining Collection (for Curtains with lining) -->
+                        <div v-if="product.productType === 'Curtains' && product.lining && product.lining !== 'No Lining'" class="form-field">
+                          <CrastinoDropdown
+                            v-model="product.liningCollection"
+                            :options="curtainOptions.liningCollections"
+                            placeholder="Lining Collection"
+                            min-width="140px"
+                          />
+                        </div>
+                        
+                        <!-- Lining Colour (for Curtains with lining) -->
+                        <div v-if="product.productType === 'Curtains' && product.lining && product.lining !== 'No Lining'" class="form-field">
+                          <CrastinoDropdown
+                            v-model="product.liningColour"
+                            :options="curtainOptions.liningColours"
+                            placeholder="Lining Colour"
+                            min-width="130px"
+                          />
+                        </div>
+                        
                         <!-- Fields for Shades (Non-curtain products) -->
                         <template v-if="['Roller Shades', 'Roman Shades'].includes(product.productType)">
                           <!-- Motor Checkbox -->
@@ -794,6 +814,26 @@
                             :options="curtainOptions.liningOptions"
                             placeholder="Lining"
                             min-width="120px"
+                          />
+                        </div>
+                        
+                        <!-- Lining Collection (for Curtains with lining) -->
+                        <div v-if="product.productType === 'Curtains' && product.lining && product.lining !== 'No Lining'" class="form-field">
+                          <CrastinoDropdown
+                            v-model="product.liningCollection"
+                            :options="curtainOptions.liningCollections"
+                            placeholder="Lining Collection"
+                            min-width="140px"
+                          />
+                        </div>
+                        
+                        <!-- Lining Colour (for Curtains with lining) -->
+                        <div v-if="product.productType === 'Curtains' && product.lining && product.lining !== 'No Lining'" class="form-field">
+                          <CrastinoDropdown
+                            v-model="product.liningColour"
+                            :options="curtainOptions.liningColours"
+                            placeholder="Lining Colour"
+                            min-width="130px"
                           />
                         </div>
                         
@@ -1191,7 +1231,9 @@ function createDefaultProduct() {
     headingHeight: null,
     isTwoSided: false,
     lining: '',
-    numberOfPanels: null,  // Add this new field
+    liningCollection: '', // Add new lining collection field
+    liningColour: '', // Add new lining colour field
+    numberOfPanels: null,
     hooksPp: null,
     hooksTotal: null,
     delivery: ''
@@ -1300,6 +1342,23 @@ const curtainOptions = {
     'Blackout Lining',
     'Thermal Lining',
     'Interlining'
+  ],
+  liningCollections: [
+    'Basic Collection',
+    'Premium Collection',
+    'Luxury Collection',
+    'Eco Collection',
+    'Designer Collection'
+  ],
+  liningColours: [
+    'White',
+    'Cream',
+    'Beige',
+    'Light Grey',
+    'Charcoal',
+    'Black',
+    'Ivory',
+    'Natural'
   ],
   deliveryOptions: [
     'Standard',
@@ -1420,7 +1479,9 @@ function addNewProduct() {
     headingHeight: null,
     isTwoSided: false,
     lining: '',
-    numberOfPanels: null,  // Add this new field
+    liningCollection: '', // Add new lining collection field
+    liningColour: '', // Add new lining colour field
+    numberOfPanels: null,
     hooksPp: null,
     hooksTotal: null,
     delivery: ''
