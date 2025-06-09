@@ -6,7 +6,16 @@
     <!-- Page Content -->
     <div class="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
       <div class="mb-6">
-        <h1 class="text-2xl font-bold mb-2" style="color: #2D2D2D;">Table Order Entry System</h1>
+        <div class="flex justify-between items-center mb-2">
+          <h1 class="text-2xl font-bold" style="color: #2D2D2D;">
+          Hello, {{ userName || 'User' }}
+        </h1>
+          <div class="text-lg font-medium" style="color: #6B6B6B;">
+            <div class="date-display">
+              {{ currentDate }}
+            </div>
+          </div>
+        </div>
         <p style="color: #6B6B6B;">
           Create and manage multiple orders with a spreadsheet-like interface.
         </p>
@@ -1111,7 +1120,37 @@ const client = useKindeClient();
 const isLoading = ref(true);
 const hasPermission = ref(true); // Default to true to allow access
 
-// Check if user has the required permission to access order entry
+// Create a safe way to access auth (same as Navbar)
+const auth = computed(() => {
+  try {
+    const nuxtApp = useNuxtApp();
+    return nuxtApp.$auth || null;
+  } catch (e) {
+    console.error("Error accessing auth:", e);
+    return null;
+  }
+});
+
+// Create a computed property for user (same as Navbar)
+const user = computed(() => {
+  return auth.value?.user || {};
+});
+
+// Create a computed property for the user name
+const userName = computed(() => {
+  return user.value?.given_name || 'User';
+});
+
+// Add this computed property for the current date
+const currentDate = computed(() => {
+  const now = new Date()
+  const day = String(now.getDate()).padStart(2, '0')
+  const month = String(now.getMonth() + 1).padStart(2, '0') // +1 because months are 0-indexed
+  const year = now.getFullYear()
+  return `${day}/${month}/${year}`
+})
+
+// Update the onMounted function to remove the Kinde client user fetching
 onMounted(async () => {
   try {
     // For now, simply check that the user is authenticated
@@ -3302,5 +3341,26 @@ div[class*="border-b border-gray-200"] {
 /* Ensure the tab content area allows overflow */
 .bg-white.rounded-b-lg {
   overflow: visible !important;
+}
+
+.date-display {
+  font-size: 13px;
+  font-weight: 300;
+  color: #6B6B6B;
+  margin-top: 8px;
+}
+
+/* Date display styling to match Figma design */
+.date-display {
+  width: 118px;
+  position: relative;
+  font-size: 16px;
+  letter-spacing: 0.2em;
+  line-height: 14px;
+  text-transform: uppercase;
+  font-family: 'Albert Sans', sans-serif;
+  color: #000;
+  text-align: left;
+  display: inline-block;
 }
 </style>
