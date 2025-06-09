@@ -168,6 +168,16 @@
                         :data-ref="`scrollContainer_${pIndex}`"
                         @scroll="updateCustomScrollbar($event, pIndex)"
                       >
+                        <!-- Room (for Curtains) -->
+                        <div v-if="product.productType === 'Curtains'" class="form-field">
+                          <CrastinoDropdown
+                            v-model="product.room"
+                            :options="curtainOptions.rooms"
+                            placeholder="Room"
+                            min-width="120px"
+                          />
+                        </div>
+                        
                         <!-- Product Type -->
                         <div class="form-field">
                           <CrastinoDropdown
@@ -176,6 +186,82 @@
                             placeholder="Type"
                             min-width="120px"
                           />
+                        </div>
+                        
+                        <!-- Height -->
+                        <div class="form-field">
+                          <div class="input-rounded number-input">
+                            <UInput
+                              v-model="product.height"
+                              type="number"
+                              placeholder="Height"
+                              class="input-rounded w-24"
+                              size="sm"
+                            />
+                            <div class="number-controls">
+                              <div class="number-btn" @mousedown="incrementValue(product, 'height', 1)">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                  <polyline points="18,15 12,9 6,15"></polyline>
+                                </svg>
+                              </div>
+                              <div class="number-btn" @mousedown="incrementValue(product, 'height', -1)">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                  <polyline points="6,9 12,15 18,9"></polyline>
+                                </svg>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <!-- Width -->
+                        <div class="form-field">
+                          <div class="input-rounded number-input">
+                            <UInput
+                              v-model="product.width"
+                              type="number"
+                              placeholder="Width"
+                              class="input-rounded w-24"
+                              size="sm"
+                            />
+                            <div class="number-controls">
+                              <div class="number-btn" @mousedown="incrementValue(product, 'width', 1)">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                  <polyline points="18,15 12,9 6,15"></polyline>
+                                </svg>
+                              </div>
+                              <div class="number-btn" @mousedown="incrementValue(product, 'width', -1)">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                  <polyline points="6,9 12,15 18,9"></polyline>
+                                </svg>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <!-- Quantity (keeping after dimensions) -->
+                        <div class="form-field">
+                          <div class="input-rounded number-input">
+                            <UInput
+                              v-model="product.quantity"
+                              type="number"
+                              placeholder="1"
+                              min="1"
+                              class="input-rounded w-14"
+                              size="sm"
+                            />
+                            <div class="number-controls">
+                              <div class="number-btn" @mousedown="incrementValue(product, 'quantity', 1)">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                  <polyline points="18,15 12,9 6,15"></polyline>
+                                </svg>
+                              </div>
+                              <div class="number-btn" @mousedown="incrementValue(product, 'quantity', -1)">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                  <polyline points="6,9 12,15 18,9"></polyline>
+                                </svg>
+                              </div>
+                            </div>
+                          </div>
                         </div>
                         
                         <!-- Fabric Selection -->
@@ -207,71 +293,112 @@
                           </button>
                         </div>
                         
-                        <!-- Dimensions -->
-                        <div class="form-field-group">
-                          <div class="input-rounded number-input">
-                            <UInput
-                              v-model="product.height"
-                              type="number"
-                              placeholder="Height"
-                              class="input-rounded w-24"
-                              size="sm"
-                            />
-                            <div class="number-controls">
-                              <div class="number-btn" @mousedown="incrementValue(product, 'height', 1)">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                  <polyline points="18,15 12,9 6,15"></polyline>
-                                </svg>
+                        <!-- Curtain Style (for Curtains) -->
+                        <div v-if="product.productType === 'Curtains'" class="form-field">
+                          <CrastinoDropdown
+                            v-model="product.curtainStyle"
+                            :options="curtainOptions.curtainStyles"
+                            placeholder="Style"
+                            min-width="120px"
+                          />
+                        </div>
+                        
+                        <!-- Bottom Style (for Curtains) -->
+                        <div v-if="product.productType === 'Curtains'" class="form-field">
+                          <CrastinoDropdown
+                            v-model="product.bottomStyle"
+                            :options="curtainOptions.bottomStyles"
+                            placeholder="Bottom"
+                            min-width="100px"
+                          />
+                        </div>
+                        
+                        <!-- # of Panels (for Curtains) -->
+                        <div v-if="product.productType === 'Curtains'" class="form-field">
+                          <CrastinoDropdown
+                            v-model="product.numberOfPanels"
+                            :options="[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]"
+                            placeholder="# Panels"
+                            min-width="90px"
+                            @update:modelValue="calculateHooksTotal(product)"
+                          />
+                        </div>
+                        
+                        <!-- Delivery (for Curtains) -->
+                        <div v-if="product.productType === 'Curtains'" class="form-field">
+                          <CrastinoDropdown
+                            v-model="product.delivery"
+                            :options="curtainOptions.deliveryOptions"
+                            placeholder="Delivery"
+                            min-width="120px"
+                          />
+                        </div>
+                        
+                        <!-- Price Field (for Curtains) -->
+                        <div v-if="product.productType === 'Curtains'" class="form-field">
+                          <div class="price-field-container" style="min-width: 120px;">
+                            <div class="price-field">
+                              <div 
+                                class="price-icon-wrapper"
+                                @mouseenter="showPriceTooltip($event, pIndex)"
+                                @mouseleave="hidePriceTooltip"
+                              >
+                                <UIcon name="i-heroicons-information-circle" class="price-info-icon" />
                               </div>
-                              <div class="number-btn" @mousedown="incrementValue(product, 'height', -1)">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                  <polyline points="6,9 12,15 18,9"></polyline>
-                                </svg>
-                              </div>
-                            </div>
-                          </div>
-                          <span class="text-xs mx-1" style="color: #6B6B6B;">×</span>
-                          <div class="input-rounded number-input">
-                            <UInput
-                              v-model="product.width"
-                              type="number"
-                              placeholder="Width"
-                              class="input-rounded w-24"
-                              size="sm"
-                            />
-                            <div class="number-controls">
-                              <div class="number-btn" @mousedown="incrementValue(product, 'width', 1)">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                  <polyline points="18,15 12,9 6,15"></polyline>
-                                </svg>
-                              </div>
-                              <div class="number-btn" @mousedown="incrementValue(product, 'width', -1)">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                  <polyline points="6,9 12,15 18,9"></polyline>
-                                </svg>
-                              </div>
+                              <div class="price-text">$125.50</div>
                             </div>
                           </div>
                         </div>
                         
-                        <!-- Quantity -->
+                        <!-- Notes - Always present -->
                         <div class="form-field">
+                          <UInput
+                            v-model="product.notes"
+                            placeholder="Notes"
+                            class="input-rounded w-24"
+                            size="sm"
+                          />
+                        </div>
+                        
+                        <!-- Hooks PP (for Curtains) -->
+                        <div v-if="product.productType === 'Curtains'" class="form-field">
+                          <CrastinoDropdown
+                            v-model="product.hooksPp"
+                            :options="[1, 2, 3, 4, 5, 6, 7]"
+                            placeholder="Hooks PP"
+                            min-width="90px"
+                            @update:modelValue="calculateHooksTotal(product)"
+                          />
+                        </div>
+                        
+                        <!-- Hooks Total (for Curtains) -->
+                        <div v-if="product.productType === 'Curtains'" class="form-field">
+                          <CrastinoDropdown
+                            v-model="product.hooksTotal"
+                            :options="[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 25, 30, 35, 40, 45, 50, 60, 70]"
+                            placeholder="Hooks Total"
+                            min-width="100px"
+                            :disabled="true"
+                          />
+                        </div>
+                        
+                        <!-- Heading Height (for Curtains) -->
+                        <div v-if="product.productType === 'Curtains'" class="form-field">
                           <div class="input-rounded number-input">
                             <UInput
-                              v-model="product.quantity"
+                              v-model="product.headingHeight"
                               type="number"
-                              placeholder="1"
-                              min="1"
-                              class="input-rounded w-14"
+                              placeholder="Head Height"
+                              class="input-rounded w-28"
                               size="sm"
                             />
                             <div class="number-controls">
-                              <div class="number-btn" @mousedown="incrementValue(product, 'quantity', 1)">
+                              <div class="number-btn" @mousedown="incrementValue(product, 'headingHeight', 1)">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                   <polyline points="18,15 12,9 6,15"></polyline>
                                 </svg>
                               </div>
-                              <div class="number-btn" @mousedown="incrementValue(product, 'quantity', -1)">
+                              <div class="number-btn" @mousedown="incrementValue(product, 'headingHeight', -1)">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                   <polyline points="6,9 12,15 18,9"></polyline>
                                 </svg>
@@ -280,130 +407,29 @@
                           </div>
                         </div>
                         
-                        <!-- Conditional Fields for Curtains -->
-                        <template v-if="product.productType === 'Curtains'">
-                          <!-- Room -->
-                          <div class="form-field">
-                            <CrastinoDropdown
-                              v-model="product.room"
-                              :options="curtainOptions.rooms"
-                              placeholder="Room"
-                              min-width="120px"
+                        <!-- 2-Sided Checkbox (for Curtains) -->
+                        <div v-if="product.productType === 'Curtains'" class="form-field">
+                          <div class="flex items-center gap-1">
+                            <UCheckbox
+                              v-model="product.isTwoSided"
+                              size="sm"
                             />
+                            <span class="text-xs whitespace-nowrap" style="color: #6B6B6B;">2-Sided</span>
                           </div>
-                          
-                          <!-- Curtain Style -->
-                          <div class="form-field">
-                            <CrastinoDropdown
-                              v-model="product.curtainStyle"
-                              :options="curtainOptions.curtainStyles"
-                              placeholder="Style"
-                              min-width="120px"
-                            />
-                          </div>
-                          
-                          <!-- Bottom Style -->
-                          <div class="form-field">
-                            <CrastinoDropdown
-                              v-model="product.bottomStyle"
-                              :options="curtainOptions.bottomStyles"
-                              placeholder="Bottom"
-                              min-width="100px"
-                            />
-                          </div>
-                          
-                          <!-- Heading Height -->
-                          <div class="form-field">
-                            <div class="input-rounded number-input">
-                              <UInput
-                                v-model="product.headingHeight"
-                                type="number"
-                                placeholder="Head Height"
-                                class="input-rounded w-28"
-                                size="sm"
-                              />
-                              <div class="number-controls">
-                                <div class="number-btn" @mousedown="incrementValue(product, 'headingHeight', 1)">
-                                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <polyline points="18,15 12,9 6,15"></polyline>
-                                  </svg>
-                                </div>
-                                <div class="number-btn" @mousedown="incrementValue(product, 'headingHeight', -1)">
-                                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <polyline points="6,9 12,15 18,9"></polyline>
-                                  </svg>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                          
-                          <!-- 2-Sided Checkbox -->
-                          <div class="form-field">
-                            <div class="flex items-center gap-1">
-                              <UCheckbox
-                                v-model="product.isTwoSided"
-                                size="sm"
-                              />
-                              <span class="text-xs whitespace-nowrap" style="color: #6B6B6B;">2-Sided</span>
-                            </div>
-                          </div>
-                          
-                          <!-- Lining -->
-                          <div class="form-field">
-                            <CrastinoDropdown
-                              v-model="product.lining"
-                              :options="curtainOptions.liningOptions"
-                              placeholder="Lining"
-                              min-width="120px"
-                            />
-                          </div>
-                          
-                          <!-- # of Panels -->
-                          <div class="form-field">
-                            <CrastinoDropdown
-                              v-model="product.numberOfPanels"
-                              :options="[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]"
-                              placeholder="# Panels"
-                              min-width="90px"
-                              @update:modelValue="calculateHooksTotal(product)"
-                            />
-                          </div>
-                          
-                          <!-- Hooks PP -->
-                          <div class="form-field">
-                            <CrastinoDropdown
-                              v-model="product.hooksPp"
-                              :options="[1, 2, 3, 4, 5, 6, 7]"
-                              placeholder="Hooks PP"
-                              min-width="90px"
-                              @update:modelValue="calculateHooksTotal(product)"
-                            />
-                          </div>
-                          
-                          <!-- Hooks Total -->
-                          <div class="form-field">
-                            <CrastinoDropdown
-                              v-model="product.hooksTotal"
-                              :options="[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 25, 30, 35, 40, 45, 50, 60, 70]"
-                              placeholder="Hooks Total"
-                              min-width="100px"
-                              :disabled="true"
-                            />
-                          </div>
-                          
-                          <!-- Delivery -->
-                          <div class="form-field">
-                            <CrastinoDropdown
-                              v-model="product.delivery"
-                              :options="curtainOptions.deliveryOptions"
-                              placeholder="Delivery"
-                              min-width="120px"
-                            />
-                          </div>
-                        </template>
+                        </div>
+                        
+                        <!-- Lining (for Curtains) -->
+                        <div v-if="product.productType === 'Curtains'" class="form-field">
+                          <CrastinoDropdown
+                            v-model="product.lining"
+                            :options="curtainOptions.liningOptions"
+                            placeholder="Lining"
+                            min-width="120px"
+                          />
+                        </div>
                         
                         <!-- Fields for Shades (Non-curtain products) -->
-                        <template v-else-if="['Roller Shades', 'Roman Shades'].includes(product.productType)">
+                        <template v-if="['Roller Shades', 'Roman Shades'].includes(product.productType)">
                           <!-- Motor Checkbox -->
                           <div class="form-field">
                             <div class="flex items-center gap-1">
@@ -454,16 +480,6 @@
                             />
                           </div>
                         </template>
-                        
-                        <!-- Notes - Always present at the end -->
-                        <div class="form-field">
-                          <UInput
-                            v-model="product.notes"
-                            placeholder="Notes"
-                            class="input-rounded w-24"
-                            size="sm"
-                          />
-                        </div>
                       </div>
                     </div>
                     
@@ -512,6 +528,16 @@
                         :data-ref="`unifiedScrollContainer_${pIndex}`"
                         @scroll="updateUnifiedScrollbar"
                       >
+                        <!-- Room (for Curtains) -->
+                        <div v-if="product.productType === 'Curtains'" class="form-field">
+                          <CrastinoDropdown
+                            v-model="product.room"
+                            :options="curtainOptions.rooms"
+                            placeholder="Room"
+                            min-width="120px"
+                          />
+                        </div>
+                        
                         <!-- Product Type -->
                         <div class="form-field">
                           <CrastinoDropdown
@@ -520,6 +546,82 @@
                             placeholder="Type"
                             min-width="120px"
                           />
+                        </div>
+                        
+                        <!-- Height -->
+                        <div class="form-field">
+                          <div class="input-rounded number-input">
+                            <UInput
+                              v-model="product.height"
+                              type="number"
+                              placeholder="Height"
+                              class="input-rounded w-24"
+                              size="sm"
+                            />
+                            <div class="number-controls">
+                              <div class="number-btn" @mousedown="incrementValue(product, 'height', 1)">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                  <polyline points="18,15 12,9 6,15"></polyline>
+                                </svg>
+                              </div>
+                              <div class="number-btn" @mousedown="incrementValue(product, 'height', -1)">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                  <polyline points="6,9 12,15 18,9"></polyline>
+                                </svg>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <!-- Width -->
+                        <div class="form-field">
+                          <div class="input-rounded number-input">
+                            <UInput
+                              v-model="product.width"
+                              type="number"
+                              placeholder="Width"
+                              class="input-rounded w-24"
+                              size="sm"
+                            />
+                            <div class="number-controls">
+                              <div class="number-btn" @mousedown="incrementValue(product, 'width', 1)">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                  <polyline points="18,15 12,9 6,15"></polyline>
+                                </svg>
+                              </div>
+                              <div class="number-btn" @mousedown="incrementValue(product, 'width', -1)">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                  <polyline points="6,9 12,15 18,9"></polyline>
+                                </svg>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <!-- Quantity (keeping after dimensions) -->
+                        <div class="form-field">
+                          <div class="input-rounded number-input">
+                            <UInput
+                              v-model="product.quantity"
+                              type="number"
+                              placeholder="1"
+                              min="1"
+                              class="input-rounded w-14"
+                              size="sm"
+                            />
+                            <div class="number-controls">
+                              <div class="number-btn" @mousedown="incrementValue(product, 'quantity', 1)">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                  <polyline points="18,15 12,9 6,15"></polyline>
+                                </svg>
+                              </div>
+                              <div class="number-btn" @mousedown="incrementValue(product, 'quantity', -1)">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                  <polyline points="6,9 12,15 18,9"></polyline>
+                                </svg>
+                              </div>
+                            </div>
+                          </div>
                         </div>
                         
                         <!-- Fabric Selection -->
@@ -551,71 +653,112 @@
                           </button>
                         </div>
                         
-                        <!-- Dimensions -->
-                        <div class="form-field-group">
-                          <div class="input-rounded number-input">
-                            <UInput
-                              v-model="product.height"
-                              type="number"
-                              placeholder="Height"
-                              class="input-rounded w-24"
-                              size="sm"
-                            />
-                            <div class="number-controls">
-                              <div class="number-btn" @mousedown="incrementValue(product, 'height', 1)">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                  <polyline points="18,15 12,9 6,15"></polyline>
-                                </svg>
+                        <!-- Curtain Style (for Curtains) -->
+                        <div v-if="product.productType === 'Curtains'" class="form-field">
+                          <CrastinoDropdown
+                            v-model="product.curtainStyle"
+                            :options="curtainOptions.curtainStyles"
+                            placeholder="Style"
+                            min-width="120px"
+                          />
+                        </div>
+                        
+                        <!-- Bottom Style (for Curtains) -->
+                        <div v-if="product.productType === 'Curtains'" class="form-field">
+                          <CrastinoDropdown
+                            v-model="product.bottomStyle"
+                            :options="curtainOptions.bottomStyles"
+                            placeholder="Bottom"
+                            min-width="100px"
+                          />
+                        </div>
+                        
+                        <!-- # of Panels (for Curtains) -->
+                        <div v-if="product.productType === 'Curtains'" class="form-field">
+                          <CrastinoDropdown
+                            v-model="product.numberOfPanels"
+                            :options="[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]"
+                            placeholder="# Panels"
+                            min-width="90px"
+                            @update:modelValue="calculateHooksTotal(product)"
+                          />
+                        </div>
+                        
+                        <!-- Delivery (for Curtains) -->
+                        <div v-if="product.productType === 'Curtains'" class="form-field">
+                          <CrastinoDropdown
+                            v-model="product.delivery"
+                            :options="curtainOptions.deliveryOptions"
+                            placeholder="Delivery"
+                            min-width="120px"
+                          />
+                        </div>
+                        
+                        <!-- Price Field (for Curtains) -->
+                        <div v-if="product.productType === 'Curtains'" class="form-field">
+                          <div class="price-field-container" style="min-width: 120px;">
+                            <div class="price-field">
+                              <div 
+                                class="price-icon-wrapper"
+                                @mouseenter="showPriceTooltip($event, pIndex)"
+                                @mouseleave="hidePriceTooltip"
+                              >
+                                <UIcon name="i-heroicons-information-circle" class="price-info-icon" />
                               </div>
-                              <div class="number-btn" @mousedown="incrementValue(product, 'height', -1)">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                  <polyline points="6,9 12,15 18,9"></polyline>
-                                </svg>
-                              </div>
-                            </div>
-                          </div>
-                          <span class="text-xs mx-1" style="color: #6B6B6B;">×</span>
-                          <div class="input-rounded number-input">
-                            <UInput
-                              v-model="product.width"
-                              type="number"
-                              placeholder="Width"
-                              class="input-rounded w-24"
-                              size="sm"
-                            />
-                            <div class="number-controls">
-                              <div class="number-btn" @mousedown="incrementValue(product, 'width', 1)">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                  <polyline points="18,15 12,9 6,15"></polyline>
-                                </svg>
-                              </div>
-                              <div class="number-btn" @mousedown="incrementValue(product, 'width', -1)">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                  <polyline points="6,9 12,15 18,9"></polyline>
-                                </svg>
-                              </div>
+                              <div class="price-text">$125.50</div>
                             </div>
                           </div>
                         </div>
                         
-                        <!-- Quantity -->
+                        <!-- Notes - Always present -->
                         <div class="form-field">
+                          <UInput
+                            v-model="product.notes"
+                            placeholder="Notes"
+                            class="input-rounded w-24"
+                            size="sm"
+                          />
+                        </div>
+                        
+                        <!-- Hooks PP (for Curtains) -->
+                        <div v-if="product.productType === 'Curtains'" class="form-field">
+                          <CrastinoDropdown
+                            v-model="product.hooksPp"
+                            :options="[1, 2, 3, 4, 5, 6, 7]"
+                            placeholder="Hooks PP"
+                            min-width="90px"
+                            @update:modelValue="calculateHooksTotal(product)"
+                          />
+                        </div>
+                        
+                        <!-- Hooks Total (for Curtains) -->
+                        <div v-if="product.productType === 'Curtains'" class="form-field">
+                          <CrastinoDropdown
+                            v-model="product.hooksTotal"
+                            :options="[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 25, 30, 35, 40, 45, 50, 60, 70]"
+                            placeholder="Hooks Total"
+                            min-width="100px"
+                            :disabled="true"
+                          />
+                        </div>
+                        
+                        <!-- Heading Height (for Curtains) -->
+                        <div v-if="product.productType === 'Curtains'" class="form-field">
                           <div class="input-rounded number-input">
                             <UInput
-                              v-model="product.quantity"
+                              v-model="product.headingHeight"
                               type="number"
-                              placeholder="1"
-                              min="1"
-                              class="input-rounded w-14"
+                              placeholder="Head Height"
+                              class="input-rounded w-28"
                               size="sm"
                             />
                             <div class="number-controls">
-                              <div class="number-btn" @mousedown="incrementValue(product, 'quantity', 1)">
+                              <div class="number-btn" @mousedown="incrementValue(product, 'headingHeight', 1)">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                   <polyline points="18,15 12,9 6,15"></polyline>
                                 </svg>
                               </div>
-                              <div class="number-btn" @mousedown="incrementValue(product, 'quantity', -1)">
+                              <div class="number-btn" @mousedown="incrementValue(product, 'headingHeight', -1)">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                   <polyline points="6,9 12,15 18,9"></polyline>
                                 </svg>
@@ -624,130 +767,29 @@
                           </div>
                         </div>
                         
-                        <!-- Conditional Fields for Curtains -->
-                        <template v-if="product.productType === 'Curtains'">
-                          <!-- Room -->
-                          <div class="form-field">
-                            <CrastinoDropdown
-                              v-model="product.room"
-                              :options="curtainOptions.rooms"
-                              placeholder="Room"
-                              min-width="120px"
+                        <!-- 2-Sided Checkbox (for Curtains) -->
+                        <div v-if="product.productType === 'Curtains'" class="form-field">
+                          <div class="flex items-center gap-1">
+                            <UCheckbox
+                              v-model="product.isTwoSided"
+                              size="sm"
                             />
+                            <span class="text-xs whitespace-nowrap" style="color: #6B6B6B;">2-Sided</span>
                           </div>
-                          
-                          <!-- Curtain Style -->
-                          <div class="form-field">
-                            <CrastinoDropdown
-                              v-model="product.curtainStyle"
-                              :options="curtainOptions.curtainStyles"
-                              placeholder="Style"
-                              min-width="120px"
-                            />
-                          </div>
-                          
-                          <!-- Bottom Style -->
-                          <div class="form-field">
-                            <CrastinoDropdown
-                              v-model="product.bottomStyle"
-                              :options="curtainOptions.bottomStyles"
-                              placeholder="Bottom"
-                              min-width="100px"
-                            />
-                          </div>
-                          
-                          <!-- Heading Height -->
-                          <div class="form-field">
-                            <div class="input-rounded number-input">
-                              <UInput
-                                v-model="product.headingHeight"
-                                type="number"
-                                placeholder="Head Height"
-                                class="input-rounded w-28"
-                                size="sm"
-                              />
-                              <div class="number-controls">
-                                <div class="number-btn" @mousedown="incrementValue(product, 'headingHeight', 1)">
-                                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <polyline points="18,15 12,9 6,15"></polyline>
-                                  </svg>
-                                </div>
-                                <div class="number-btn" @mousedown="incrementValue(product, 'headingHeight', -1)">
-                                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <polyline points="6,9 12,15 18,9"></polyline>
-                                  </svg>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                          
-                          <!-- 2-Sided Checkbox -->
-                          <div class="form-field">
-                            <div class="flex items-center gap-1">
-                              <UCheckbox
-                                v-model="product.isTwoSided"
-                                size="sm"
-                              />
-                              <span class="text-xs whitespace-nowrap" style="color: #6B6B6B;">2-Sided</span>
-                            </div>
-                          </div>
-                          
-                          <!-- Lining -->
-                          <div class="form-field">
-                            <CrastinoDropdown
-                              v-model="product.lining"
-                              :options="curtainOptions.liningOptions"
-                              placeholder="Lining"
-                              min-width="120px"
-                            />
-                          </div>
-                          
-                          <!-- # of Panels -->
-                          <div class="form-field">
-                            <CrastinoDropdown
-                              v-model="product.numberOfPanels"
-                              :options="[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]"
-                              placeholder="# Panels"
-                              min-width="90px"
-                              @update:modelValue="calculateHooksTotal(product)"
-                            />
-                          </div>
-                          
-                          <!-- Hooks PP -->
-                          <div class="form-field">
-                            <CrastinoDropdown
-                              v-model="product.hooksPp"
-                              :options="[1, 2, 3, 4, 5, 6, 7]"
-                              placeholder="Hooks PP"
-                              min-width="90px"
-                              @update:modelValue="calculateHooksTotal(product)"
-                            />
-                          </div>
-                          
-                          <!-- Hooks Total -->
-                          <div class="form-field">
-                            <CrastinoDropdown
-                              v-model="product.hooksTotal"
-                              :options="[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 25, 30, 35, 40, 45, 50, 60, 70]"
-                              placeholder="Hooks Total"
-                              min-width="100px"
-                              :disabled="true"
-                            />
-                          </div>
-                          
-                          <!-- Delivery -->
-                          <div class="form-field">
-                            <CrastinoDropdown
-                              v-model="product.delivery"
-                              :options="curtainOptions.deliveryOptions"
-                              placeholder="Delivery"
-                              min-width="120px"
-                            />
-                          </div>
-                        </template>
+                        </div>
+                        
+                        <!-- Lining (for Curtains) -->
+                        <div v-if="product.productType === 'Curtains'" class="form-field">
+                          <CrastinoDropdown
+                            v-model="product.lining"
+                            :options="curtainOptions.liningOptions"
+                            placeholder="Lining"
+                            min-width="120px"
+                          />
+                        </div>
                         
                         <!-- Fields for Shades (Non-curtain products) -->
-                        <template v-else-if="['Roller Shades', 'Roman Shades'].includes(product.productType)">
+                        <template v-if="['Roller Shades', 'Roman Shades'].includes(product.productType)">
                           <!-- Motor Checkbox -->
                           <div class="form-field">
                             <div class="flex items-center gap-1">
@@ -798,16 +840,6 @@
                             />
                           </div>
                         </template>
-                        
-                        <!-- Notes - Always present at the end -->
-                        <div class="form-field">
-                          <UInput
-                            v-model="product.notes"
-                            placeholder="Notes"
-                            class="input-rounded w-24"
-                            size="sm"
-                          />
-                        </div>
                       </div>
                     </div>
                   </div>
@@ -1043,6 +1075,26 @@
       </div>
     </div>
   </div>
+
+  <!-- Floating Price Tooltip -->
+  <Teleport to="body">
+    <div 
+      v-if="priceTooltip.show"
+      class="price-tooltip-fixed"
+      :style="{
+        top: priceTooltip.top + 'px',
+        left: priceTooltip.left + 'px'
+      }"
+    >
+      <div class="price-tooltip-content">
+        <div class="price-tooltip-background"></div>
+        <div class="price-tooltip-text">
+          <p class="price-breakdown-line">12kg 8x4x120cm</p>
+          <p class="price-breakdown-line">Shipping $5</p>
+        </div>
+      </div>
+    </div>
+  </Teleport>
 </template>
 
 <script setup>
@@ -2109,6 +2161,51 @@ function incrementHooksValue(product, field, increment) {
   }
 }
 
+// Add to the reactive data section
+const priceTooltip = ref({
+  show: false,
+  top: 0,
+  left: 0
+})
+
+// Add these functions to handle tooltip positioning
+function showPriceTooltip(event, productIndex, isUnified = false) {
+  const iconElement = event.currentTarget
+  const rect = iconElement.getBoundingClientRect()
+  
+  // Position tooltip above and to the right of the icon
+  const tooltipTop = rect.top - 40 // 40px above the icon
+  const tooltipLeft = rect.left + rect.width + 10 // 10px to the right of the icon
+  
+  // Ensure tooltip doesn't go off screen
+  const tooltipWidth = 120 // Approximate tooltip width
+  const tooltipHeight = 35 // Approximate tooltip height
+  
+  let finalTop = tooltipTop
+  let finalLeft = tooltipLeft
+  
+  // Adjust if tooltip would go off the right edge
+  if (finalLeft + tooltipWidth > window.innerWidth) {
+    finalLeft = rect.left - tooltipWidth - 10 // Show to the left instead
+  }
+  
+  // Adjust if tooltip would go off the top edge
+  if (finalTop < 0) {
+    finalTop = rect.bottom + 10 // Show below instead
+  }
+  
+  priceTooltip.value = {
+    show: true,
+    top: finalTop,
+    left: finalLeft
+  }
+}
+
+function hidePriceTooltip() {
+  priceTooltip.value.show = false
+}
+
+
 </script>
 
 <style>
@@ -2401,6 +2498,78 @@ div[data-headlessui-state] li[aria-selected="true"]:hover,
   height: 61px !important;
   font-size: 13px !important;
   font-weight: 300 !important;
+}
+
+.price-tooltip-fixed {
+  position: fixed;
+  z-index: 10000;
+  pointer-events: none;
+  font-family: 'Albert Sans', sans-serif;
+}
+
+.price-tooltip-content {
+  position: relative;
+  width: 78px;
+  height: 27px;
+}
+
+.price-tooltip-background {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  border-radius: 29.21px;
+  background-color: #bfb7b0;
+  width: 78px;
+  height: 27px;
+}
+
+.price-tooltip-text {
+  position: absolute;
+  top: 9px;
+  left: calc(50% - 26px);
+  line-height: 2px;
+  font-weight: 300;
+  display: inline-block;
+  width: 53px;
+  height: 13px;
+  text-align: center;
+  font-size: 7.08px;
+  color: #fff;
+}
+
+.price-breakdown-line {
+  margin: 0;
+  line-height: 1.2;
+}
+
+.price-breakdown-line:first-child {
+  margin-bottom: 5.31px;
+}
+
+/* Remove the old tooltip styles */
+.price-tooltip {
+  display: none !important;
+}
+
+/* Update icon wrapper to remove overflow restrictions */
+.price-icon-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.price-info-icon {
+  width: 16px !important;
+  height: 16px !important;
+  color: #6B6B6B;
+  flex-shrink: 0;
+  transition: color 0.2s ease;
+}
+
+/* Icon hover effect - subtly darken */
+.price-icon-wrapper:hover .price-info-icon {
+  color: #4A4A4A;
 }
 
 /* Active tab */
@@ -3017,5 +3186,118 @@ input[type="checkbox"] {
 /* Remove dropdown arrow */
 .hooks-select::-ms-expand {
   display: none;
+}
+
+/* Price field styling based on Figma design */
+.price-field-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  overflow: visible; /* Ensure tooltip can escape container */
+}
+
+.price-field {
+  position: relative;
+  border-radius: 48.44px;
+  background-color: #fff;
+  border: 0.7px solid #dbdad8;
+  box-sizing: border-box;
+  width: 100%;
+  height: 35px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  padding: 8.8px 16px 8.8px 16.1px;
+  gap: 7.3px;
+  text-align: left;
+  font-size: 11.74px;
+  color: #000;
+  font-family: 'Albert Sans', sans-serif;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+  overflow: visible; /* Ensure tooltip can escape */
+}
+
+.price-field:hover {
+  border: 1px solid #BFB7B0;
+}
+
+/* Icon wrapper for proper hover targeting */
+.price-icon-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  overflow: visible; /* Ensure tooltip can escape */
+}
+
+.price-info-icon {
+  width: 16px !important;
+  height: 16px !important;
+  color: #6B6B6B;
+  flex-shrink: 0;
+  transition: color 0.2s ease;
+}
+
+/* Icon hover effect - subtly darken */
+.price-icon-wrapper:hover .price-info-icon {
+  color: #4A4A4A;
+}
+
+.price-text {
+  position: relative;
+  line-height: 19.08px;
+  font-weight: 300;
+  color: #000;
+  font-family: 'Albert Sans', sans-serif;
+  font-size: 11.74px;
+}
+
+/* Price tooltip styling - use absolute positioning with high z-index */
+.price-tooltip {
+  position: absolute;
+  top: -35px;
+  left: 20px;
+  z-index: 9999; /* Very high z-index to appear above everything */
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+/* Show tooltip when hovering over icon wrapper */
+.price-icon-wrapper:hover .price-tooltip {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Ensure all parent containers allow the tooltip to escape */
+.border-b {
+  overflow: visible !important;
+}
+
+.pb-4 {
+  overflow: visible !important;
+}
+
+.mb-4 {
+  overflow: visible !important;
+}
+
+/* Target the specific product row containers */
+div[class*="border-b border-gray-200"] {
+  overflow: visible !important;
+}
+
+/* Make sure the main content area allows overflow */
+.p-6 {
+  overflow: visible !important;
+}
+
+/* Ensure the tab content area allows overflow */
+.bg-white.rounded-b-lg {
+  overflow: visible !important;
 }
 </style>
