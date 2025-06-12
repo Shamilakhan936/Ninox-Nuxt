@@ -14,44 +14,50 @@
       </svg>
     </div>
     
-    <!-- Dropdown Menu (positioned directly relative to container) -->
-    <div 
-      v-if="isOpen" 
-      class="dropdown-menu"
-      @click.stop
-      :style="{ 
-        minWidth: minWidth,
-        top: dropdownPosition.top + 'px',
-        left: dropdownPosition.left + 'px'
-      }"
-    >
-      <div class="dropdown-content">
-        <div 
-          v-for="(option, index) in options" 
-          :key="index"
-          :class="[
-            'dropdown-option',
-            { 'selected': isSelected(option) }
-          ]"
-          @click="selectOption(option)"
-        >
-          {{ getOptionLabel(option) }}
-          <div v-if="index < options.length - 1" class="option-separator"></div>
+    <!-- Dropdown Menu (positioned absolutely relative to document) -->
+    <Teleport to="body">
+      <div 
+        v-if="isOpen" 
+        ref="dropdownRef"
+        class="dropdown-menu"
+        @click.stop
+        :style="{ 
+          minWidth: minWidth,
+          top: dropdownPosition.top + 'px',
+          left: dropdownPosition.left + 'px',
+          maxHeight: dropdownPosition.maxHeight + 'px'
+        }"
+      >
+        <div class="dropdown-content">
+          <div 
+            v-for="(option, index) in options" 
+            :key="index"
+            :class="[
+              'dropdown-option',
+              { 'selected': isSelected(option) }
+            ]"
+            @click="selectOption(option)"
+          >
+            {{ getOptionLabel(option) }}
+            <div v-if="index < options.length - 1" class="option-separator"></div>
+          </div>
         </div>
       </div>
-    </div>
+    </Teleport>
     
     <!-- Click overlay to close dropdown -->
-    <div 
-      v-if="isOpen" 
-      class="dropdown-overlay"
-      @click="closeDropdown"
-    ></div>
+    <Teleport to="body">
+      <div 
+        v-if="isOpen" 
+        class="dropdown-overlay"
+        @click="closeDropdown"
+      ></div>
+    </Teleport>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, watch, onUnmounted, nextTick } from 'vue'
+import { ref, computed, watch, onUnmounted, nextTick, onMounted } from 'vue'
 
 const props = defineProps({
   modelValue: {
@@ -80,7 +86,8 @@ const emit = defineEmits(['update:modelValue', 'click'])
 
 const isOpen = ref(false)
 const containerRef = ref(null)
-const dropdownPosition = ref({ top: 0, left: 0 })
+const dropdownRef = ref(null)
+const dropdownPosition = ref({ top: 0, left: 0, maxHeight: 244 })
 
 // Computed property for display value
 const displayValue = computed(() => {
@@ -142,12 +149,46 @@ function toggleDropdown() {
 }
 
 function updateDropdownPosition() {
-  if (containerRef.value) {
-    const rect = containerRef.value.getBoundingClientRect()
-    dropdownPosition.value = {
-      top: rect.bottom + 4, // 4px spacing below the trigger
-      left: rect.left
-    }
+  if (!containerRef.value) return
+  
+  const rect = containerRef.value.getBoundingClientRect()
+  const scrollTop = window.pageYOffset || document.documentElement.scrollTop
+  const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft
+  
+  // Calculate absolute position
+  const absoluteTop = rect.bottom + scrollTop + 4 // 4px spacing below the trigger
+  const absoluteLeft = rect.left + scrollLeft
+  
+  // Calculate available space below and above the trigger
+  const viewportHeight = window.innerHeight
+  const spaceBelow = viewportHeight - rect.bottom
+  const spaceAbove = rect.top
+  
+  // Default dropdown height
+  const defaultMaxHeight = 244
+  
+  // Determine if dropdown should appear above or below
+  let finalTop = absoluteTop
+  let maxHeight = defaultMaxHeight
+  
+  if (spaceBelow < 200 && spaceAbove > spaceBelow) {
+    // Show above the trigger if there's more space above
+    finalTop = rect.top + scrollTop - Math.min(defaultMaxHeight, spaceAbove - 10)
+    maxHeight = Math.min(defaultMaxHeight, spaceAbove - 10)
+  } else {
+    // Show below the trigger
+    maxHeight = Math.min(defaultMaxHeight, spaceBelow - 10)
+  }
+  
+  // Ensure dropdown doesn't go off the right edge of the screen
+  const dropdownWidth = parseInt(props.minWidth) || 200
+  const maxLeft = window.innerWidth + scrollLeft - dropdownWidth - 10
+  const finalLeft = Math.min(absoluteLeft, maxLeft)
+  
+  dropdownPosition.value = {
+    top: finalTop,
+    left: finalLeft,
+    maxHeight: Math.max(100, maxHeight) // Minimum height of 100px
   }
 }
 
@@ -163,26 +204,59 @@ function selectOption(option) {
   closeDropdown()
 }
 
+// Handle scroll events to update dropdown position
+function handleScroll() {
+  if (isOpen.value) {
+    // Check if the trigger element is still visible
+    if (containerRef.value) {
+      const rect = containerRef.value.getBoundingClientRect()
+      
+      // Close dropdown if trigger is scrolled too far out of view
+      if (rect.bottom < -50 || rect.top > window.innerHeight + 50) {
+        closeDropdown()
+        return
+      }
+    }
+    
+    // Update position
+    updateDropdownPosition()
+  }
+}
+
+// Handle window resize
+function handleResize() {
+  if (isOpen.value) {
+    updateDropdownPosition()
+  }
+}
+
 // Close dropdown when clicking outside
 function handleClickOutside(event) {
-  if (!event.target.closest('.custom-dropdown-container')) {
+  if (!event.target.closest('.custom-dropdown-container') && 
+      !event.target.closest('.dropdown-menu')) {
     closeDropdown()
   }
 }
 
-// Add/remove event listener when dropdown opens/closes
+// Add/remove event listeners when dropdown opens/closes
 watch(isOpen, (newValue) => {
   console.log('Watch isOpen changed to:', newValue)
   if (newValue) {
     document.addEventListener('click', handleClickOutside)
+    window.addEventListener('scroll', handleScroll, true) // Use capture phase
+    window.addEventListener('resize', handleResize)
   } else {
     document.removeEventListener('click', handleClickOutside)
+    window.removeEventListener('scroll', handleScroll, true)
+    window.removeEventListener('resize', handleResize)
   }
 })
 
 // Cleanup on unmount
 onUnmounted(() => {
   document.removeEventListener('click', handleClickOutside)
+  window.removeEventListener('scroll', handleScroll, true)
+  window.removeEventListener('resize', handleResize)
 })
 </script>
 
@@ -259,12 +333,11 @@ onUnmounted(() => {
 }
 
 .dropdown-menu {
-  position: fixed; /* Keep fixed positioning for proper z-index layering */
+  position: absolute; /* Changed from fixed to absolute */
   border-radius: 26px;
   background-color: #fff;
   border: 1px solid #8a7c59;
   box-sizing: border-box;
-  max-height: 244px;
   overflow-y: auto;
   z-index: 10000;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
