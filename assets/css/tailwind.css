@@ -1,3 +1,37 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Override Nuxt UI and Tailwind base link styles for mobile menu */
+.mobile-menu a,
+.mobile-menu button {
+  text-decoration: none !important;
+  text-underline-offset: unset !important;
+  text-decoration-line: none !important;
+  text-decoration-style: none !important;
+  text-decoration-color: transparent !important;
+  text-decoration-thickness: 0 !important;
+}
+
+.mobile-menu a:hover,
+.mobile-menu a:focus,
+.mobile-menu a:active,
+.mobile-menu a:visited,
+.mobile-menu button:hover,
+.mobile-menu button:focus,
+.mobile-menu button:active {
+  text-decoration: none !important;
+  text-underline-offset: unset !important;
+  text-decoration-line: none !important;
+  text-decoration-style: none !important;
+  text-decoration-color: transparent !important;
+  text-decoration-thickness: 0 !important;
+}
+
+/* Also override any Nuxt UI component styles in mobile menu */
+.mobile-menu .nuxt-link-active,
+.mobile-menu .nuxt-link-exact-active,
+.mobile-menu .router-link-active,
+.mobile-menu .router-link-exact-active {
+  text-decoration: none !important;
+}

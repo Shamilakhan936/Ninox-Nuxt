@@ -178,28 +178,80 @@ definePageMeta({
 }
 
 @media (max-width: 768px) {
+  .homepage-vol1 {
+    height: 100vh;
+    min-height: 600px;
+  }
+  
+  .video-background {
+    top: 120px;
+    height: calc(100vh - 200px);
+    min-height: 500px;
+  }
+  
+  .video-overlay,
+  .content-overlay {
+    top: 120px;
+    height: calc(100vh - 200px);
+    min-height: 500px;
+  }
+  
   .hero-text {
-    font-size: 32px;
-    line-height: 40px;
+    font-size: 28px;
+    line-height: 34px;
     width: 90%;
     left: 5%;
     transform: none;
+    top: 45%;
+    text-align: center;
   }
   
   .reseller-banner {
-    width: 90%;
-    left: 5%;
+    width: 85%;
+    left: 7.5%;
     transform: none;
+    top: calc(55% + 40px);
   }
   
   .banner-background {
     width: 100%;
+    height: 50px;
   }
   
   .banner-text {
     left: 50%;
     transform: translateX(-50%);
-    font-size: 18px;
+    font-size: 16px;
+    top: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-text {
+    font-size: 24px;
+    line-height: 30px;
+    width: 95%;
+    left: 2.5%;
+  }
+  
+  .reseller-banner {
+    width: 90%;
+    left: 5%;
+  }
+  
+  .banner-text {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 360px) {
+  .hero-text {
+    font-size: 20px;
+    line-height: 26px;
+  }
+  
+  .banner-text {
+    font-size: 12px;
   }
 }
 </style>
