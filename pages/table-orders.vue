@@ -177,8 +177,8 @@
                         :data-ref="`scrollContainer_${pIndex}`"
                         @scroll="updateCustomScrollbar($event, pIndex)"
                       >
-                        <!-- Room (for Curtains) -->
-                        <div v-if="product.productType === 'Curtains'" class="form-field">
+                        <!-- Room (for Curtains and Roman Shades) -->
+                        <div v-if="product.productType === 'Curtains' || product.productType === 'Roman Shades'" class="form-field">
                           <CrastinoDropdown
                             v-model="product.room"
                             :options="curtainOptions.rooms"
@@ -247,7 +247,7 @@
                           </div>
                         </div>
                         
-                        <!-- Quantity (keeping after dimensions) -->
+                        <!-- Quantity -->
                         <div class="form-field">
                           <div class="input-rounded number-input">
                             <UInput
@@ -312,6 +312,16 @@
                           />
                         </div>
                         
+                        <!-- Shade Style (for Roman Shades) -->
+                        <div v-if="product.productType === 'Roman Shades'" class="form-field">
+                          <CrastinoDropdown
+                            v-model="product.shadeStyle"
+                            :options="romanShadeOptions.shadeStyles"
+                            placeholder="Shade Style"
+                            min-width="120px"
+                          />
+                        </div>
+                        
                         <!-- Bottom Style (for Curtains) -->
                         <div v-if="product.productType === 'Curtains'" class="form-field">
                           <CrastinoDropdown
@@ -319,6 +329,27 @@
                             :options="curtainOptions.bottomStyles"
                             placeholder="Bottom"
                             min-width="100px"
+                          />
+                        </div>
+                        
+                        <!-- Control Type (for Roman Shades) -->
+                        <div v-if="product.productType === 'Roman Shades'" class="form-field">
+                          <CrastinoDropdown
+                            v-model="product.controlType"
+                            :options="romanShadeOptions.controlTypes"
+                            placeholder="Control Type"
+                            min-width="120px"
+                            @update:modelValue="handleControlTypeChange(product)"
+                          />
+                        </div>
+                        
+                        <!-- Motor Type (for Roman Shades when motorized) -->
+                        <div v-if="product.productType === 'Roman Shades' && product.controlType === 'Motorized'" class="form-field">
+                          <CrastinoDropdown
+                            v-model="product.motorType"
+                            :options="getMotorTypes('Roman Shades')"
+                            placeholder="Motor Type"
+                            min-width="120px"
                           />
                         </div>
                         
@@ -333,8 +364,8 @@
                           />
                         </div>
                         
-                        <!-- Delivery (for Curtains) -->
-                        <div v-if="product.productType === 'Curtains'" class="form-field">
+                        <!-- Delivery (for Curtains and Roman Shades) -->
+                        <div v-if="product.productType === 'Curtains' || product.productType === 'Roman Shades'" class="form-field">
                           <CrastinoDropdown
                             v-model="product.delivery"
                             :options="curtainOptions.deliveryOptions"
@@ -343,8 +374,8 @@
                           />
                         </div>
                         
-                        <!-- Price Field (for Curtains) -->
-                        <div v-if="product.productType === 'Curtains'" class="form-field">
+                        <!-- Price Field (for Curtains and Roman Shades) -->
+                        <div v-if="product.productType === 'Curtains' || product.productType === 'Roman Shades'" class="form-field">
                           <div class="price-field-container" style="min-width: 120px;">
                             <div class="price-field">
                               <div 
@@ -354,7 +385,7 @@
                               >
                                 <UIcon name="i-heroicons-information-circle" class="price-info-icon" />
                               </div>
-                              <div class="price-text">$125.50</div>
+                              <div class="price-text">{{ product.productType === 'Curtains' ? '$125.50' : '$95.75' }}</div>
                             </div>
                           </div>
                         </div>
@@ -369,8 +400,8 @@
                           />
                         </div>
                         
-                        <!-- Hooks PP (for Curtains) -->
-                        <div v-if="product.productType === 'Curtains'" class="form-field">
+                        <!-- Hooks PP (for Curtains and Roman Shades) -->
+                        <div v-if="product.productType === 'Curtains' || product.productType === 'Roman Shades'" class="form-field">
                           <CrastinoDropdown
                             v-model="product.hooksPp"
                             :options="[1, 2, 3, 4, 5, 6, 7]"
@@ -380,8 +411,8 @@
                           />
                         </div>
                         
-                        <!-- Hooks Total (for Curtains) -->
-                        <div v-if="product.productType === 'Curtains'" class="form-field">
+                        <!-- Hooks Total (for Curtains and Roman Shades) -->
+                        <div v-if="product.productType === 'Curtains' || product.productType === 'Roman Shades'" class="form-field">
                           <CrastinoDropdown
                             v-model="product.hooksTotal"
                             :options="[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 25, 30, 35, 40, 45, 50, 60, 70]"
@@ -391,8 +422,8 @@
                           />
                         </div>
                         
-                        <!-- Heading Height (for Curtains) -->
-                        <div v-if="product.productType === 'Curtains'" class="form-field">
+                        <!-- Heading Height (for Curtains and Roman Shades) -->
+                        <div v-if="product.productType === 'Curtains' || product.productType === 'Roman Shades'" class="form-field">
                           <div class="input-rounded number-input">
                             <UInput
                               v-model="product.headingHeight"
@@ -416,8 +447,8 @@
                           </div>
                         </div>
                         
-                        <!-- 2-Sided Checkbox (for Curtains) -->
-                        <div v-if="product.productType === 'Curtains'" class="form-field">
+                        <!-- 2-Sided Checkbox (for Curtains and Roman Shades) -->
+                        <div v-if="product.productType === 'Curtains' || product.productType === 'Roman Shades'" class="form-field">
                           <div class="flex items-center gap-1">
                             <UCheckbox
                               v-model="product.isTwoSided"
@@ -427,8 +458,8 @@
                           </div>
                         </div>
                         
-                        <!-- Lining (for Curtains) -->
-                        <div v-if="product.productType === 'Curtains'" class="form-field">
+                        <!-- Lining (for Curtains and Roman Shades) -->
+                        <div v-if="product.productType === 'Curtains' || product.productType === 'Roman Shades'" class="form-field">
                           <CrastinoDropdown
                             v-model="product.lining"
                             :options="curtainOptions.liningOptions"
@@ -437,8 +468,8 @@
                           />
                         </div>
                         
-                        <!-- Lining Collection (for Curtains with lining) -->
-                        <div v-if="product.productType === 'Curtains' && product.lining && product.lining !== 'No Lining'" class="form-field">
+                        <!-- Lining Collection (for Curtains and Roman Shades with lining) -->
+                        <div v-if="(product.productType === 'Curtains' || product.productType === 'Roman Shades') && product.lining && product.lining !== 'No Lining'" class="form-field">
                           <CrastinoDropdown
                             v-model="product.liningCollection"
                             :options="curtainOptions.liningCollections"
@@ -447,8 +478,8 @@
                           />
                         </div>
                         
-                        <!-- Lining Colour (for Curtains with lining) -->
-                        <div v-if="product.productType === 'Curtains' && product.lining && product.lining !== 'No Lining'" class="form-field">
+                        <!-- Lining Colour (for Curtains and Roman Shades with lining) -->
+                        <div v-if="(product.productType === 'Curtains' || product.productType === 'Roman Shades') && product.lining && product.lining !== 'No Lining'" class="form-field">
                           <CrastinoDropdown
                             v-model="product.liningColour"
                             :options="curtainOptions.liningColours"
@@ -457,14 +488,13 @@
                           />
                         </div>
                         
-                        <!-- Fields for Shades (Non-curtain products) -->
-                        <template v-if="['Roller Shades', 'Roman Shades'].includes(product.productType)">
+                        <!-- Fields for Roller Shades (keep existing logic for Roller Shades) -->
+                        <template v-if="product.productType === 'Roller Shades'">
                           <!-- Motor Checkbox -->
                           <div class="form-field">
                             <div class="flex items-center gap-1">
                               <UCheckbox
                                 v-model="product.isMotorized"
-                                :disabled="!['Roller Shades', 'Roman Shades'].includes(product.productType)"
                                 size="sm"
                               />
                               <span class="text-xs whitespace-nowrap" style="color: #6B6B6B;">Motor</span>
@@ -557,8 +587,8 @@
                         :data-ref="`unifiedScrollContainer_${pIndex}`"
                         @scroll="updateUnifiedScrollbar"
                       >
-                        <!-- Room (for Curtains) -->
-                        <div v-if="product.productType === 'Curtains'" class="form-field">
+                        <!-- Room (for Curtains and Roman Shades) -->
+                        <div v-if="product.productType === 'Curtains' || product.productType === 'Roman Shades'" class="form-field">
                           <CrastinoDropdown
                             v-model="product.room"
                             :options="curtainOptions.rooms"
@@ -627,7 +657,7 @@
                           </div>
                         </div>
                         
-                        <!-- Quantity (keeping after dimensions) -->
+                        <!-- Quantity -->
                         <div class="form-field">
                           <div class="input-rounded number-input">
                             <UInput
@@ -692,6 +722,16 @@
                           />
                         </div>
                         
+                        <!-- Shade Style (for Roman Shades) -->
+                        <div v-if="product.productType === 'Roman Shades'" class="form-field">
+                          <CrastinoDropdown
+                            v-model="product.shadeStyle"
+                            :options="romanShadeOptions.shadeStyles"
+                            placeholder="Shade Style"
+                            min-width="120px"
+                          />
+                        </div>
+                        
                         <!-- Bottom Style (for Curtains) -->
                         <div v-if="product.productType === 'Curtains'" class="form-field">
                           <CrastinoDropdown
@@ -699,6 +739,27 @@
                             :options="curtainOptions.bottomStyles"
                             placeholder="Bottom"
                             min-width="100px"
+                          />
+                        </div>
+                        
+                        <!-- Control Type (for Roman Shades) -->
+                        <div v-if="product.productType === 'Roman Shades'" class="form-field">
+                          <CrastinoDropdown
+                            v-model="product.controlType"
+                            :options="romanShadeOptions.controlTypes"
+                            placeholder="Control Type"
+                            min-width="120px"
+                            @update:modelValue="handleControlTypeChange(product)"
+                          />
+                        </div>
+                        
+                        <!-- Motor Type (for Roman Shades when motorized) -->
+                        <div v-if="product.productType === 'Roman Shades' && product.controlType === 'Motorized'" class="form-field">
+                          <CrastinoDropdown
+                            v-model="product.motorType"
+                            :options="getMotorTypes('Roman Shades')"
+                            placeholder="Motor Type"
+                            min-width="120px"
                           />
                         </div>
                         
@@ -713,8 +774,8 @@
                           />
                         </div>
                         
-                        <!-- Delivery (for Curtains) -->
-                        <div v-if="product.productType === 'Curtains'" class="form-field">
+                        <!-- Delivery (for Curtains and Roman Shades) -->
+                        <div v-if="product.productType === 'Curtains' || product.productType === 'Roman Shades'" class="form-field">
                           <CrastinoDropdown
                             v-model="product.delivery"
                             :options="curtainOptions.deliveryOptions"
@@ -723,8 +784,8 @@
                           />
                         </div>
                         
-                        <!-- Price Field (for Curtains) -->
-                        <div v-if="product.productType === 'Curtains'" class="form-field">
+                        <!-- Price Field (for Curtains and Roman Shades) -->
+                        <div v-if="product.productType === 'Curtains' || product.productType === 'Roman Shades'" class="form-field">
                           <div class="price-field-container" style="min-width: 120px;">
                             <div class="price-field">
                               <div 
@@ -734,7 +795,7 @@
                               >
                                 <UIcon name="i-heroicons-information-circle" class="price-info-icon" />
                               </div>
-                              <div class="price-text">$125.50</div>
+                              <div class="price-text">{{ product.productType === 'Curtains' ? '$125.50' : '$95.75' }}</div>
                             </div>
                           </div>
                         </div>
@@ -749,8 +810,8 @@
                           />
                         </div>
                         
-                        <!-- Hooks PP (for Curtains) -->
-                        <div v-if="product.productType === 'Curtains'" class="form-field">
+                        <!-- Hooks PP (for Curtains and Roman Shades) -->
+                        <div v-if="product.productType === 'Curtains' || product.productType === 'Roman Shades'" class="form-field">
                           <CrastinoDropdown
                             v-model="product.hooksPp"
                             :options="[1, 2, 3, 4, 5, 6, 7]"
@@ -760,8 +821,8 @@
                           />
                         </div>
                         
-                        <!-- Hooks Total (for Curtains) -->
-                        <div v-if="product.productType === 'Curtains'" class="form-field">
+                        <!-- Hooks Total (for Curtains and Roman Shades) -->
+                        <div v-if="product.productType === 'Curtains' || product.productType === 'Roman Shades'" class="form-field">
                           <CrastinoDropdown
                             v-model="product.hooksTotal"
                             :options="[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 25, 30, 35, 40, 45, 50, 60, 70]"
@@ -771,8 +832,8 @@
                           />
                         </div>
                         
-                        <!-- Heading Height (for Curtains) -->
-                        <div v-if="product.productType === 'Curtains'" class="form-field">
+                        <!-- Heading Height (for Curtains and Roman Shades) -->
+                        <div v-if="product.productType === 'Curtains' || product.productType === 'Roman Shades'" class="form-field">
                           <div class="input-rounded number-input">
                             <UInput
                               v-model="product.headingHeight"
@@ -796,8 +857,8 @@
                           </div>
                         </div>
                         
-                        <!-- 2-Sided Checkbox (for Curtains) -->
-                        <div v-if="product.productType === 'Curtains'" class="form-field">
+                        <!-- 2-Sided Checkbox (for Curtains and Roman Shades) -->
+                        <div v-if="product.productType === 'Curtains' || product.productType === 'Roman Shades'" class="form-field">
                           <div class="flex items-center gap-1">
                             <UCheckbox
                               v-model="product.isTwoSided"
@@ -807,8 +868,8 @@
                           </div>
                         </div>
                         
-                        <!-- Lining (for Curtains) -->
-                        <div v-if="product.productType === 'Curtains'" class="form-field">
+                        <!-- Lining (for Curtains and Roman Shades) -->
+                        <div v-if="product.productType === 'Curtains' || product.productType === 'Roman Shades'" class="form-field">
                           <CrastinoDropdown
                             v-model="product.lining"
                             :options="curtainOptions.liningOptions"
@@ -817,8 +878,8 @@
                           />
                         </div>
                         
-                        <!-- Lining Collection (for Curtains with lining) -->
-                        <div v-if="product.productType === 'Curtains' && product.lining && product.lining !== 'No Lining'" class="form-field">
+                        <!-- Lining Collection (for Curtains and Roman Shades with lining) -->
+                        <div v-if="(product.productType === 'Curtains' || product.productType === 'Roman Shades') && product.lining && product.lining !== 'No Lining'" class="form-field">
                           <CrastinoDropdown
                             v-model="product.liningCollection"
                             :options="curtainOptions.liningCollections"
@@ -827,8 +888,8 @@
                           />
                         </div>
                         
-                        <!-- Lining Colour (for Curtains with lining) -->
-                        <div v-if="product.productType === 'Curtains' && product.lining && product.lining !== 'No Lining'" class="form-field">
+                        <!-- Lining Colour (for Curtains and Roman Shades with lining) -->
+                        <div v-if="(product.productType === 'Curtains' || product.productType === 'Roman Shades') && product.lining && product.lining !== 'No Lining'" class="form-field">
                           <CrastinoDropdown
                             v-model="product.liningColour"
                             :options="curtainOptions.liningColours"
@@ -837,14 +898,13 @@
                           />
                         </div>
                         
-                        <!-- Fields for Shades (Non-curtain products) -->
-                        <template v-if="['Roller Shades', 'Roman Shades'].includes(product.productType)">
+                        <!-- Fields for Roller Shades (keep existing logic for Roller Shades) -->
+                        <template v-if="product.productType === 'Roller Shades'">
                           <!-- Motor Checkbox -->
                           <div class="form-field">
                             <div class="flex items-center gap-1">
                               <UCheckbox
                                 v-model="product.isMotorized"
-                                :disabled="!['Roller Shades', 'Roman Shades'].includes(product.productType)"
                                 size="sm"
                               />
                               <span class="text-xs whitespace-nowrap" style="color: #6B6B6B;">Motor</span>
@@ -1231,12 +1291,15 @@ function createDefaultProduct() {
     headingHeight: null,
     isTwoSided: false,
     lining: '',
-    liningCollection: '', // Add new lining collection field
-    liningColour: '', // Add new lining colour field
+    liningCollection: '',
+    liningColour: '',
     numberOfPanels: null,
     hooksPp: null,
     hooksTotal: null,
-    delivery: ''
+    delivery: '',
+    // Roman Shade-specific fields
+    shadeStyle: '',
+    controlType: 'Manual'
   }
 }
 
@@ -1368,6 +1431,22 @@ const curtainOptions = {
   ]
 }
 
+// Add Roman Shade-specific options
+const romanShadeOptions = {
+  shadeStyles: [
+    'Flat',
+    'Hobbled',
+    'Waterfall',
+    'Relaxed',
+    'Teardrop',
+    'Balloon'
+  ],
+  controlTypes: [
+    'Manual',
+    'Motorized'
+  ]
+}
+
 // Helper function to get motor types based on product type
 function getMotorTypes(productType) {
   return motorTypes[productType] || []
@@ -1479,12 +1558,15 @@ function addNewProduct() {
     headingHeight: null,
     isTwoSided: false,
     lining: '',
-    liningCollection: '', // Add new lining collection field
-    liningColour: '', // Add new lining colour field
+    liningCollection: '',
+    liningColour: '',
     numberOfPanels: null,
     hooksPp: null,
     hooksTotal: null,
-    delivery: ''
+    delivery: '',
+    // Roman Shade-specific fields
+    shadeStyle: '',
+    controlType: 'Manual'
   })
 }
 
@@ -2305,6 +2387,15 @@ function hidePriceTooltip() {
   priceTooltip.value.show = false
 }
 
+// Add this function to handle control type changes
+function handleControlTypeChange(product) {
+  if (product.controlType === 'Manual') {
+    product.motorType = ''
+    product.isMotorized = false
+  } else if (product.controlType === 'Motorized') {
+    product.isMotorized = true
+  }
+}
 
 </script>
 
