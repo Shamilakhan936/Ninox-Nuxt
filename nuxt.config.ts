@@ -82,6 +82,15 @@ export default defineNuxtConfig({
       },
     },
     
+    // Protect admin page
+    '/admin': {
+      appMiddleware: ['auth-logged-in'],
+      kinde: {
+        redirectUrl: '/api/login',
+        external: true,
+      },
+    },
+    
     // Protect API routes that should only be accessed by authenticated users
     '/api/ninox/user-orders': {
       appMiddleware: ['auth-logged-in'],
