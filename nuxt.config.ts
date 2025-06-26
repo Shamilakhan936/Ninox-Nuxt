@@ -45,7 +45,8 @@ export default defineNuxtConfig({
 
   // Add CSS files
   css: [
-    '@/assets/css/tailwind.css'
+    '@/assets/css/tailwind.css',
+    '~/assets/css/table-orders.css'
   ],
 
   // Remove the PostCSS configuration entirely

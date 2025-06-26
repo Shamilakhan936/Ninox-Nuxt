@@ -1,0 +1,787 @@
+/* Import Albert Sans font */
+@import url('https://fonts.googleapis.com/css2?family=Albert+Sans:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+/* Apply Albert Sans to entire component */
+.table-orders-container {
+  font-family: 'Albert Sans', sans-serif;
+}
+
+/* Product numbering with exact Figma specifications */
+.product-number {
+  font-family: 'Albert Sans', sans-serif;
+  font-weight: 300;
+  font-size: 11.74px;
+  line-height: 19.08px;
+  letter-spacing: 0px;
+  color: #000;
+  margin-bottom: 8.81px;
+  font-display: swap;
+}
+
+/* Form field styling - Default state */
+.input-rounded input,
+.input-rounded .ui-input input,
+.input-rounded div input,
+.select-rounded select,
+.select-rounded .ui-select select,
+.select-rounded div select,
+.select-rounded button,
+.select-rounded .ui-select button,
+.select-rounded div button,
+[data-headlessui-state] input,
+[data-headlessui-state] select,
+[data-headlessui-state] button,
+.ui-input input,
+.ui-select select,
+.ui-select button,
+div[class*="select"] button,
+div[class*="input"] input {
+  border: 0.5px solid #E5E5E5 !important;
+  background-color: #FFFFFF !important;
+  color: #000 !important;
+  border-radius: 48.44px !important;
+  font-size: 11.74px !important;
+  line-height: 19.08px !important;
+  font-weight: 300 !important;
+  padding: 8.8px 16.1px !important;
+  height: 35px !important;
+  box-sizing: border-box !important;
+  font-family: 'Albert Sans', sans-serif !important;
+  transition: border 0.2s ease !important;
+}
+
+/* Focus state */
+.input-rounded input:focus,
+.input-rounded .ui-input input:focus,
+.input-rounded div input:focus,
+.select-rounded select:focus,
+.select-rounded .ui-select select:focus,
+.select-rounded div select:focus,
+.select-rounded button:focus,
+.select-rounded .ui-select button:focus,
+.select-rounded div button:focus,
+.select-rounded button:focus-visible,
+.select-rounded .ui-select button:focus-visible,
+.select-rounded div button:focus-visible,
+[data-headlessui-state] input:focus,
+[data-headlessui-state] select:focus,
+[data-headlessui-state] button:focus,
+[data-headlessui-state="open"] button,
+[data-headlessui-state*="focus"] button,
+.ui-input input:focus,
+.ui-select select:focus,
+.ui-select button:focus,
+.ui-select button:focus-visible,
+div[class*="select"] button:focus,
+div[class*="select"] button:focus-visible,
+div[class*="input"] input:focus,
+.ui-select[data-headlessui-state="open"] button,
+.ui-select[data-headlessui-state*="open"] button,
+button[data-headlessui-state="open"],
+button[data-headlessui-state*="open"] {
+  border: 1.5px solid #2D2D2D !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+/* Focus-within support */
+.input-rounded:focus-within input,
+.input-rounded:focus-within .ui-input input,
+.input-rounded:focus-within div input,
+.select-rounded:focus-within select,
+.select-rounded:focus-within .ui-select select,
+.select-rounded:focus-within div select,
+.select-rounded:focus-within button,
+.select-rounded:focus-within .ui-select button,
+.select-rounded:focus-within div button {
+  border: 1.5px solid #2D2D2D !important;
+}
+
+/* Dropdown Menu Styling */
+[role="listbox"],
+[role="menu"],
+.ui-select-options,
+.ui-select [role="listbox"],
+div[data-headlessui-state] [role="listbox"],
+div[data-headlessui-state] ul,
+.select-rounded [role="listbox"],
+.select-rounded ul {
+  background-color: #FFFFFF !important;
+  border: 0.5px solid #E5E5E5 !important;
+  border-radius: 16px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+  padding: 8px !important;
+  margin-top: 4px !important;
+  font-family: 'Albert Sans', sans-serif !important;
+  max-height: 200px !important;
+  overflow-y: auto !important;
+  z-index: 50 !important;
+}
+
+/* Dropdown option styling */
+[role="option"],
+.ui-select-option,
+.ui-select [role="option"],
+div[data-headlessui-state] [role="option"],
+div[data-headlessui-state] li,
+.select-rounded [role="option"],
+.select-rounded li {
+  padding: 8px 12px !important;
+  font-size: 11.74px !important;
+  line-height: 19.08px !important;
+  font-weight: 300 !important;
+  font-family: 'Albert Sans', sans-serif !important;
+  color: #2D2D2D !important;
+  border-radius: 8px !important;
+  margin: 2px 0 !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+  background-color: transparent !important;
+  border: none !important;
+}
+
+/* Dropdown option hover state */
+[role="option"]:hover,
+.ui-select-option:hover,
+.ui-select [role="option"]:hover,
+div[data-headlessui-state] [role="option"]:hover,
+div[data-headlessui-state] li:hover,
+.select-rounded [role="option"]:hover,
+.select-rounded li:hover,
+[data-headlessui-state="active"] {
+  background-color: #F5F5F5 !important;
+  color: #2D2D2D !important;
+}
+
+/* Selected dropdown option */
+[role="option"][aria-selected="true"],
+.ui-select-option[aria-selected="true"],
+.ui-select [role="option"][aria-selected="true"],
+div[data-headlessui-state] [role="option"][aria-selected="true"],
+div[data-headlessui-state] li[aria-selected="true"],
+.select-rounded [role="option"][aria-selected="true"],
+.select-rounded li[aria-selected="true"],
+[data-headlessui-state*="selected"] {
+  background-color: #8A7C59 !important;
+  color: #FFFFFF !important;
+  font-weight: 400 !important;
+}
+
+/* Selected option hover state */
+[role="option"][aria-selected="true"]:hover,
+.ui-select-option[aria-selected="true"]:hover,
+.ui-select [role="option"][aria-selected="true"]:hover,
+div[data-headlessui-state] [role="option"][aria-selected="true"]:hover,
+div[data-headlessui-state] li[aria-selected="true"]:hover,
+.select-rounded [role="option"][aria-selected="true"]:hover,
+.select-rounded li[aria-selected="true"]:hover,
+[data-headlessui-state*="selected"]:hover {
+  background-color: #6B5B42 !important;
+  color: #FFFFFF !important;
+}
+
+/* Custom scrollbar for dropdown */
+[role="listbox"]::-webkit-scrollbar,
+.ui-select-options::-webkit-scrollbar,
+.select-rounded [role="listbox"]::-webkit-scrollbar {
+  width: 4px !important;
+}
+
+[role="listbox"]::-webkit-scrollbar-track,
+.ui-select-options::-webkit-scrollbar-track,
+.select-rounded [role="listbox"]::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+
+[role="listbox"]::-webkit-scrollbar-thumb,
+.ui-select-options::-webkit-scrollbar-thumb,
+.select-rounded [role="listbox"]::-webkit-scrollbar-thumb {
+  background-color: #E5E5E5 !important;
+  border-radius: 2px !important;
+}
+
+[role="listbox"]::-webkit-scrollbar-thumb:hover,
+.ui-select-options::-webkit-scrollbar-thumb:hover,
+.select-rounded [role="listbox"]::-webkit-scrollbar-thumb:hover {
+  background-color: #DBDAD8 !important;
+}
+
+/* Dropdown arrow styling */
+.select-rounded svg,
+.ui-select svg,
+.select-rounded .ui-select svg {
+  color: #6B6B6B !important;
+  width: 14px !important;
+  height: 14px !important;
+  transition: transform 0.2s ease !important;
+}
+
+.select-rounded[data-headlessui-state="open"] svg,
+.ui-select[data-headlessui-state="open"] svg,
+.select-rounded .ui-select[data-headlessui-state="open"] svg {
+  transform: rotate(180deg) !important;
+}
+
+/* Special instructions field styling */
+.special-instructions,
+.special-instructions input,
+.special-instructions .ui-input input {
+  border: 0.5px solid #E5E5E5 !important;
+  border-radius: 48.44px !important;
+  background-color: #fff !important;
+  height: 35px !important;
+  font-size: 11.74px !important;
+  line-height: 19.08px !important;
+  font-weight: 300 !important;
+  font-family: 'Albert Sans', sans-serif !important;
+  padding: 8.8px 16.1px !important;
+  transition: border 0.2s ease !important;
+}
+
+.special-instructions:focus,
+.special-instructions input:focus,
+.special-instructions .ui-input input:focus,
+.special-instructions:focus-within input {
+  border: 1.5px solid #2D2D2D !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+/* Textarea styling */
+.textarea-rounded textarea {
+  border: 0.5px solid #E5E5E5 !important;
+  background-color: #FFFFFF !important;
+  color: #000 !important;
+  border-radius: 48.44px !important;
+  font-size: 11.74px !important;
+  line-height: 19.08px !important;
+  font-weight: 300 !important;
+  font-family: 'Albert Sans', sans-serif !important;
+  transition: border 0.2s ease !important;
+}
+
+.textarea-rounded textarea:focus {
+  border: 1.5px solid #2D2D2D !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+/* Tab styling */
+.tab-container {
+  border-radius: 6.49px 6.49px 0px 0px !important;
+  height: 61px !important;
+  font-size: 13px !important;
+  font-weight: 300 !important;
+}
+
+.tab-active {
+  background-color: #fff !important;
+  color: #000 !important;
+}
+
+.tab-inactive {
+  background-color: #EAEAEA !important;
+  color: #BFB7B0 !important;
+}
+
+/* Number input styling */
+.input-rounded input[type="number"] {
+  -moz-appearance: textfield;
+  padding-right: 40px !important;
+}
+
+.input-rounded input[type="number"]::-webkit-outer-spin-button,
+.input-rounded input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.input-rounded.number-input {
+  position: relative;
+  display: inline-block;
+}
+
+.input-rounded.number-input input[type="number"] {
+  padding-right: 32px !important;
+}
+
+.input-rounded.number-input .number-controls {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.input-rounded.number-input:hover .number-controls,
+.input-rounded.number-input input:focus + .number-controls {
+  opacity: 1;
+}
+
+.input-rounded.number-input .number-btn {
+  width: 16px;
+  height: 16px;
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.input-rounded.number-input .number-btn:hover {
+  background: rgba(138, 124, 89, 0.1);
+  transform: scale(1.1);
+}
+
+.input-rounded.number-input .number-btn:active {
+  background: rgba(138, 124, 89, 0.2);
+  transform: scale(0.95);
+}
+
+.input-rounded.number-input .number-btn svg {
+  width: 10px;
+  height: 10px;
+  color: #DBDAD8;
+  stroke-width: 2.5;
+}
+
+.input-rounded.number-input .number-btn:hover svg {
+  color: #8A7C59;
+}
+
+/* Button styling */
+.rounded-full {
+  border-radius: 74px !important;
+}
+
+button.rounded-full {
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Add New Product button */
+.add-product-button {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  background: transparent;
+  border: none;
+  border-radius: 20px;
+  color: #BFB7B0;
+  font-size: 13px;
+  font-weight: 300;
+  font-family: 'Albert Sans', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.add-product-button:hover {
+  color: #8A7C59;
+  background: rgba(138, 124, 89, 0.08);
+}
+
+.add-product-button:active {
+  background: rgba(138, 124, 89, 0.15);
+  transform: scale(0.98);
+}
+
+.add-product-button:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+/* Delete button styling */
+.delete-product-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  color: #DBDAD8;
+  font-size: 16px;
+  font-weight: 300;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  outline: none;
+  line-height: 1;
+}
+
+.delete-product-button:hover {
+  color: #EF4444;
+  background: rgba(239, 68, 68, 0.08);
+  transform: scale(1.1);
+}
+
+.delete-product-button:active {
+  background: rgba(239, 68, 68, 0.15);
+  transform: scale(0.95);
+}
+
+.delete-product-button:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+/* Checkbox styling */
+input[type="checkbox"] {
+  border: 1px solid #8A7C59 !important;
+  border-radius: 2px !important;
+  background-color: #fff !important;
+  width: 16px !important;
+  height: 16px !important;
+}
+
+/* Typography */
+.text-xs {
+  font-size: 11.74px !important;
+  line-height: 19.08px !important;
+  font-weight: 300 !important;
+  font-family: 'Albert Sans', sans-serif !important;
+}
+
+.text-sm {
+  font-size: 13px !important;
+  font-weight: 300 !important;
+  font-family: 'Albert Sans', sans-serif !important;
+}
+
+.motor-label {
+  font-size: 16px !important;
+  line-height: 24px !important;
+  color: #3D3935 !important;
+  font-family: 'Albert Sans', sans-serif !important;
+}
+
+/* Text selection */
+::selection {
+  background-color: #0ea5e9 !important;
+  color: white !important;
+}
+
+::-moz-selection {
+  background-color: #0ea5e9 !important;
+  color: white !important;
+}
+
+/* Fabric button styling */
+.fabric-button {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  border: 0.5px solid #E5E5E5 !important;
+  background-color: #FFFFFF !important;
+  color: #000 !important;
+  border-radius: 48.44px !important;
+  font-size: 11.74px !important;
+  line-height: 19.08px !important;
+  font-weight: 300 !important;
+  padding: 8.8px 16.1px !important;
+  height: 35px !important;
+  box-sizing: border-box !important;
+  font-family: 'Albert Sans', sans-serif !important;
+  transition: border 0.2s ease !important;
+  cursor: pointer !important;
+  outline: none !important;
+}
+
+.fabric-button:hover {
+  border: 1px solid #BFB7B0 !important;
+}
+
+.fabric-button:focus,
+.fabric-button:focus-visible {
+  border: 1.5px solid #2D2D2D !important;
+  box-shadow: none !important;
+}
+
+.fabric-button:disabled {
+  background-color: #F9F9F9 !important;
+  color: #DBDAD8 !important;
+  cursor: not-allowed !important;
+  border: 0.5px solid #E5E5E5 !important;
+}
+
+.fabric-button:disabled:hover {
+  border: 0.5px solid #E5E5E5 !important;
+}
+
+.fabric-button span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fabric-button svg {
+  color: #6B6B6B !important;
+  transition: transform 0.2s ease !important;
+}
+
+.fabric-button:disabled svg {
+  color: #DBDAD8 !important;
+}
+
+/* Horizontal scrolling form container */
+.product-form-container {
+  position: relative;
+  width: 100%;
+  padding-bottom: 0;
+}
+
+.product-form-scroll {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.form-field-fixed {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.form-fields-scroll {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  flex: 1;
+  padding-bottom: 2px;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.form-fields-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.form-field {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.form-field-group {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Custom scrollbar track */
+.custom-scrollbar-track {
+  position: relative;
+  width: 100%;
+  height: 9px;
+  border-radius: 10px;
+  border: 1px solid #d9d9d9;
+  box-sizing: border-box;
+  background-color: transparent;
+  margin-top: 8px;
+  cursor: pointer;
+}
+
+.custom-scrollbar-thumb {
+  position: absolute;
+  top: 1.5px;
+  border-radius: 10px;
+  background-color: #d9d9d9;
+  height: 5px;
+  transition: background-color 0.2s ease;
+  cursor: grab;
+  min-width: 20px;
+}
+
+.custom-scrollbar-thumb:hover {
+  background-color: #bfb7b0;
+}
+
+.custom-scrollbar-thumb:active {
+  cursor: grabbing;
+  background-color: #8a7c59;
+}
+
+.product-form-container:has(.custom-scrollbar-track) {
+  padding-bottom: 17px;
+}
+
+/* Unified scroll mode styles */
+.form-fields-scroll.unified-scroll {
+  scroll-behavior: auto;
+}
+
+.product-form-container.unified-mode {
+  /* Inherits from .product-form-container */
+}
+
+.unified-scrollbar {
+  margin-left: 80px;
+  width: calc(100% - 80px);
+  margin-top: 8px;
+}
+
+.product-form-container.unified-mode .custom-scrollbar-track:not(.unified-scrollbar) {
+  display: none;
+}
+
+/* Price field styling */
+.price-field-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  overflow: visible;
+}
+
+.price-field {
+  position: relative;
+  border-radius: 48.44px;
+  background-color: #fff;
+  border: 0.7px solid #dbdad8;
+  box-sizing: border-box;
+  width: 100%;
+  height: 35px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  padding: 8.8px 16px 8.8px 16.1px;
+  gap: 7.3px;
+  text-align: left;
+  font-size: 11.74px;
+  color: #000;
+  font-family: 'Albert Sans', sans-serif;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+  overflow: visible;
+}
+
+.price-field:hover {
+  border: 1px solid #BFB7B0;
+}
+
+.price-icon-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  overflow: visible;
+}
+
+.price-info-icon {
+  width: 16px !important;
+  height: 16px !important;
+  color: #6B6B6B;
+  flex-shrink: 0;
+  transition: color 0.2s ease;
+}
+
+.price-icon-wrapper:hover .price-info-icon {
+  color: #4A4A4A;
+}
+
+.price-text {
+  position: relative;
+  line-height: 19.08px;
+  font-weight: 300;
+  color: #000;
+  font-family: 'Albert Sans', sans-serif;
+  font-size: 11.74px;
+}
+
+/* Price tooltip */
+.price-tooltip-fixed {
+  position: fixed;
+  z-index: 10000;
+  pointer-events: none;
+  font-family: 'Albert Sans', sans-serif;
+}
+
+.price-tooltip-content {
+  position: relative;
+  width: 78px;
+  height: 27px;
+}
+
+.price-tooltip-background {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  border-radius: 29.21px;
+  background-color: #bfb7b0;
+  width: 78px;
+  height: 27px;
+}
+
+.price-tooltip-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-weight: 300;
+  text-align: center;
+  font-size: 7.08px;
+  color: #fff;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.price-breakdown-line {
+  margin: 0;
+  line-height: 8px;
+  white-space: nowrap;
+}
+
+.price-breakdown-line:first-child {
+  margin-bottom: 1px;
+}
+
+/* Date display */
+.date-display {
+  width: 118px;
+  position: relative;
+  font-size: 16px;
+  letter-spacing: 0.2em;
+  line-height: 14px;
+  text-transform: uppercase;
+  font-family: 'Albert Sans', sans-serif;
+  color: #000;
+  text-align: left;
+  display: inline-block;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .form-fields-scroll {
+    gap: 6px;
+  }
+  
+  .form-field {
+    min-width: fit-content;
+  }
+}
+
+/* Overflow fixes for tooltips */
+.border-b,
+.pb-4,
+.mb-4,
+div[class*="border-b border-gray-200"],
+.p-6,
+.bg-white.rounded-b-lg {
+  overflow: visible !important;
+} 
