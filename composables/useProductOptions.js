@@ -86,16 +86,42 @@ export const useProductOptions = () => {
 
   const romanShadeOptions = {
     shadeStyles: [
-      'Flat',
-      'Hobbled',
-      'Waterfall',
-      'Relaxed',
-      'Teardrop',
-      'Balloon'
+      'Flat Roman',
+      'Hobbled Roman',
+      'Balloon Roman',
+      'Austrian Roman',
+      'Relaxed Roman'
     ],
     controlTypes: [
       'Manual',
       'Motorized'
+    ],
+    systemColours: [
+      'White',
+      'Black',
+      'Silver',
+      'Bronze',
+      'Antique Gold',
+      'Natural Wood',
+      'Dark Wood'
+    ],
+    motorModels: [
+      'Standard Model',
+      'Premium Model',
+      'Smart Model',
+      'Pro Model'
+    ],
+    motorPositions: [
+      'Left',
+      'Right',
+      'Center'
+    ],
+    accessories: [
+      'None',
+      'Valance',
+      'Side Panels',
+      'Tiebacks',
+      'Holdbacks'
     ]
   }
 
