@@ -176,7 +176,28 @@
                     @scroll="updateCustomScrollbar"
                   />
                   
-                  <!-- Generic Product Row (for Curtains and other types) -->
+                  <!-- Curtains Product Row -->
+                  <CurtainsProductRow
+                    v-else-if="product.productType === 'Curtains'"
+                    :product="product"
+                    :product-index="pIndex"
+                    :product-types="productTypes"
+                    :curtain-options="curtainOptions"
+                    :is-unified-scroll="false"
+                    :scrollbar-data="scrollbarData[pIndex]"
+                    :scroll-thumb-style="getScrollThumbStyle(pIndex)"
+                    @update:product="orders[activeTabIndex].products[pIndex] = $event"
+                    @remove="removeProduct(pIndex)"
+                    @open-fabric-modal="openFabricModal(pIndex)"
+                    @open-fabric-color-modal="openFabricColorModal(pIndex)"
+                    @show-price-tooltip="showPriceTooltip($event, pIndex)"
+                    @hide-price-tooltip="hidePriceTooltip"
+                    @scroll-to-position="scrollToPosition($event, pIndex)"
+                    @start-scrollbar-drag="startScrollbarDrag($event, pIndex)"
+                    @scroll="updateCustomScrollbar"
+                  />
+                  
+                  <!-- Generic Product Row (for other types) -->
                   <div v-else class="border-b border-gray-200 pb-4 mb-4 last:border-b-0 last:mb-0">
                     <!-- Horizontal scrollable form fields container -->
                     <div class="product-form-container">
@@ -526,7 +547,24 @@
                     @scroll="updateUnifiedScrollbar"
                   />
                   
-                  <!-- Generic Product Row (for Curtains and other types) -->
+                  <!-- Curtains Product Row -->
+                  <CurtainsProductRow
+                    v-else-if="product.productType === 'Curtains'"
+                    :product="product"
+                    :product-index="pIndex"
+                    :product-types="productTypes"
+                    :curtain-options="curtainOptions"
+                    :is-unified-scroll="true"
+                    @update:product="orders[activeTabIndex].products[pIndex] = $event"
+                    @remove="removeProduct(pIndex)"
+                    @open-fabric-modal="openFabricModal(pIndex)"
+                    @open-fabric-color-modal="openFabricColorModal(pIndex)"
+                    @show-price-tooltip="showPriceTooltip($event, pIndex)"
+                    @hide-price-tooltip="hidePriceTooltip"
+                    @scroll="updateUnifiedScrollbar"
+                  />
+                  
+                  <!-- Generic Product Row (for other types) -->
                   <div v-else class="border-b border-gray-200 pb-4 mb-4 last:border-b-0 last:mb-0">
                     <!-- Horizontal scrollable form fields container -->
                     <div class="product-form-container unified-mode">
@@ -1117,6 +1155,7 @@ import FabricColorSearchModal from '../components/FabricColorSearchModal.vue'
 import NotificationSystem from '../components/NotificationSystem.vue'
 import CrastinoDropdown from '../components/CrastinoDropdown.vue'
 import RomanShadesProductRow from '../components/RomanShadesProductRow.vue'
+import CurtainsProductRow from '../components/CurtainsProductRow.vue'
 
 // Import composables
 import { useProductOptions } from '../composables/useProductOptions'
