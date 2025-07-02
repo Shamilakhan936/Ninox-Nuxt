@@ -135,9 +135,7 @@ function isSelected(option) {
 function toggleDropdown() {
   if (props.disabled) return
   
-  console.log('Dropdown toggled, isOpen was:', isOpen.value)
   isOpen.value = !isOpen.value
-  console.log('Dropdown isOpen now:', isOpen.value)
   
   // Calculate position when opening
   if (isOpen.value) {
@@ -152,53 +150,93 @@ function updateDropdownPosition() {
   if (!containerRef.value) return
   
   const rect = containerRef.value.getBoundingClientRect()
-  const scrollTop = window.pageYOffset || document.documentElement.scrollTop
-  const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft
-  
-  // Calculate absolute position
-  const absoluteTop = rect.bottom + scrollTop + 4 // 4px spacing below the trigger
-  const absoluteLeft = rect.left + scrollLeft
-  
-  // Calculate available space below and above the trigger
   const viewportHeight = window.innerHeight
-  const spaceBelow = viewportHeight - rect.bottom
-  const spaceAbove = rect.top
+  const viewportWidth = window.innerWidth
   
-  // Default dropdown height
-  const defaultMaxHeight = 244
+  // Constants
+  const DROPDOWN_SPACING = 4
+  const MIN_SPACE_NEEDED = 10 // Reduced minimum space needed
+  const DEFAULT_MAX_HEIGHT = 244
+  const EDGE_BUFFER = 10
+  const ABSOLUTE_MIN_HEIGHT = 60 // Absolute minimum height for dropdown
   
-  // Determine if dropdown should appear above or below
-  let finalTop = absoluteTop
-  let maxHeight = defaultMaxHeight
+  // Calculate available space
+  const spaceBelow = viewportHeight - rect.bottom - EDGE_BUFFER
+  const spaceAbove = rect.top - EDGE_BUFFER
   
-  if (spaceBelow < 200 && spaceAbove > spaceBelow) {
-    // Show above the trigger if there's more space above
-    finalTop = rect.top + scrollTop - Math.min(defaultMaxHeight, spaceAbove - 10)
-    maxHeight = Math.min(defaultMaxHeight, spaceAbove - 10)
+  // Determine dropdown width
+  const dropdownWidth = Math.max(parseInt(props.minWidth) || 200, rect.width)
+  
+  // Determine position and constraints
+  let finalTop
+  let maxHeight
+  let showAbove = false
+  
+  // Always try to position relative to the trigger first
+  if (spaceBelow >= MIN_SPACE_NEEDED) {
+    // Show below - there's enough reasonable space
+    showAbove = false
+    finalTop = rect.bottom + DROPDOWN_SPACING
+    maxHeight = Math.min(DEFAULT_MAX_HEIGHT, spaceBelow - DROPDOWN_SPACING)
+  } else if (spaceAbove >= MIN_SPACE_NEEDED) {
+    // Show above - not enough space below but enough above
+    showAbove = true
+    maxHeight = Math.min(DEFAULT_MAX_HEIGHT, spaceAbove - DROPDOWN_SPACING)
+    finalTop = rect.top - maxHeight - DROPDOWN_SPACING
   } else {
-    // Show below the trigger
-    maxHeight = Math.min(defaultMaxHeight, spaceBelow - 10)
+    // Very limited space case: still position relative to trigger, just use whatever space is available
+    if (spaceBelow >= spaceAbove) {
+      // Prefer below even with minimal space
+      showAbove = false
+      finalTop = rect.bottom + DROPDOWN_SPACING
+      maxHeight = Math.max(ABSOLUTE_MIN_HEIGHT, spaceBelow - DROPDOWN_SPACING)
+      
+      // If dropdown would go off bottom, adjust but keep it below the trigger
+      if (finalTop + maxHeight > viewportHeight - EDGE_BUFFER) {
+        maxHeight = Math.max(ABSOLUTE_MIN_HEIGHT, viewportHeight - finalTop - EDGE_BUFFER)
+      }
+    } else {
+      // Prefer above even with minimal space
+      showAbove = true
+      maxHeight = Math.max(ABSOLUTE_MIN_HEIGHT, spaceAbove - DROPDOWN_SPACING)
+      finalTop = rect.top - maxHeight - DROPDOWN_SPACING
+      
+      // If dropdown would go off top, adjust but keep it above the trigger
+      if (finalTop < EDGE_BUFFER) {
+        finalTop = EDGE_BUFFER
+        maxHeight = Math.max(ABSOLUTE_MIN_HEIGHT, rect.top - EDGE_BUFFER - DROPDOWN_SPACING)
+      }
+    }
   }
   
-  // Ensure dropdown doesn't go off the right edge of the screen
-  const dropdownWidth = parseInt(props.minWidth) || 200
-  const maxLeft = window.innerWidth + scrollLeft - dropdownWidth - 10
-  const finalLeft = Math.min(absoluteLeft, maxLeft)
+  // Handle horizontal positioning
+  let finalLeft = rect.left
+  
+  // Ensure dropdown doesn't go off the right edge
+  if (finalLeft + dropdownWidth > viewportWidth - EDGE_BUFFER) {
+    finalLeft = viewportWidth - dropdownWidth - EDGE_BUFFER
+  }
+  
+  // Ensure dropdown doesn't go off the left edge
+  if (finalLeft < EDGE_BUFFER) {
+    finalLeft = EDGE_BUFFER
+  }
+  
+  // Final safety check: ensure we have a minimum viable height
+  maxHeight = Math.max(ABSOLUTE_MIN_HEIGHT, maxHeight)
   
   dropdownPosition.value = {
     top: finalTop,
     left: finalLeft,
-    maxHeight: Math.max(100, maxHeight) // Minimum height of 100px
+    maxHeight: maxHeight
   }
 }
 
 function closeDropdown() {
-  console.log('Closing dropdown')
   isOpen.value = false
 }
 
 function selectOption(option) {
-  console.log('Option selected:', option)
   const value = getOptionValue(option)
   emit('update:modelValue', value)
   closeDropdown()
@@ -207,46 +245,72 @@ function selectOption(option) {
 // Handle scroll events to update dropdown position
 function handleScroll() {
   if (isOpen.value) {
-    // Check if the trigger element is still visible
+    // Check if the trigger element is still visible and reasonably positioned
     if (containerRef.value) {
       const rect = containerRef.value.getBoundingClientRect()
+      const viewportHeight = window.innerHeight
       
-      // Close dropdown if trigger is scrolled too far out of view
-      if (rect.bottom < -50 || rect.top > window.innerHeight + 50) {
+      // Close dropdown if trigger is scrolled way out of view
+      if (rect.bottom < -100 || rect.top > viewportHeight + 100) {
         closeDropdown()
         return
       }
+      
+      // If trigger is still somewhat visible, update position
+      if (rect.bottom > -50 && rect.top < viewportHeight + 50) {
+        updateDropdownPosition()
+      }
     }
-    
-    // Update position
-    updateDropdownPosition()
   }
 }
 
 // Handle window resize
 function handleResize() {
   if (isOpen.value) {
-    updateDropdownPosition()
+    // Small delay to ensure window has finished resizing
+    setTimeout(() => {
+      updateDropdownPosition()
+    }, 10)
   }
 }
 
 // Close dropdown when clicking outside
 function handleClickOutside(event) {
-  if (!event.target.closest('.custom-dropdown-container') && 
-      !event.target.closest('.dropdown-menu')) {
-    closeDropdown()
+  // Don't close if clicking on the trigger or dropdown
+  if (event.target.closest('.custom-dropdown-container') || 
+      event.target.closest('.dropdown-menu')) {
+    return
+  }
+  closeDropdown()
+}
+
+// Enhanced keyboard support
+function handleKeydown(event) {
+  if (!isOpen.value) return
+  
+  switch (event.key) {
+    case 'Escape':
+      closeDropdown()
+      break
+    case 'Tab':
+      closeDropdown()
+      break
   }
 }
 
 // Add/remove event listeners when dropdown opens/closes
 watch(isOpen, (newValue) => {
-  console.log('Watch isOpen changed to:', newValue)
   if (newValue) {
-    document.addEventListener('click', handleClickOutside)
-    window.addEventListener('scroll', handleScroll, true) // Use capture phase
-    window.addEventListener('resize', handleResize)
+    // Use setTimeout to ensure the dropdown is rendered first
+    setTimeout(() => {
+      document.addEventListener('click', handleClickOutside, true)
+      document.addEventListener('keydown', handleKeydown, true)
+      window.addEventListener('scroll', handleScroll, true)
+      window.addEventListener('resize', handleResize)
+    }, 10)
   } else {
-    document.removeEventListener('click', handleClickOutside)
+    document.removeEventListener('click', handleClickOutside, true)
+    document.removeEventListener('keydown', handleKeydown, true)
     window.removeEventListener('scroll', handleScroll, true)
     window.removeEventListener('resize', handleResize)
   }
@@ -254,7 +318,8 @@ watch(isOpen, (newValue) => {
 
 // Cleanup on unmount
 onUnmounted(() => {
-  document.removeEventListener('click', handleClickOutside)
+  document.removeEventListener('click', handleClickOutside, true)
+  document.removeEventListener('keydown', handleKeydown, true)
   window.removeEventListener('scroll', handleScroll, true)
   window.removeEventListener('resize', handleResize)
 })
@@ -307,6 +372,9 @@ onUnmounted(() => {
   line-height: 19.08px;
   font-weight: 300;
   flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .dropdown-arrow {
@@ -328,21 +396,24 @@ onUnmounted(() => {
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 9998;
+  z-index: 10100; /* Higher than modal's 10001 */
   background: transparent;
 }
 
 .dropdown-menu {
-  position: absolute; /* Changed from fixed to absolute */
+  position: fixed;
   border-radius: 26px;
   background-color: #fff;
   border: 1px solid #8a7c59;
   box-sizing: border-box;
   overflow-y: auto;
-  z-index: 10000;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  z-index: 10101; /* Higher than modal's 10001 and overlay's 10100 */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   width: max-content;
   min-width: 200px;
+  
+  /* Smooth transitions for position changes */
+  transition: opacity 0.15s ease, transform 0.15s ease;
 }
 
 .dropdown-content {
@@ -359,6 +430,7 @@ onUnmounted(() => {
   transition: all 0.15s ease;
   font-size: 11.74px;
   position: relative;
+  white-space: nowrap;
 }
 
 .dropdown-option:hover {
@@ -381,19 +453,36 @@ onUnmounted(() => {
 
 /* Custom scrollbar */
 .dropdown-menu::-webkit-scrollbar {
-  width: 4px;
+  width: 6px;
 }
 
 .dropdown-menu::-webkit-scrollbar-track {
   background: transparent;
+  border-radius: 3px;
 }
 
 .dropdown-menu::-webkit-scrollbar-thumb {
   background-color: #E5E5E5;
-  border-radius: 2px;
+  border-radius: 3px;
 }
 
 .dropdown-menu::-webkit-scrollbar-thumb:hover {
   background-color: #DBDAD8;
+}
+
+/* Animation for dropdown appearance */
+.dropdown-menu {
+  animation: dropdownAppear 0.15s ease-out;
+}
+
+@keyframes dropdownAppear {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 </style>

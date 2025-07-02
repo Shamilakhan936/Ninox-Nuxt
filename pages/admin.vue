@@ -327,6 +327,10 @@ const entities = [
   }
 ];
 
+// Use runtime config for API base URL
+const config = useRuntimeConfig()
+const apiBase = config.public.apiBase
+
 // Computed properties
 const currentEntity = computed(() => {
   return entities.find(e => e.key === activeEntity.value) || entities[0];
@@ -342,15 +346,12 @@ async function fetchData() {
   error.value = null;
   
   try {
-    const response = await fetch(`http://localhost:3001/api/${currentEntity.value.endpoint}`);
+    const response = await fetch(`/api/${currentEntity.value.endpoint}`);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     const responseData = await response.json();
     
-    // Extract the data array from the API response
-    // API returns: { success: true, data: [...] }
-    // We need just the array for the component
     entityData.value[activeEntity.value] = responseData.data || responseData;
     
   } catch (err) {
@@ -366,8 +367,8 @@ async function saveItem() {
   
   try {
     const url = editingItem.value 
-      ? `http://localhost:3001/api/${currentEntity.value.endpoint}/${editingItem.value.id}`
-      : `http://localhost:3001/api/${currentEntity.value.endpoint}`;
+      ? `/api/${currentEntity.value.endpoint}/${editingItem.value.id}`
+      : `/api/${currentEntity.value.endpoint}`;
     
     const method = editingItem.value ? 'PUT' : 'POST';
     
@@ -383,10 +384,8 @@ async function saveItem() {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     
-    // Refresh data
     await fetchData();
     
-    // Show success notification
     showNotification({
       title: 'Success',
       description: `${currentEntity.value.singular} ${editingItem.value ? 'updated' : 'created'} successfully`,
@@ -411,7 +410,7 @@ async function deleteItem() {
   deleting.value = true;
   
   try {
-    const response = await fetch(`http://localhost:3001/api/${currentEntity.value.endpoint}/${deletingItem.value.id}`, {
+    const response = await fetch(`/api/${currentEntity.value.endpoint}/${deletingItem.value.id}`, {
       method: 'DELETE'
     });
     
@@ -419,10 +418,8 @@ async function deleteItem() {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     
-    // Refresh data
     await fetchData();
     
-    // Show success notification
     showNotification({
       title: 'Success',
       description: `${currentEntity.value.singular} deleted successfully`,
