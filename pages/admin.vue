@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen" style="background-color: #f7f7f5;">
+  <div class="min-h-screen" style="background-color: #ffffff;">
     <!-- Navigation -->
     <Navbar />
 
