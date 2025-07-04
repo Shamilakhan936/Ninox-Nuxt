@@ -59,7 +59,7 @@ const props = defineProps({
       { name: "Credits", action: "credits", route: "/account/credits" },
       { name: "Shipments", action: "shipments", route: "/account/shipments" },
       { name: "Back Orders", action: "back-orders", comingSoon: true },
-      { name: "Complaints", action: "complaints", comingSoon: true },
+      { name: "Complaints", action: "complaints", route: "/account/complaints" },
     ],
   },
   showOrderUpload: {

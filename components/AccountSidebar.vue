@@ -48,6 +48,9 @@
 
 <script setup>
 import { defineProps, defineEmits } from "vue";
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
 
 const props = defineProps({
   activeItem: {
@@ -80,4 +83,12 @@ const handleMenuClick = (menuItem) => {
 const handleOrderUploadClick = () => {
   emit("order-upload-click");
 };
+
+function isComplaintsActive(menuItem) {
+  if (menuItem.name !== 'Complaints') return false
+  return (
+    route.path === '/account/complaints' ||
+    route.path === '/account/complaintForm'
+  )
+}
 </script>
