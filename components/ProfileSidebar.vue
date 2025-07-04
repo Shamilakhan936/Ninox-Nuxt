@@ -1,26 +1,22 @@
 <template>
   <div
-    class="absolute left-[84px] top-[32px] w-[205px] flex flex-col gap-[30px] text-black z-10"
+    class="sticky top-[100px] w-[205px] flex flex-col gap-[30px] text-black z-10"
   >
-    <!-- Active Item (My Account by default) -->
-    <div class="flex items-center justify-between">
-      <div class="text-[16px] leading-[27.82px] uppercase font-medium">
-        {{ activeItem }}
-      </div>
-      <UIcon
-        name="i-heroicons-chevron-right"
-        class="w-[25px] h-[25px] text-black"
-      />
-    </div>
-
-    <!-- Menu Items -->
+    <!-- Sidebar Menu Items -->
     <div
       v-for="menuItem in menuItems"
       :key="menuItem.name"
       class="flex items-center justify-between cursor-pointer hover:opacity-70 transition-opacity"
       @click="handleMenuClick(menuItem)"
     >
-      <div class="text-[16px] leading-[27.82px] uppercase font-light">
+      <div
+        :class="[
+          'leading-[27.82px] uppercase font-light transition-all',
+          menuItem.name === currentActiveItem
+            ? 'text-base font-medium text-black'
+            : 'text-[16px] font-light',
+        ]"
+      >
         {{ menuItem.name }}
       </div>
       <UIcon
@@ -29,7 +25,7 @@
       />
     </div>
 
-    <!-- Order Upload (conditional) -->
+    <!-- Order Upload Button -->
     <div
       v-if="showOrderUpload"
       class="flex items-center justify-between cursor-pointer hover:opacity-70 transition-opacity"
@@ -47,7 +43,7 @@
 </template>
 
 <script setup>
-import { defineProps, defineEmits } from "vue";
+import { defineProps, defineEmits, ref, watch } from "vue";
 
 const props = defineProps({
   activeItem: {
@@ -57,8 +53,9 @@ const props = defineProps({
   menuItems: {
     type: Array,
     default: () => [
+      { name: "My Account", action: "account", route: "/account" },
       { name: "Orders", action: "orders", route: "/table-orders" },
-      { name: "Invoices", action: "invoices" },
+      { name: "Invoices", action: "invoices", route: "/invoices" },
       { name: "Credits", action: "credits" },
       { name: "Shipments", action: "shipments" },
       { name: "Back Orders", action: "back-orders" },
@@ -73,10 +70,23 @@ const props = defineProps({
 
 const emit = defineEmits(["menu-click", "order-upload-click"]);
 
+const currentActiveItem = ref(props.activeItem);
+
+// Watch for prop changes
+watch(
+  () => props.activeItem,
+  (newVal) => {
+    currentActiveItem.value = newVal;
+  }
+);
+
+// Menu click handler
 const handleMenuClick = (menuItem) => {
+  currentActiveItem.value = menuItem.name;
   emit("menu-click", menuItem);
 };
 
+// Upload click handler
 const handleOrderUploadClick = () => {
   emit("order-upload-click");
 };
