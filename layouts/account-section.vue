@@ -113,10 +113,10 @@ const attrs = useAttrs();
 
 const menuItems = attrs.menuItems || [
   { name: "My Account", action: "account", route: "/account" },
-  { name: "Orders", action: "orders", route: "/table-orders" },
-  { name: "Invoices", action: "invoices", route: "/invoices" },
-  { name: "Credits", action: "credits", route: "/credits" },
-  { name: "Shipments", action: "shipments", route: "/shipments" },
+  { name: "Orders", action: "orders", route: "/account/orders" },
+  { name: "Invoices", action: "invoices", route: "/account/invoices" },
+  { name: "Credits", action: "credits", route: "/account/credits" },
+  { name: "Shipments", action: "shipments", route: "/account/shipments" },
   { name: "Back Orders", action: "back-orders", comingSoon: true },
   { name: "Complaints", action: "complaints", comingSoon: true },
 ];
