@@ -13,7 +13,7 @@
 
     <InvoiceSearchForm
       :fields="searchFields"
-      button-label="Search Invoices"
+      button-label="Search"
       @submit="handleSearch"
     />
 

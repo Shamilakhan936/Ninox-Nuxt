@@ -117,9 +117,8 @@ const menuItems = attrs.menuItems || [
   { name: "Invoices", action: "invoices", route: "/account/invoices" },
   { name: "Credits", action: "credits", route: "/account/credits" },
   { name: "Shipments", action: "shipments", route: "/account/shipments" },
-  { name: "Back Orders", action: "back-orders", comingSoon: true },
-   { name: "Complaints", action: "complaints", route: "/account/complaints" },
- 
+  { name: "Back Orders", action: "back-orders", route: "/account/back-orders" },
+  { name: "Complaints", action: "complaints", route: "/account/complaints" },
 ];
 
 const activeItem = ref(attrs.activeItem || "My Account");
@@ -137,15 +136,6 @@ watch(
   { immediate: true }
 );
 
-// Handle sidebar menu click
-// const handleMenuClick = (menuItem) => {
-//   if (menuItem.name !== activeItem.value) {
-//     activeItem.value = menuItem.name;
-//     if (menuItem.route) {
-//       navigateTo(menuItem.route);
-//     }
-//   }
-// };
 const handleMenuClick = (menuItem) => {
   if (menuItem.comingSoon || !menuItem.route) {
     showNotification({

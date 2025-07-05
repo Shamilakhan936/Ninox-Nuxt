@@ -421,6 +421,9 @@
               v-model="passwordForm.current"
               type="password"
               placeholder="Enter current password"
+              :ui="{
+                wrapper: 'inputStyles',
+              }"
             />
           </UFormGroup>
 
@@ -429,6 +432,9 @@
               v-model="passwordForm.new"
               type="password"
               placeholder="Enter new password"
+              :ui="{
+                wrapper: 'inputStyles',
+              }"
             />
           </UFormGroup>
 
@@ -437,6 +443,9 @@
               v-model="passwordForm.confirm"
               type="password"
               placeholder="Confirm new password"
+              :ui="{
+                wrapper: 'inputStyles',
+              }"
             />
           </UFormGroup>
         </div>
