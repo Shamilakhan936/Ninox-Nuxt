@@ -6,7 +6,7 @@
           v-model="searchQuery"
           type="text"
           placeholder="Complaint Number/Article Number"
-          class="w-full px-[35px] py-3 bg-transparent focus:outline-none text-sm placeholder-[#6F6259] w-full rounded-[66px] border border-[#C9C7C5] bg-white text-[#6F6259] h-[50px]"
+          class="w-full px-6 py-3 bg-transparent focus:outline-none text-sm placeholder-[#6F6259] w-full rounded-[66px] border border-[#C9C7C5] bg-white text-[#6F6259] h-[50px]"
         />
       </div>
     </div>

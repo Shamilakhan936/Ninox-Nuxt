@@ -359,7 +359,7 @@
     </UModal>
 
     <!-- Language Change Modal -->
-    <UModal v-model="showLanguageModal">
+    <UModal v-model="showLanguageModal" class="languageModal">
       <UCard>
         <template #header>
           <div class="flex justify-between items-center">
@@ -379,6 +379,7 @@
               v-model="selectedLanguage"
               :options="languageOptions"
               placeholder="Choose your preferred language"
+              class="selectStyles"
             />
           </UFormGroup>
         </div>
@@ -401,7 +402,7 @@
     </UModal>
 
     <!-- Password Change Modal -->
-    <UModal v-model="showPasswordModal">
+    <UModal v-model="showPasswordModal" class="passwordModal">
       <UCard>
         <template #header>
           <div class="flex justify-between items-center">
@@ -421,9 +422,7 @@
               v-model="passwordForm.current"
               type="password"
               placeholder="Enter current password"
-              :ui="{
-                wrapper: 'inputStyles',
-              }"
+              class="inputStyles"
             />
           </UFormGroup>
 
@@ -432,9 +431,7 @@
               v-model="passwordForm.new"
               type="password"
               placeholder="Enter new password"
-              :ui="{
-                wrapper: 'inputStyles',
-              }"
+              class="inputStyles"
             />
           </UFormGroup>
 
@@ -443,9 +440,7 @@
               v-model="passwordForm.confirm"
               type="password"
               placeholder="Confirm new password"
-              :ui="{
-                wrapper: 'inputStyles',
-              }"
+              class="inputStyles"
             />
           </UFormGroup>
         </div>

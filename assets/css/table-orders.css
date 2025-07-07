@@ -222,15 +222,29 @@ div[data-headlessui-state] li[aria-selected="true"]:hover,
   transform: rotate(180deg) !important;
 }
 
-.inputStyles input {
+.passwordModal .inputStyles input[type="password"] {
   border: 1px solid #c9c7c5 !important;
   background-color: #ffffff !important;
   color: #000 !important;
   border-radius: 66px !important;
   font-size: 16px !important;
   font-weight: 300 !important;
-  padding: 35px 12px !important;
+  padding: 12px 24px !important;
   height: 50px !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+.languageModal .selectStyles select {
+  border: 1px solid #c9c7c5 !important;
+  background-color: #ffffff !important;
+  color: #000 !important;
+  border-radius: 66px !important;
+  font-size: 16px !important;
+  font-weight: 300 !important;
+  padding: 12px 24px !important;
+  height: 50px !important;
+  box-shadow: none !important;
+  outline: none !important;
 }
 
 /* Special instructions field styling */
