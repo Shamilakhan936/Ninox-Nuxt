@@ -1,7 +1,5 @@
 <template>
   <div class="min-h-screen table-orders-container" style="background-color: #ffffff;">
-    <!-- Navigation -->
-    <Navbar />
 
     <!-- Page Content -->
     <div class="container mx-auto py-8 px-4 sm:px-6 lg:px-8">

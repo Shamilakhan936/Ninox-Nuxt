@@ -1,14 +1,14 @@
 /* Import Albert Sans font */
-@import url('https://fonts.googleapis.com/css2?family=Albert+Sans:wght@100;200;300;400;500;600;700;800;900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Albert+Sans:wght@100;200;300;400;500;600;700;800;900&display=swap");
 
 /* Apply Albert Sans to entire component */
 .table-orders-container {
-  font-family: 'Albert Sans', sans-serif;
+  font-family: "Albert Sans", sans-serif;
 }
 
 /* Product numbering with exact Figma specifications */
 .product-number {
-  font-family: 'Albert Sans', sans-serif;
+  font-family: "Albert Sans", sans-serif;
   font-weight: 300;
   font-size: 11.74px;
   line-height: 19.08px;
@@ -36,8 +36,8 @@
 .ui-select button,
 div[class*="select"] button,
 div[class*="input"] input {
-  border: 0.5px solid #E5E5E5 !important;
-  background-color: #FFFFFF !important;
+  border: 1px solid #c9c7c5 !important;
+  background-color: #ffffff !important;
   color: #000 !important;
   border-radius: 48.44px !important;
   font-size: 11.74px !important;
@@ -46,7 +46,7 @@ div[class*="input"] input {
   padding: 8.8px 16.1px !important;
   height: 35px !important;
   box-sizing: border-box !important;
-  font-family: 'Albert Sans', sans-serif !important;
+  font-family: "Albert Sans", sans-serif !important;
   transition: border 0.2s ease !important;
 }
 
@@ -79,7 +79,7 @@ div[class*="input"] input:focus,
 .ui-select[data-headlessui-state*="open"] button,
 button[data-headlessui-state="open"],
 button[data-headlessui-state*="open"] {
-  border: 1.5px solid #2D2D2D !important;
+  border: 1.5px solid #2d2d2d !important;
   box-shadow: none !important;
   outline: none !important;
 }
@@ -94,7 +94,7 @@ button[data-headlessui-state*="open"] {
 .select-rounded:focus-within button,
 .select-rounded:focus-within .ui-select button,
 .select-rounded:focus-within div button {
-  border: 1.5px solid #2D2D2D !important;
+  border: 1.5px solid #2d2d2d !important;
 }
 
 /* Dropdown Menu Styling */
@@ -106,13 +106,13 @@ div[data-headlessui-state] [role="listbox"],
 div[data-headlessui-state] ul,
 .select-rounded [role="listbox"],
 .select-rounded ul {
-  background-color: #FFFFFF !important;
-  border: 0.5px solid #E5E5E5 !important;
+  background-color: #ffffff !important;
+  border: 0.5px solid #e5e5e5 !important;
   border-radius: 16px !important;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
   padding: 8px !important;
   margin-top: 4px !important;
-  font-family: 'Albert Sans', sans-serif !important;
+  font-family: "Albert Sans", sans-serif !important;
   max-height: 200px !important;
   overflow-y: auto !important;
   z-index: 50 !important;
@@ -130,8 +130,8 @@ div[data-headlessui-state] li,
   font-size: 11.74px !important;
   line-height: 19.08px !important;
   font-weight: 300 !important;
-  font-family: 'Albert Sans', sans-serif !important;
-  color: #2D2D2D !important;
+  font-family: "Albert Sans", sans-serif !important;
+  color: #2d2d2d !important;
   border-radius: 8px !important;
   margin: 2px 0 !important;
   cursor: pointer !important;
@@ -149,8 +149,8 @@ div[data-headlessui-state] li:hover,
 .select-rounded [role="option"]:hover,
 .select-rounded li:hover,
 [data-headlessui-state="active"] {
-  background-color: #F5F5F5 !important;
-  color: #2D2D2D !important;
+  background-color: #f5f5f5 !important;
+  color: #2d2d2d !important;
 }
 
 /* Selected dropdown option */
@@ -162,8 +162,8 @@ div[data-headlessui-state] li[aria-selected="true"],
 .select-rounded [role="option"][aria-selected="true"],
 .select-rounded li[aria-selected="true"],
 [data-headlessui-state*="selected"] {
-  background-color: #8A7C59 !important;
-  color: #FFFFFF !important;
+  background-color: #8a7c59 !important;
+  color: #ffffff !important;
   font-weight: 400 !important;
 }
 
@@ -176,8 +176,8 @@ div[data-headlessui-state] li[aria-selected="true"]:hover,
 .select-rounded [role="option"][aria-selected="true"]:hover,
 .select-rounded li[aria-selected="true"]:hover,
 [data-headlessui-state*="selected"]:hover {
-  background-color: #6B5B42 !important;
-  color: #FFFFFF !important;
+  background-color: #6b5b42 !important;
+  color: #ffffff !important;
 }
 
 /* Custom scrollbar for dropdown */
@@ -196,21 +196,21 @@ div[data-headlessui-state] li[aria-selected="true"]:hover,
 [role="listbox"]::-webkit-scrollbar-thumb,
 .ui-select-options::-webkit-scrollbar-thumb,
 .select-rounded [role="listbox"]::-webkit-scrollbar-thumb {
-  background-color: #E5E5E5 !important;
+  background-color: #e5e5e5 !important;
   border-radius: 2px !important;
 }
 
 [role="listbox"]::-webkit-scrollbar-thumb:hover,
 .ui-select-options::-webkit-scrollbar-thumb:hover,
 .select-rounded [role="listbox"]::-webkit-scrollbar-thumb:hover {
-  background-color: #DBDAD8 !important;
+  background-color: #dbdad8 !important;
 }
 
 /* Dropdown arrow styling */
 .select-rounded svg,
 .ui-select svg,
 .select-rounded .ui-select svg {
-  color: #6B6B6B !important;
+  color: #6b6b6b !important;
   width: 14px !important;
   height: 14px !important;
   transition: transform 0.2s ease !important;
@@ -222,18 +222,43 @@ div[data-headlessui-state] li[aria-selected="true"]:hover,
   transform: rotate(180deg) !important;
 }
 
+.passwordModal .inputStyles input[type="password"] {
+  border: 1px solid #c9c7c5 !important;
+  background-color: #ffffff !important;
+  color: #000 !important;
+  border-radius: 66px !important;
+  font-size: 16px !important;
+  font-weight: 300 !important;
+  padding: 12px 24px !important;
+  height: 50px !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+.languageModal .selectStyles select {
+  border: 1px solid #c9c7c5 !important;
+  background-color: #ffffff !important;
+  color: #000 !important;
+  border-radius: 66px !important;
+  font-size: 16px !important;
+  font-weight: 300 !important;
+  padding: 12px 24px !important;
+  height: 50px !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
 /* Special instructions field styling */
 .special-instructions,
 .special-instructions input,
 .special-instructions .ui-input input {
-  border: 0.5px solid #E5E5E5 !important;
+  border: 0.5px solid #e5e5e5 !important;
   border-radius: 48.44px !important;
   background-color: #fff !important;
   height: 35px !important;
   font-size: 11.74px !important;
   line-height: 19.08px !important;
   font-weight: 300 !important;
-  font-family: 'Albert Sans', sans-serif !important;
+  font-family: "Albert Sans", sans-serif !important;
   padding: 8.8px 16.1px !important;
   transition: border 0.2s ease !important;
 }
@@ -242,26 +267,26 @@ div[data-headlessui-state] li[aria-selected="true"]:hover,
 .special-instructions input:focus,
 .special-instructions .ui-input input:focus,
 .special-instructions:focus-within input {
-  border: 1.5px solid #2D2D2D !important;
+  border: 1.5px solid #2d2d2d !important;
   box-shadow: none !important;
   outline: none !important;
 }
 
 /* Textarea styling */
 .textarea-rounded textarea {
-  border: 0.5px solid #E5E5E5 !important;
-  background-color: #FFFFFF !important;
+  border: 0.5px solid #e5e5e5 !important;
+  background-color: #ffffff !important;
   color: #000 !important;
   border-radius: 48.44px !important;
   font-size: 11.74px !important;
   line-height: 19.08px !important;
   font-weight: 300 !important;
-  font-family: 'Albert Sans', sans-serif !important;
+  font-family: "Albert Sans", sans-serif !important;
   transition: border 0.2s ease !important;
 }
 
 .textarea-rounded textarea:focus {
-  border: 1.5px solid #2D2D2D !important;
+  border: 1.5px solid #2d2d2d !important;
   box-shadow: none !important;
   outline: none !important;
 }
@@ -280,8 +305,8 @@ div[data-headlessui-state] li[aria-selected="true"]:hover,
 }
 
 .tab-inactive {
-  background-color: #EAEAEA !important;
-  color: #BFB7B0 !important;
+  background-color: #eaeaea !important;
+  color: #bfb7b0 !important;
 }
 
 /* Number input styling */
@@ -349,12 +374,12 @@ div[data-headlessui-state] li[aria-selected="true"]:hover,
 .input-rounded.number-input .number-btn svg {
   width: 10px;
   height: 10px;
-  color: #DBDAD8;
+  color: #dbdad8;
   stroke-width: 2.5;
 }
 
 .input-rounded.number-input .number-btn:hover svg {
-  color: #8A7C59;
+  color: #8a7c59;
 }
 
 /* Button styling */
@@ -375,17 +400,17 @@ button.rounded-full {
   background: transparent;
   border: none;
   border-radius: 20px;
-  color: #BFB7B0;
+  color: #bfb7b0;
   font-size: 13px;
   font-weight: 300;
-  font-family: 'Albert Sans', sans-serif;
+  font-family: "Albert Sans", sans-serif;
   cursor: pointer;
   transition: all 0.2s ease;
   outline: none;
 }
 
 .add-product-button:hover {
-  color: #8A7C59;
+  color: #8a7c59;
   background: rgba(138, 124, 89, 0.08);
 }
 
@@ -409,7 +434,7 @@ button.rounded-full {
   background: transparent;
   border: none;
   border-radius: 50%;
-  color: #DBDAD8;
+  color: #dbdad8;
   font-size: 16px;
   font-weight: 300;
   cursor: pointer;
@@ -419,7 +444,7 @@ button.rounded-full {
 }
 
 .delete-product-button:hover {
-  color: #EF4444;
+  color: #ef4444;
   background: rgba(239, 68, 68, 0.08);
   transform: scale(1.1);
 }
@@ -436,7 +461,7 @@ button.rounded-full {
 
 /* Checkbox styling */
 input[type="checkbox"] {
-  border: 1px solid #8A7C59 !important;
+  border: 1px solid #8a7c59 !important;
   border-radius: 2px !important;
   background-color: #fff !important;
   width: 16px !important;
@@ -448,20 +473,20 @@ input[type="checkbox"] {
   font-size: 11.74px !important;
   line-height: 19.08px !important;
   font-weight: 300 !important;
-  font-family: 'Albert Sans', sans-serif !important;
+  font-family: "Albert Sans", sans-serif !important;
 }
 
 .text-sm {
   font-size: 13px !important;
   font-weight: 300 !important;
-  font-family: 'Albert Sans', sans-serif !important;
+  font-family: "Albert Sans", sans-serif !important;
 }
 
 .motor-label {
   font-size: 16px !important;
   line-height: 24px !important;
-  color: #3D3935 !important;
-  font-family: 'Albert Sans', sans-serif !important;
+  color: #3d3935 !important;
+  font-family: "Albert Sans", sans-serif !important;
 }
 
 /* Text selection */
@@ -481,8 +506,8 @@ input[type="checkbox"] {
   align-items: center !important;
   justify-content: space-between !important;
   width: 100% !important;
-  border: 0.5px solid #E5E5E5 !important;
-  background-color: #FFFFFF !important;
+  border: 0.5px solid #e5e5e5 !important;
+  background-color: #ffffff !important;
   color: #000 !important;
   border-radius: 48.44px !important;
   font-size: 11.74px !important;
@@ -491,31 +516,31 @@ input[type="checkbox"] {
   padding: 8.8px 16.1px !important;
   height: 35px !important;
   box-sizing: border-box !important;
-  font-family: 'Albert Sans', sans-serif !important;
+  font-family: "Albert Sans", sans-serif !important;
   transition: border 0.2s ease !important;
   cursor: pointer !important;
   outline: none !important;
 }
 
 .fabric-button:hover {
-  border: 1px solid #BFB7B0 !important;
+  border: 1px solid #bfb7b0 !important;
 }
 
 .fabric-button:focus,
 .fabric-button:focus-visible {
-  border: 1.5px solid #2D2D2D !important;
+  border: 1.5px solid #2d2d2d !important;
   box-shadow: none !important;
 }
 
 .fabric-button:disabled {
-  background-color: #F9F9F9 !important;
-  color: #DBDAD8 !important;
+  background-color: #f9f9f9 !important;
+  color: #dbdad8 !important;
   cursor: not-allowed !important;
-  border: 0.5px solid #E5E5E5 !important;
+  border: 0.5px solid #e5e5e5 !important;
 }
 
 .fabric-button:disabled:hover {
-  border: 0.5px solid #E5E5E5 !important;
+  border: 0.5px solid #e5e5e5 !important;
 }
 
 .fabric-button span {
@@ -525,12 +550,12 @@ input[type="checkbox"] {
 }
 
 .fabric-button svg {
-  color: #6B6B6B !important;
+  color: #6b6b6b !important;
   transition: transform 0.2s ease !important;
 }
 
 .fabric-button:disabled svg {
-  color: #DBDAD8 !important;
+  color: #dbdad8 !important;
 }
 
 /* Horizontal scrolling form container */
@@ -633,7 +658,8 @@ input[type="checkbox"] {
   margin-top: 8px;
 }
 
-.product-form-container.unified-mode .custom-scrollbar-track:not(.unified-scrollbar) {
+.product-form-container.unified-mode
+  .custom-scrollbar-track:not(.unified-scrollbar) {
   display: none;
 }
 
@@ -662,14 +688,14 @@ input[type="checkbox"] {
   text-align: left;
   font-size: 11.74px;
   color: #000;
-  font-family: 'Albert Sans', sans-serif;
+  font-family: "Albert Sans", sans-serif;
   cursor: pointer;
   transition: border-color 0.2s ease;
   overflow: visible;
 }
 
 .price-field:hover {
-  border: 1px solid #BFB7B0;
+  border: 1px solid #bfb7b0;
 }
 
 .price-icon-wrapper {
@@ -683,13 +709,13 @@ input[type="checkbox"] {
 .price-info-icon {
   width: 16px !important;
   height: 16px !important;
-  color: #6B6B6B;
+  color: #6b6b6b;
   flex-shrink: 0;
   transition: color 0.2s ease;
 }
 
 .price-icon-wrapper:hover .price-info-icon {
-  color: #4A4A4A;
+  color: #4a4a4a;
 }
 
 .price-text {
@@ -697,7 +723,7 @@ input[type="checkbox"] {
   line-height: 19.08px;
   font-weight: 300;
   color: #000;
-  font-family: 'Albert Sans', sans-serif;
+  font-family: "Albert Sans", sans-serif;
   font-size: 11.74px;
 }
 
@@ -706,7 +732,7 @@ input[type="checkbox"] {
   position: fixed;
   z-index: 10000;
   pointer-events: none;
-  font-family: 'Albert Sans', sans-serif;
+  font-family: "Albert Sans", sans-serif;
 }
 
 .price-tooltip-content {
@@ -759,7 +785,7 @@ input[type="checkbox"] {
   letter-spacing: 0.2em;
   line-height: 14px;
   text-transform: uppercase;
-  font-family: 'Albert Sans', sans-serif;
+  font-family: "Albert Sans", sans-serif;
   color: #000;
   text-align: left;
   display: inline-block;
@@ -770,7 +796,7 @@ input[type="checkbox"] {
   .form-fields-scroll {
     gap: 6px;
   }
-  
+
   .form-field {
     min-width: fit-content;
   }
@@ -784,4 +810,4 @@ div[class*="border-b border-gray-200"],
 .p-6,
 .bg-white.rounded-b-lg {
   overflow: visible !important;
-} 
+}
