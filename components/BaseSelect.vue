@@ -6,7 +6,7 @@
 
     <div class="relative">
       <select
-        class="min-w-[310px] appearance-none rounded-[66px] px-[35px] py-3 text-sm border border-[#C9C7C5] focus:outline-none focus:ring-1 focus:ring-[#8A7C59] h-[50px]"
+        class="min-w-[220px] appearance-none rounded-[66px] px-6 py-3 text-sm border border-[#C9C7C5] focus:outline-none h-[50px]"
         :value="modelValue"
         @change="$emit('update:modelValue', $event.target.value)"
       >
