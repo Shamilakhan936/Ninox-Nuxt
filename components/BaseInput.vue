@@ -6,7 +6,7 @@
     <input
       ref="inputRef"
       :placeholder="placeholder"
-      class="rounded-[66px] px-6 py-3 text-sm border border-[#C9C7C5] h-[50px] focus:outline-none bg-white"
+      class="rounded-[66px] px-6 py-3 text-sm border border-[#C9C7C5] h-[50px] focus:outline-none bg-white text-black"
       :style="{ width: inputWidth + 'px' }"
       :value="modelValue"
       @input="$emit('update:modelValue', $event.target.value)"
