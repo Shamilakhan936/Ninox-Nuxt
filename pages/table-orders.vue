@@ -971,7 +971,7 @@
                   style="background-color: #8A7C59; color: #F7F7F5;"
                   :loading="isSubmitting"
                   :disabled="!isFormValid"
-                  @click="submitCurrentOrder"
+                  @click="submitOrder"
                 >
                   SUBMIT ORDER
             </UButton>
@@ -1247,6 +1247,9 @@ const activeTabIndex = ref(0)
 const newOrderName = ref('')
 const isUnifiedScroll = ref(false)
 
+// Add at the top with other state variables
+const defaultFactoryId = ref(1) // You'll need to set this based on your factories
+
 // Initialize orders with one default order
 const orders = ref([
   {
@@ -1286,11 +1289,7 @@ const isFormValid = computed(() => {
     if (!product.width || !product.height) return false
     if (!product.fabricId && !product.fabricDetails) return false
     if (!product.fabricColorId && !product.fabricColorDetails) return false
-    if (product.isMotorized && !product.motorType) return false
-    if (!product.isMotorized && !product.controlSide) return false
-    if (!product.mountLocation) return false
-    if (product.productType === 'Roller Shades' && !product.rollDirection) return false
-    if (product.quantity < 1) return false
+    if (Number(product.quantity) < 1) return false
   }
   
   return true
@@ -1479,6 +1478,194 @@ onMounted(async () => {
     isLoading.value = false
   }
 })
+
+// Add this function before the lifecycle hooks
+const submitOrder = async () => {
+  if (!isFormValid.value) {
+    showNotification({
+      title: 'Validation Error',
+      description: 'Please complete all required fields before submitting the order.',
+      color: 'red'
+    })
+    return
+  }
+
+  const currentOrderData = orders.value[activeTabIndex.value]
+  
+  if (!currentOrderData.client) {
+    showNotification({
+      title: 'Client Required',
+      description: 'Please select a client before submitting the order.',
+      color: 'red'
+    })
+    return
+  }
+
+  isSubmitting.value = true
+
+  try {
+    // Map frontend client data to backend customerId
+    const customerId = currentOrderData.client.id || currentOrderData.client.fields?.['Customer ID']
+    
+    if (!customerId) {
+      throw new Error('Client ID not found. Please ensure the client has a valid ID.')
+    }
+
+    // Map frontend products to backend format
+    const mappedProducts = currentOrderData.products.map(product => {
+      // Extract fabric and color IDs
+      const fabricId = product.fabricId || product.fabricDetails?.id || product.fabricDetails?.fields?.['Fabric ID']
+      const fabricColourId = product.fabricColorId || product.fabricColorDetails?.id || product.fabricColorDetails?.fields?.['Color ID']
+
+      if (!fabricId || !fabricColourId) {
+        throw new Error(`Missing fabric or color information for product: ${product.productType}`)
+      }
+
+      // Base order item data
+      const orderItemData = {
+        factoryId: defaultFactoryId.value, // You may want to make this selectable
+        fabricId: Number(fabricId),
+        fabricColourId: Number(fabricColourId),
+        productType: mapProductType(product.productType),
+        quantity: Number(product.quantity) || 1,
+        width: Number(product.width),
+        height: Number(product.height),
+        mountLocation: product.mountLocation || 'Inside',
+        hardwareColor: product.hardwareColor || 'White',
+        worksheetImage: product.worksheetImage || null,
+        notes: product.notes || null,
+        status: 'Queued'
+      }
+
+      // Add product-specific details
+      const productDetails = buildProductDetails(product)
+
+      return {
+        ...orderItemData,
+        productDetails
+      }
+    })
+
+    // Prepare order data
+    const orderData = {
+      customerId: Number(customerId),
+      status: 'Defining Order',
+      fulfillment: null, // You may want to make this selectable
+      installationDate: null, // You may want to add a date picker
+      customerLocation: currentOrderData.client.fields?.['Delivery Address'] || null,
+      notes: currentOrderData.specialInstructions || null
+    }
+
+    // Submit to backend
+    const response = await $fetch('/api/orders/complete', {
+      method: 'POST',
+      body: {
+        orderData,
+        products: mappedProducts
+      }
+    })
+
+    if (response.success) {
+      showNotification({
+        title: 'Order Submitted Successfully',
+        description: `Order with ${mappedProducts.length} products has been created.`,
+        color: 'green'
+      })
+
+      // Reset the current order
+      orders.value[activeTabIndex.value] = {
+        name: `Order #${activeTabIndex.value + 1}`,
+        products: [createDefaultProduct()],
+        specialInstructions: '',
+        client: null
+      }
+    } else {
+      throw new Error(response.error || 'Failed to create order')
+    }
+
+  } catch (error) {
+    console.error('Order submission error:', error)
+    showNotification({
+      title: 'Order Submission Failed',
+      description: error.message || 'An unexpected error occurred while creating the order.',
+      color: 'red'
+    })
+  } finally {
+    isSubmitting.value = false
+  }
+}
+
+// Helper function to map frontend product types to backend format
+const mapProductType = (frontendType) => {
+  const typeMap = {
+    'Roman Shades': 'roman_shades',
+    'Curtains': 'curtains',
+    'Roller Shades': 'roller_shades',
+    'Pleated Shades': 'pleated_shades'
+  }
+  return typeMap[frontendType] || frontendType.toLowerCase().replace(' ', '_')
+}
+
+// Helper function to build product-specific details
+const buildProductDetails = (product) => {
+  const productType = product.productType
+
+  switch (productType) {
+    case 'Roman Shades':
+      return {
+        room: product.room || null,
+        shadeStyle: product.shadeStyle || null,
+        controlType: product.controlType || 'Manual',
+        motorType: product.isMotorized ? product.motorType : null,
+        lining: product.lining || 'No Lining',
+        liningCollection: product.liningCollection || null,
+        liningColour: product.liningColour || null,
+        delivery: product.delivery || null,
+        hooksPp: product.hooksPp ? Number(product.hooksPp) : null,
+        hooksTotal: product.hooksTotal ? Number(product.hooksTotal) : null,
+        headingHeight: product.headingHeight ? Number(product.headingHeight) : null,
+        isTwoSided: Boolean(product.isTwoSided)
+      }
+
+    case 'Curtains':
+      return {
+        room: product.room || null,
+        curtainStyle: product.curtainStyle || null,
+        bottomStyle: product.bottomStyle || null,
+        numberOfPanels: product.numberOfPanels ? Number(product.numberOfPanels) : 1,
+        lining: product.lining || 'No Lining',
+        liningCollection: product.liningCollection || null,
+        liningColour: product.liningColour || null,
+        delivery: product.delivery || null,
+        hooksPp: product.hooksPp ? Number(product.hooksPp) : null,
+        hooksTotal: product.hooksTotal ? Number(product.hooksTotal) : null,
+        headingHeight: product.headingHeight ? Number(product.headingHeight) : null,
+        isTwoSided: Boolean(product.isTwoSided)
+      }
+
+    case 'Roller Shades':
+      return {
+        room: product.room || null,
+        controlType: product.controlType || 'Manual',
+        motorType: product.isMotorized ? product.motorType : null,
+        chainType: !product.isMotorized ? product.chainType : null,
+        rollDirection: product.rollDirection || 'Standard',
+        delivery: product.delivery || null
+      }
+
+    case 'Pleated Shades':
+      return {
+        room: product.room || null,
+        controlType: product.controlType || 'Manual',
+        motorType: product.isMotorized ? product.motorType : null,
+        pleatedStyle: product.pleatedStyle || null,
+        delivery: product.delivery || null
+      }
+
+    default:
+      return {}
+  }
+}
 </script>
 
 <style>
