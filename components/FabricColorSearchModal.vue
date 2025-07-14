@@ -1,11 +1,8 @@
 <template>
   <UModal v-model="isOpen" :ui="{ width: 'max-w-4xl' }">
     <div class="fabric-search-container">
-      <!-- Close button - properly positioned -->
-      <button
-        class="close-button"
-        @click="close"
-      >
+      <!-- Close button -->
+      <button class="close-button" @click="close">
         ×
       </button>
       
@@ -13,7 +10,7 @@
       <div class="search-title">Select Fabric Color</div>
       
       <!-- Subtitle -->
-      <div class="search-subtitle">Choose a color for {{ fabricName }}</div>
+      <div class="search-subtitle">Choose a color for {{ fabricName || 'selected fabric' }}</div>
       
       <!-- Divider line -->
       <div class="search-divider" />
@@ -23,9 +20,10 @@
         <!-- Search input -->
         <input
           v-model="searchQuery"
-          placeholder="Search by color name..."
+          placeholder="Search by color name or category..."
           class="search-input"
           @keyup.enter="debouncedSearch"
+          @input="debouncedSearch"
           autofocus
         />
         
@@ -33,7 +31,7 @@
         <button
           class="search-button"
           :disabled="isLoading"
-          @click="debouncedSearch"
+          @click="searchFabricColors"
         >
           <span v-if="!isLoading">SEARCH</span>
           <span v-else>SEARCHING...</span>
@@ -42,7 +40,7 @@
       
       <!-- Helper text -->
       <div class="search-helper-text">
-        Search for specific color names or browse all available colors for this fabric.
+        {{ fabricId ? 'Search for specific color names or browse all available colors for this fabric.' : 'Please select a fabric first to view available colors.' }}
       </div>
       
       <!-- Results section -->
@@ -63,24 +61,23 @@
           {{ error }}
         </UAlert>
         
+        <!-- No fabric selected -->
+        <UAlert
+          v-else-if="!fabricId"
+          color="amber"
+          variant="soft"
+          icon="i-heroicons-information-circle"
+          class="mb-4"
+        >
+          Please select a fabric first to view available colors.
+        </UAlert>
+        
         <!-- Results grid -->
-        <div v-if="fabricColors.length > 0" class="border rounded-lg overflow-hidden">
+        <div v-else-if="fabricColors.length > 0" class="border rounded-lg overflow-hidden">
           <div class="bg-gray-50 p-2 flex justify-between items-center">
             <span class="text-sm text-gray-600">
               Found {{ fabricColors.length }} color(s) for {{ fabricName }}
             </span>
-            
-            <!-- Load more button if there are more results -->
-            <UButton
-              v-if="hasMore"
-              size="xs"
-              color="gray"
-              variant="ghost"
-              @click="loadMore"
-              :disabled="isLoading"
-            >
-              Load More
-            </UButton>
           </div>
           
           <!-- Color grid -->
@@ -93,18 +90,21 @@
             >
               <div class="flex items-center space-x-3">
                 <div 
-                  class="w-8 h-8 rounded-full border border-gray-300"
-                  :style="{ backgroundColor: color.fields['Color Hex'] || '#64748b' }"
+                  class="w-8 h-8 rounded-full border border-gray-300 flex-shrink-0"
+                  :style="{ backgroundColor: color.swatchColor || '#64748b' }"
                 ></div>
                 <div class="overflow-hidden flex-1">
                   <div class="text-sm font-medium text-gray-900 truncate">
-                    {{ color.fields['Color Name'] }}
+                    {{ color.colour }}
                   </div>
                   <div class="text-xs text-gray-500 truncate">
-                    {{ color.fields['Collection Name'] || fabricName }}
-                    <template v-if="color.fields['Color Category']">
-                      - {{ color.fields['Color Category'] }}
+                    {{ color.collectionName || fabricName }}
+                    <template v-if="color.colourCategory">
+                      - {{ color.colourCategory }}
                     </template>
+                  </div>
+                  <div v-if="color.availableForSample" class="text-xs text-green-600 mt-1">
+                    Sample Available
                   </div>
                 </div>
               </div>
@@ -112,17 +112,22 @@
           </div>
         </div>
         
+        <!-- No results -->
+        <div v-else-if="fabricId && searchQuery && !isLoading" class="text-center py-8">
+          <UIcon name="i-heroicons-exclamation-triangle" class="w-12 h-12 mx-auto mb-4 text-gray-400" />
+          <p class="text-gray-600">No colors found matching "{{ searchQuery }}" for this fabric.</p>
+        </div>
+        
+        <!-- No colors for fabric -->
+        <div v-else-if="fabricId && !isLoading && hasSearched" class="text-center py-8">
+          <UIcon name="i-heroicons-swatch" class="w-12 h-12 mx-auto mb-4 text-gray-400" />
+          <p class="text-gray-600">No colors available for this fabric yet.</p>
+        </div>
+        
         <!-- Footer buttons -->
         <div class="flex justify-between mt-4">
           <UButton color="gray" variant="soft" @click="close">
             Cancel
-          </UButton>
-          <UButton 
-            v-if="fabricColors.length > 0" 
-            color="primary" 
-            @click="close"
-          >
-            Done
           </UButton>
         </div>
       </div>
@@ -131,8 +136,8 @@
 </template>
 
 <script setup>
-import { ref, watch, computed } from 'vue';
-import debounce from 'lodash/debounce';
+import { ref, watch, computed } from 'vue'
+import debounce from 'lodash/debounce'
 
 // Props
 const props = defineProps({
@@ -152,119 +157,137 @@ const props = defineProps({
     type: [String, Number],
     default: null
   }
-});
+})
 
 // Emits
-const emit = defineEmits(['update:model-value', 'select', 'notification']);
+const emit = defineEmits(['update:model-value', 'select', 'notification'])
 
 // Computed for modal state
 const isOpen = computed({
   get: () => props.modelValue,
   set: (value) => emit('update:model-value', value)
-});
+})
 
 // State
-const searchQuery = ref('');
-const fabricColors = ref([]);
-const isLoading = ref(false);
-const error = ref(null);
-const page = ref(1);
-const hasMore = ref(true);
-const hasSearched = ref(false);
+const searchQuery = ref('')
+const fabricColors = ref([])
+const isLoading = ref(false)
+const error = ref(null)
+const hasSearched = ref(false)
 
 // Methods
 const debouncedSearch = debounce(() => {
-  page.value = 1;
-  fetchFabricColors();
-}, 300);
+  searchFabricColors()
+}, 300)
 
 // Reset the search state
 function reset() {
-  searchQuery.value = '';
-  fabricColors.value = [];
-  error.value = null;
-  page.value = 1;
-  hasMore.value = true;
-  hasSearched.value = false;
-}
-
-// Load more results
-function loadMore() {
-  page.value++;
-  fetchFabricColors(true);
+  searchQuery.value = ''
+  fabricColors.value = []
+  error.value = null
+  hasSearched.value = false
 }
 
 // Select a fabric color
 function selectColor(color) {
-  emit('select', color);
-  close();
+  console.log('Selected color:', color)
+  
+  // Transform the color data to match what table-orders expects
+  const transformedColor = {
+    id: color.id,
+    fields: {
+      'Color ID': color.id,
+      'Color Name': color.colour,
+      'Collection Name': color.collectionName,
+      'Color Category': color.colourCategory,
+      'Available for Sample': color.availableForSample
+    },
+    // Include original data
+    ...color
+  }
+  
+  emit('select', transformedColor)
+  
+  emit('notification', {
+    title: 'Color Selected',
+    description: `${color.colour} has been selected.`,
+    color: 'indigo'
+  })
+  
+  close()
 }
 
 // Close modal
 function close() {
-  isOpen.value = false;
+  isOpen.value = false
 }
 
 // Fetch fabric colors
-async function fetchFabricColors(append = false) {
+async function searchFabricColors() {
   if (!props.fabricId) {
-    error.value = 'No fabric type selected';
-    return;
+    error.value = 'No fabric selected'
+    return
   }
   
-  isLoading.value = true;
-  error.value = null;
-  hasSearched.value = true;
+  isLoading.value = true
+  error.value = null
+  hasSearched.value = true
   
   try {
-    const response = await fetch(`/api/ninox/fabric-colors?fabricId=${props.fabricId}&search=${searchQuery.value}&page=${page.value}`);
-    const data = await response.json();
+    const queryParams = new URLSearchParams({
+      fabricId: props.fabricId.toString()
+    })
+    
+    // Add search query if provided
+    if (searchQuery.value.trim()) {
+      queryParams.append('search', searchQuery.value.trim())
+    }
+    
+    const response = await fetch(`/api/fabric-colours?${queryParams}`)
     
     if (!response.ok) {
-      throw new Error(data.error || 'Failed to fetch fabric colors');
+      throw new Error(`HTTP error! status: ${response.status}`)
     }
     
-    if (append) {
-      fabricColors.value = [...fabricColors.value, ...data.colors];
-    } else {
-      fabricColors.value = data.colors;
-    }
+    const data = await response.json()
     
-    hasMore.value = data.hasMore;
+    // Handle both data.data and direct array response
+    fabricColors.value = data.data || data || []
+    
   } catch (err) {
-    console.error('Error fetching fabric colors:', err);
-    error.value = err.message;
+    console.error('Error fetching fabric colors:', err)
+    error.value = err.message || 'Failed to fetch fabric colors'
     emit('notification', {
       title: 'Error',
-      description: err.message,
+      description: err.message || 'Failed to fetch fabric colors',
       color: 'red'
-    });
+    })
   } finally {
-    isLoading.value = false;
+    isLoading.value = false
   }
 }
 
 // Watch for modal open
 watch(() => props.modelValue, (newVal) => {
   if (newVal && props.fabricId) {
-    reset();
+    reset()
     // Auto-fetch colors when modal opens
-    fetchFabricColors();
+    searchFabricColors()
   }
-});
+})
 
 // Watch for fabric ID changes
 watch(() => props.fabricId, (newVal) => {
   if (props.modelValue && newVal) {
-    reset();
-    fetchFabricColors();
+    reset()
+    searchFabricColors()
   }
-});
+})
 
 // Expose methods
 defineExpose({
   reset
-});
+})
 </script>
 
 <style scoped>

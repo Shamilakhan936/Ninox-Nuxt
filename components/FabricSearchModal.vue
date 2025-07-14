@@ -1,11 +1,8 @@
 <template>
   <UModal v-model="isOpen" :ui="{ width: 'max-w-4xl' }">
     <div class="fabric-search-container">
-      <!-- Close button - properly positioned -->
-      <button
-        class="close-button"
-        @click="close"
-      >
+      <!-- Close button -->
+      <button class="close-button" @click="close">
         ×
       </button>
       
@@ -23,9 +20,10 @@
         <!-- Search input -->
         <input
           v-model="searchTerm"
-          placeholder="Search by fabric name, color or type..."
+          placeholder="Search by fabric name, supplier, or type..."
           class="search-input"
           @keyup.enter="search"
+          @input="debouncedSearch"
           autofocus
         />
         
@@ -42,7 +40,7 @@
       
       <!-- Helper text -->
       <div class="search-helper-text">
-        Enter at least 3 characters to search. More specific searches will yield better results.
+        Enter at least 2 characters to search. More specific searches will yield better results.
       </div>
       
       <!-- Results section - shown after search -->
@@ -71,86 +69,55 @@
           icon="i-heroicons-exclamation-triangle"
           class="mb-4"
         >
-          No fabrics found matching "{{ searchTerm }}" for product type "{{ productType }}". Try a different search term.
+          No fabrics found matching "{{ searchTerm }}". Try a different search term.
         </UAlert>
         
         <!-- Search results -->
         <div v-if="fabrics.length > 0" class="border rounded-lg overflow-hidden">
           <div class="bg-gray-50 p-2 flex justify-between items-center">
             <span class="text-sm text-gray-600">
-              Found {{ pagination.total }} fabric(s)
-              <span v-if="pagination.total > pagination.limit">
-                (showing {{ fabrics.length }} of {{ pagination.total }})
-              </span>
+              Found {{ fabrics.length }} fabric(s)
             </span>
-            
-            <!-- Pagination controls -->
-            <div class="flex items-center space-x-2" v-if="pagination.totalPages > 1">
-              <UButton 
-                icon="i-heroicons-chevron-left" 
-                size="xs" 
-                color="gray" 
-                variant="ghost"
-                :disabled="pagination.page === 1"
-                @click="changePage(pagination.page - 1)"
-              />
-              <span class="text-sm text-gray-600">
-                Page {{ pagination.page }} of {{ pagination.totalPages }}
-              </span>
-              <UButton 
-                icon="i-heroicons-chevron-right" 
-                size="xs" 
-                color="gray" 
-                variant="ghost"
-                :disabled="pagination.page === pagination.totalPages"
-                @click="changePage(pagination.page + 1)"
-              />
-            </div>
           </div>
           
           <UTable
             :columns="[
-              { key: 'preview', label: '' },
               { key: 'name', label: 'Name', sortable: true },
-              { key: 'type', label: 'Type' },
-              { key: 'color', label: 'Color' },
+              { key: 'products', label: 'Products' },
+              { key: 'transparency', label: 'Transparency' },
+              { key: 'supplier', label: 'Supplier' },
+              { key: 'price', label: 'Price/m' },
               { key: 'actions', label: '' }
             ]"
             :rows="formattedFabrics"
             hover
             :sort="{ column: 'name', direction: 'asc' }"
           >
-            <template #preview-data="{ row }">
-              <div class="w-10 h-10 rounded-md overflow-hidden">
-                <img 
-                  v-if="row.imageUrl" 
-                  :src="row.imageUrl" 
-                  :alt="row.name" 
-                  class="w-full h-full object-cover"
-                />
-                <div 
-                  v-else 
-                  class="w-full h-full flex items-center justify-center bg-gray-200"
-                  :style="{ backgroundColor: row.color || '#f3f4f6' }"
-                >
-                  <UIcon name="i-heroicons-swatch" class="h-6 w-6 text-white opacity-75" />
-                </div>
-              </div>
-            </template>
-            <template #type-data="{ row }">
-              <UBadge color="blue" variant="subtle" size="sm">
-                {{ row.type }}
+            <template #products-data="{ row }">
+              <UBadge v-if="row.products" color="blue" variant="subtle" size="sm">
+                {{ row.products }}
               </UBadge>
+              <span v-else class="text-gray-400">-</span>
             </template>
-            <template #color-data="{ row }">
-              <div class="flex items-center">
-                <span 
-                  class="w-4 h-4 rounded-full mr-2" 
-                  :style="{ backgroundColor: row.hex || '#f3f4f6' }"
-                ></span>
-                {{ row.color }}
-              </div>
+            
+            <template #transparency-data="{ row }">
+              <UBadge v-if="row.transparency" color="green" variant="subtle" size="sm">
+                {{ row.transparency }}
+              </UBadge>
+              <span v-else class="text-gray-400">-</span>
             </template>
+            
+            <template #supplier-data="{ row }">
+              <span class="text-sm text-gray-600">{{ row.supplier || '-' }}</span>
+            </template>
+            
+            <template #price-data="{ row }">
+              <span v-if="row.price" class="font-medium text-green-600">
+                ${{ row.price }}
+              </span>
+              <span v-else class="text-gray-400">-</span>
+            </template>
+            
             <template #actions-data="{ row }">
               <UButton
                 color="primary"
@@ -169,13 +136,6 @@
           <UButton color="gray" variant="soft" @click="close">
             Cancel
           </UButton>
-          <UButton 
-            v-if="fabrics.length > 0" 
-            color="primary" 
-            @click="close"
-          >
-            Done
-          </UButton>
         </div>
       </div>
     </div>
@@ -184,6 +144,7 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
+import debounce from 'lodash/debounce'
 
 const props = defineProps({
   modelValue: {
@@ -192,7 +153,7 @@ const props = defineProps({
   },
   productType: {
     type: String,
-    required: true
+    required: false
   }
 })
 
@@ -211,43 +172,29 @@ const isLoading = ref(false)
 const error = ref('')
 const showResults = ref(false)
 
-// Pagination
-const pagination = ref({
-  total: 0,
-  page: 1,
-  limit: 20,
-  totalPages: 1
-})
+// Debounced search function
+const debouncedSearch = debounce(() => {
+  if (searchTerm.value.length >= 2) {
+    search()
+  }
+}, 300)
 
 // Format fabrics for display in the table
 const formattedFabrics = computed(() => {
   return fabrics.value.map(fabric => ({
     _original: fabric,
-    name: fabric.fields['Fabric Name'] || '',
-    type: fabric.fields['Fabric Type'] || '',
-    color: fabric.fields['Fabric Color'] || '',
-    hex: fabric.fields['Color Hex'] || null,
-    imageUrl: fabric.fields['Image URL'] || null
+    name: fabric.publicName || 'Unknown Fabric',
+    products: fabric.products || null,
+    transparency: fabric.transparency || null,
+    supplier: fabric.supplierName || null,
+    price: fabric.externalPricePerMeter ? Number(fabric.externalPricePerMeter).toFixed(2) : null
   }))
-})
-
-// Watch for product type changes
-watch(() => props.productType, () => {
-  // Reset fabrics when product type changes
-  if (showResults.value) {
-    search()
-  }
 })
 
 // Function to trigger fabric search
 async function search() {
-  if (!props.productType) {
-    error.value = 'Please select a product type first'
-    return
-  }
-  
-  if (searchTerm.value.length < 3) {
-    error.value = 'Please enter at least 3 characters to search'
+  if (searchTerm.value.length < 2) {
+    error.value = 'Please enter at least 2 characters to search'
     return
   }
   
@@ -256,64 +203,64 @@ async function search() {
   showResults.value = true
   
   try {
-    const response = await fetch(`/api/ninox/fabrics?page=${pagination.value.page}&limit=${pagination.value.limit}&productType=${encodeURIComponent(props.productType)}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        search: searchTerm.value
-      })
+    const queryParams = new URLSearchParams({
+      search: searchTerm.value
     })
+    
+    // Add product type filter if provided
+    if (props.productType) {
+      queryParams.append('productType', props.productType)
+    }
+    
+    const response = await fetch(`/api/fabrics?${queryParams}`)
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
     
     const data = await response.json()
     
-    if (data.success) {
-      fabrics.value = data.fabrics
-      pagination.value = data.pagination
-      
-      if (data.fabrics.length === 0 && searchTerm.value) {
-        error.value = data.message || 'No fabrics found matching your search'
-      }
-    } else {
-      error.value = data.error || 'Failed to search fabrics'
+    // Handle both data.data and direct array response
+    fabrics.value = data.data || data || []
+    
+    if (fabrics.value.length === 0 && searchTerm.value) {
+      error.value = 'No fabrics found matching your search'
     }
   } catch (err) {
     error.value = err.message || 'An error occurred while searching'
+    console.error('Error searching fabrics:', err)
   } finally {
     isLoading.value = false
   }
 }
 
-// Function to change page
-function changePage(newPage) {
-  pagination.value.page = newPage
-  search()
-}
-
 // Function to select a fabric
 function selectFabric(fabric) {
-  const fabricId = fabric.fields['Fabric ID'];
+  console.log('Selected fabric:', fabric)
   
-  console.log('Selected fabric with fabricId:', fabricId);
-  console.log('Full fabric data:', fabric);
-  
-  if (!fabricId) {
-    console.error('No Fabric ID found in the selected fabric:', fabric);
+  // Transform the fabric data to match what table-orders expects
+  const transformedFabric = {
+    id: fabric.id,
+    fabricId: fabric.id,
+    fields: {
+      'Fabric ID': fabric.id,
+      'Fabric Name': fabric.publicName,
+      'Fabric Type': fabric.products || 'General',
+      'Supplier Name': fabric.supplierName || 'Unknown'
+    },
+    // Include original data
+    ...fabric
   }
   
-  emit('select', {
-    ...fabric,
-    fabricId: fabricId
-  });
+  emit('select', transformedFabric)
   
   emit('notification', {
     title: 'Fabric Selected',
-    description: `${fabric.fields['Fabric Name']} has been selected.`,
+    description: `${fabric.publicName} has been selected.`,
     color: 'blue'
-  });
+  })
   
-  close();
+  close()
 }
 
 // Function to close the modal
@@ -328,8 +275,14 @@ function reset() {
   fabrics.value = []
   error.value = ''
   showResults.value = false
-  pagination.value.page = 1
 }
+
+// Watch for modal open/close
+watch(() => props.modelValue, (newVal) => {
+  if (newVal) {
+    reset()
+  }
+})
 
 // Expose functions to parent
 defineExpose({

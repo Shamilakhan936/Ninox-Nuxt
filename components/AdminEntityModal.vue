@@ -58,6 +58,7 @@
                 :value="formData[field.key]"
                 @input="updateFormData(field.key, $event.target.value)"
                 type="number"
+                step="0.01"
                 :required="field.required"
                 :placeholder="field.placeholder"
                 class="admin-modal-input"
@@ -82,6 +83,27 @@
                 :placeholder="field.placeholder"
                 min-width="100%"
               />
+              
+              <!-- Modal Search Fields -->
+              <div v-else-if="field.type === 'modal-search'" class="modal-search-field">
+                <div class="selected-display" v-if="selectedItems[field.key]">
+                  <div class="selected-item">
+                    <span class="selected-name">{{ getSelectedDisplayName(field, selectedItems[field.key]) }}</span>
+                    <button type="button" @click="clearSelection(field.key)" class="clear-selection">
+                      ×
+                    </button>
+                  </div>
+                </div>
+                <button 
+                  type="button" 
+                  @click="openSearchModal(field)" 
+                  class="search-modal-button"
+                  :class="{ 'has-selection': selectedItems[field.key] }"
+                >
+                  <UIcon name="i-heroicons-magnifying-glass" class="w-4 h-4 mr-2" />
+                  {{ selectedItems[field.key] ? 'Change' : `Select ${field.label}` }}
+                </button>
+              </div>
             </div>
           </form>
         </div>
@@ -99,10 +121,25 @@
       </div>
     </div>
   </div>
+
+  <!-- Search Modals -->
+  <SupplierSearchModal
+    :show="activeSearchModal === 'supplier'"
+    @close="closeSearchModal"
+    @select="onSupplierSelect"
+  />
+  
+  <DatabaseFabricSearchModal
+    :show="activeSearchModal === 'fabric'"
+    @close="closeSearchModal"
+    @select="onFabricSelect"
+  />
 </template>
 
 <script setup>
 import CrastinoDropdown from './CrastinoDropdown.vue'
+import SupplierSearchModal from './SupplierSearchModal.vue'
+import DatabaseFabricSearchModal from './DatabaseFabricSearchModal.vue'
 
 const props = defineProps({
   show: {
@@ -129,9 +166,102 @@ const props = defineProps({
 
 const emit = defineEmits(['close', 'save', 'update:formData']);
 
+// State for modal searches
+const activeSearchModal = ref(null)
+const currentSearchField = ref(null)
+const selectedItems = ref({})
+
+// Initialize selected items when form data changes
+watch(() => props.formData, (newFormData) => {
+  // Initialize selected items based on existing form data
+  if (newFormData && props.entity.fields) {
+    props.entity.fields.forEach(field => {
+      if (field.type === 'modal-search' && newFormData[field.key]) {
+        // We have an ID but need to fetch the display data
+        fetchSelectedItemData(field, newFormData[field.key])
+      }
+    })
+  }
+}, { immediate: true })
+
+// Fetch data for already selected items (for edit mode)
+async function fetchSelectedItemData(field, id) {
+  if (!id || selectedItems.value[field.key]) return
+  
+  try {
+    let endpoint = ''
+    if (field.searchType === 'supplier') {
+      endpoint = `/api/suppliers/${id}`
+    } else if (field.searchType === 'fabric') {
+      endpoint = `/api/fabrics/${id}`
+    }
+    
+    if (endpoint) {
+      const response = await fetch(endpoint)
+      if (response.ok) {
+        const data = await response.json()
+        selectedItems.value[field.key] = data.data || data
+      }
+    }
+  } catch (err) {
+    console.error('Error fetching selected item data:', err)
+  }
+}
+
 function updateFormData(key, value) {
   emit('update:formData', { ...props.formData, [key]: value });
 }
+
+function openSearchModal(field) {
+  currentSearchField.value = field
+  activeSearchModal.value = field.searchType
+}
+
+function closeSearchModal() {
+  activeSearchModal.value = null
+  currentSearchField.value = null
+}
+
+function onSupplierSelect(supplier) {
+  if (currentSearchField.value) {
+    selectedItems.value[currentSearchField.value.key] = supplier
+    updateFormData(currentSearchField.value.key, supplier.id)
+    closeSearchModal()
+  }
+}
+
+function onFabricSelect(fabric) {
+  if (currentSearchField.value) {
+    selectedItems.value[currentSearchField.value.key] = fabric
+    updateFormData(currentSearchField.value.key, fabric.id)
+    closeSearchModal()
+  }
+}
+
+function clearSelection(fieldKey) {
+  selectedItems.value[fieldKey] = null
+  updateFormData(fieldKey, null)
+}
+
+function getSelectedDisplayName(field, selectedItem) {
+  if (!selectedItem) return ''
+  
+  if (field.searchType === 'supplier') {
+    return selectedItem.name || 'Unknown Supplier'
+  } else if (field.searchType === 'fabric') {
+    return selectedItem.publicName || 'Unknown Fabric'
+  }
+  
+  return 'Selected Item'
+}
+
+// Reset selected items when modal closes
+watch(() => props.show, (newVal) => {
+  if (!newVal) {
+    activeSearchModal.value = null
+    currentSearchField.value = null
+  }
+})
 </script>
 
 <style scoped>
@@ -298,6 +428,86 @@ function updateFormData(key, value) {
 .admin-modal-input::placeholder,
 .admin-modal-textarea::placeholder {
   color: #9CA3AF;
+}
+
+/* Modal Search Field Styling */
+.modal-search-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.selected-display {
+  margin-bottom: 8px;
+}
+
+.selected-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #f0f9ff;
+  border: 1px solid #bae6fd;
+  border-radius: 12px;
+  padding: 8px 12px;
+}
+
+.selected-name {
+  font-size: 14px;
+  color: #0284c7;
+  font-weight: 400;
+}
+
+.clear-selection {
+  background: none;
+  border: none;
+  color: #6b7280;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 0;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.clear-selection:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+  color: #ef4444;
+}
+
+.search-modal-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 24px;
+  border: 1px solid #c9c7c5;
+  border-radius: 66px;
+  background-color: #fff;
+  color: #6B6B6B;
+  font-size: 14px;
+  font-weight: 300;
+  font-family: 'Albert Sans', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.search-modal-button:hover {
+  border-color: #8a7c59;
+  color: #8a7c59;
+}
+
+.search-modal-button.has-selection {
+  border-color: #bae6fd;
+  color: #0284c7;
+  background-color: #f0f9ff;
+}
+
+.search-modal-button.has-selection:hover {
+  border-color: #0284c7;
+  background-color: #e0f2fe;
 }
 
 /* Footer Buttons - Matching FabricSearchModal button style */
