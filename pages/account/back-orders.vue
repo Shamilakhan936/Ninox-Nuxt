@@ -1,7 +1,7 @@
 <template>
   <div class="ml-[86px]">
     <div class="mb-[90px]">
-      <h2 class="text-3xl font-light mb-6 text-[#2D1713]">Orders History</h2>
+      <h2 class="text-3xl font-light mb-6 text-[#2D1713]">Back Orders</h2>
       <p class="text-base font-normal text-[#6F6259] leading-6">
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam eu turpis
         molestie, dictum est a, mattis tellus. Sed dignissim, metus nec
@@ -11,15 +11,15 @@
       </p>
     </div>
 
-    <OrdersSearchForm
+    <BackOrdersForm
       :fields="searchFields"
       button-label="Search"
       @submit="handleSearch"
     />
 
     <div>
-      <h3 class="text-3xl font-light mb-4 text-[#2D1713]">Recent Orders</h3>
-      <OrdersTable :orders="dummyOrders" />
+      <h3 class="text-3xl font-light mb-4 text-[#2D1713]">Recent Invoices</h3>
+      <BackOrdersTable :backOrders="dummyInvoices" />
     </div>
   </div>
 </template>
@@ -27,22 +27,28 @@
 <script setup>
 definePageMeta({ layout: "account-section" });
 
-import OrdersSearchForm from "~/components/SearchForm.vue";
-import OrdersTable from "~/components/OrdersTable.vue";
+import BackOrdersForm from "~/components/SearchForm.vue";
+import BackOrdersTable from "~/components/BackOrdersTable";
 const searchFields = [
-  { key: "order", label: "Order no", type: "text", placeholder: "#" },
+  { key: "reference", label: "Reference no.", type: "text", placeholder: "#" },
   { key: "from", label: "From", type: "date" },
+  { key: "item", label: "item no.", type: "text", placeholder: "#" },
   { key: "to", label: "To", type: "date" },
+  { key: "order", label: "order no.", type: "text", placeholder: "#" },
 ];
 
 const handleSearch = (formValues) => {
   console.log("Search submitted with values:", formValues);
 };
-const dummyOrders = Array.from({ length: 10 }, () => ({
+const dummyBackOrders = Array.from({ length: 10 }, () => ({
   order: "VF–2508227",
   date: "27/05/2025",
-  billed: "Diddo ef.",
-  total: "314,56",
-  status: "complete",
+  item: "RF-PORTOFINO-5100-28",
+  title: "Roller blind fabric texture B0 PES 280cm natural",
+  qty: "",
+  newShips: "Diddo ef.",
+  oldShips: "Diddo ef.",
+  diffDays: "Diddo ehf.",
+  adjDate: "27/05/2025",
 }));
 </script>

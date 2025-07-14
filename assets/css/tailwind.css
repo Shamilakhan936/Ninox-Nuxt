@@ -2,6 +2,20 @@
 @tailwind components;
 @tailwind utilities;
 
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+span,
+a,
+label {
+  font-family: "Albert Sans", sans-serif !important;
+}
+
 /* Override Nuxt UI and Tailwind base link styles for mobile menu */
 .mobile-menu a,
 .mobile-menu button {
