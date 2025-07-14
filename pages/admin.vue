@@ -408,11 +408,11 @@ const entities = [
     ],
   },
   {
-    key: "fabrics",
-    name: "Fabrics",
-    singular: "Fabric",
-    icon: "i-heroicons-swatch",
-    endpoint: "fabrics",
+    key: 'fabrics',
+    name: 'Fabrics',
+    singular: 'Fabric',
+    icon: 'i-heroicons-swatch',
+    endpoint: 'fabrics',
     columns: [
       { key: 'id', label: 'ID', type: 'text' },
       { key: 'publicName', label: 'Name', type: 'text' },
@@ -420,79 +420,84 @@ const entities = [
       { key: 'products', label: 'Products', type: 'text' },
       { key: 'transparency', label: 'Transparency', type: 'text' },
       { key: 'rollWidth', label: 'Width', type: 'text' },
-      { key: 'externalPricePerMeter', label: 'Price/m', type: 'currency' }
+      { key: 'externalPricePerMeter', label: 'Price/m', type: 'currency' },
+      { key: 'sustainable', label: 'Sustainable', type: 'status' }
     ],
     fields: [
+      // Basic Information
       { key: 'supplierId', label: 'Supplier ID', type: 'number', required: true, placeholder: 'Supplier ID (number)' },
       { key: 'publicName', label: 'Public Name', type: 'text', required: true, placeholder: 'Fabric public name' },
       { key: 'description', label: 'Description', type: 'textarea', required: false, placeholder: 'Fabric description' },
+      
+      // Product Properties
       { key: 'products', label: 'Products', type: 'text', required: false, placeholder: 'Pleated Shades, Curtains' },
       { key: 'transparency', label: 'Transparency', type: 'text', required: false, placeholder: 'Light Filtering' },
       { key: 'composition', label: 'Composition', type: 'text', required: false, placeholder: '100% PES' },
+      
+      // Physical Measurements
       { key: 'rollWidth', label: 'Roll Width', type: 'text', required: false, placeholder: '315cm' },
       { key: 'thickness', label: 'Thickness', type: 'text', required: false, placeholder: '1mm' },
       { key: 'weight', label: 'Weight', type: 'text', required: false, placeholder: '239g/m2' },
-      { key: 'externalPricePerMeter', label: 'External Price/Meter', type: 'number', required: false, placeholder: '22.60' }
+      { key: 'shrinkage', label: 'Shrinkage', type: 'text', required: false, placeholder: '0.004%' },
+      { key: 'opennessFactor', label: 'Openness Factor', type: 'text', required: false, placeholder: '0%' },
+      
+      // Color Fastness
+      { key: 'colorFastnessStandard', label: 'Color Fastness Standard', type: 'text', required: false, placeholder: 'ISO 105-B02' },
+      { key: 'colorFastnessValue', label: 'Color Fastness Value', type: 'text', required: false, placeholder: 'Grade 4-5' },
+      
+      // Care Instructions
+      { key: 'washTemperature', label: 'Wash Temperature', type: 'text', required: false, placeholder: '30°C' },
+      { key: 'careInstructions', label: 'Care Instructions', type: 'textarea', required: false, placeholder: 'Do not bleach. Do not tumble dry.' },
+      
+      // Environmental Properties
+      { key: 'recycled', label: 'Recycled', type: 'select', required: false, options: ['true', 'false'] },
+      { key: 'recyclable', label: 'Recyclable', type: 'select', required: false, options: ['true', 'false'] },
+      { key: 'biodegradable', label: 'Biodegradable', type: 'select', required: false, options: ['true', 'false'] },
+      { key: 'sustainable', label: 'Sustainable', type: 'select', required: false, options: ['true', 'false'] },
+      
+      // Compatibility and Standards
+      { key: 'upholsteryCompatible', label: 'Upholstery Compatible', type: 'select', required: false, options: ['true', 'false'] },
+      { key: 'carbonNeutral', label: 'Carbon Neutral', type: 'select', required: false, options: ['true', 'false'] },
+      { key: 'ecoFriendly', label: 'Eco Friendly', type: 'select', required: false, options: ['true', 'false'] },
+      { key: 'okeotexStandard100', label: 'Oeko-Tex Standard 100', type: 'select', required: false, options: ['true', 'false'] },
+      { key: 'fireRetardant', label: 'Fire Retardant', type: 'select', required: false, options: ['true', 'false'] },
+      { key: 'leaded', label: 'Leaded', type: 'select', required: false, options: ['true', 'false'] },
+      
+      // Pricing Data
+      { key: 'mToM2Conversion', label: 'M to M² Conversion', type: 'number', required: false, placeholder: '3.00' },
+      { key: 'purchasePriceInMeters', label: 'Purchase Price (Meters)', type: 'number', required: false, placeholder: '24.639' },
+      { key: 'purchasePriceInM2', label: 'Purchase Price (M²)', type: 'number', required: false, placeholder: '8.21' },
+      { key: 'originalPriceWithShipping', label: 'Original Price + Shipping', type: 'number', required: false, placeholder: '9.03' },
+      { key: 'priceWithShipping', label: 'Price with Shipping', type: 'number', required: false, placeholder: '9.03' },
+      { key: 'adjustedPrice', label: 'Adjusted Price', type: 'number', required: false, placeholder: '9.50' },
+      { key: 'internalPricePerMeter', label: 'Internal Price/Meter', type: 'number', required: false, placeholder: '20.6' },
+      { key: 'internalPricePerM2', label: 'Internal Price/M²', type: 'number', required: false, placeholder: '6.54' },
+      { key: 'externalPricePerMeter', label: 'External Price/Meter', type: 'number', required: false, placeholder: '22.6' },
+      { key: 'externalPricePerM2', label: 'External Price/M²', type: 'number', required: false, placeholder: '7.17' }
     ]
   },
   {
-    key: "fabricColours",
-    name: "Fabric Colours",
-    singular: "Fabric Colour",
-    icon: "i-heroicons-paint-brush",
-    endpoint: "fabric-colours",
+    key: 'fabricColours',
+    name: 'Fabric Colours',
+    singular: 'Fabric Colour',
+    icon: 'i-heroicons-paint-brush',
+    endpoint: 'fabric-colours',
     columns: [
-      { key: "id", label: "ID", type: "text" },
-      { key: "fabricId", label: "Fabric ID", type: "text" },
-      { key: "collectionName", label: "Collection", type: "text" },
-      { key: "colourCategory", label: "Category", type: "text" },
-      { key: "colour", label: "Colour", type: "text" },
-      { key: "availableForSample", label: "Sample Available", type: "status" },
+      { key: 'id', label: 'ID', type: 'text' },
+      { key: 'fabricId', label: 'Fabric ID', type: 'text' },
+      { key: 'collectionName', label: 'Collection', type: 'text' },
+      { key: 'colourCategory', label: 'Category', type: 'text' },
+      { key: 'colour', label: 'Colour', type: 'text' },
+      { key: 'availableForSample', label: 'Sample Available', type: 'status' }
     ],
     fields: [
-      {
-        key: "fabricId",
-        label: "Fabric ID",
-        type: "number",
-        required: true,
-        placeholder: "Fabric ID (number)",
-      },
-      {
-        key: "collectionName",
-        label: "Collection Name",
-        type: "text",
-        required: true,
-        placeholder: "Collection name",
-      },
-      {
-        key: "colourCategory",
-        label: "Colour Category",
-        type: "text",
-        required: true,
-        placeholder: "Neutrals, Blues, Reds",
-      },
-      {
-        key: "colour",
-        label: "Colour",
-        type: "text",
-        required: true,
-        placeholder: "Ocean Blue, Cream White",
-      },
-      {
-        key: "swatchImage",
-        label: "Swatch Image URL",
-        type: "text",
-        required: false,
-        placeholder: "https://example.com/swatch.jpg",
-      },
-      {
-        key: "availableForSample",
-        label: "Available for Sample",
-        type: "select",
-        required: true,
-        options: ["true", "false"],
-      },
-    ],
+      { key: 'fabricId', label: 'Fabric ID', type: 'number', required: true, placeholder: 'Fabric ID (number)' },
+      { key: 'collectionName', label: 'Collection Name', type: 'text', required: true, placeholder: 'Collection name' },
+      { key: 'colourCategory', label: 'Colour Category', type: 'text', required: true, placeholder: 'Neutrals, Blues, Reds' },
+      { key: 'colour', label: 'Colour', type: 'text', required: true, placeholder: 'Ocean Blue, Cream White' },
+      { key: 'swatchImage', label: 'Swatch Image URL', type: 'text', required: false, placeholder: 'https://example.com/swatch.jpg' },
+      { key: 'availableForSample', label: 'Available for Sample', type: 'select', required: true, options: ['true', 'false'] }
+    ]
   },
   {
     key: "orderItems",
