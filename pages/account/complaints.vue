@@ -17,7 +17,7 @@
     <ComplaintSearchBar/>
 
     <div>
-      <h3 class="text-3xl font-light mb-4 text-[#2D1713]">Recent Invoices</h3>
+      <h3 class="text-3xl font-light mb-4 text-[#2D1713]">Recent Orders</h3>
       <ComplaintTable :complaints="dummyComplaints" />
     </div>
     <FaqAccordion/>

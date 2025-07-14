@@ -21,7 +21,7 @@
           v-model="formData[field.key]"
           :id="field.key"
           :type="field.type"
-          class="flex-1 rounded-[66px] px-6 py-3 text-[#6F6259] font-light border border-[#C9C7C5] focus:outline-none h-[50px]"
+          class="flex-1 rounded-[66px] px-6 py-3 text-[#6F6259] font-light border border-[#C9C7C5] focus:outline-none h-[50px] bg-white"
           :placeholder="field.placeholder || ''"
         />
       </div>
