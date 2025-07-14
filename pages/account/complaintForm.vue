@@ -8,49 +8,42 @@
     </p>
 
     <form class="flex flex-col space-y-6">
-      <div class="w-full">
-        <BaseInput
-          label="E-mail"
-          v-model="form.email"
-          placeholder="esraeliasson@gmail.com"
-        />
-      </div>
-      <div class="w-full">
-        <BaseInput
-          label="Your Complaint Reference"
-          v-model="form.complaintReference"
-          placeholder="Your Complaint Reference"
-        />
-      </div>
-      <div class="w-full">
-        <BaseInput
-          label="Article Number"
-          v-model="form.articleNumber"
-          placeholder="Article Number"
-        />
-      </div>
-      <div class="w-full">
-        <BaseInput
-          label="Your Article Reference"
-          v-model="form.articleReference"
-          placeholder="Your Article Reference"
-        />
-      </div>
-      <div class="w-full">
-        <BaseSelect
-          label="Complaint Reason"
-          v-model="form.complaintReason"
-          :options="reasons"
-          placeholder="Complaint Reason"
-        />
-      </div>
-      <div class="w-full">
-        <BaseTextarea
-          label="Complaint Description"
-          v-model="form.complaintDescription"
-          placeholder="Complaint Description."
-        />
-      </div>
+      <BaseInput
+        label="E-mail"
+        v-model="form.email"
+        placeholder="esraeliasson@gmail.com"
+      />
+
+      <BaseInput
+        label="Your Complaint Reference"
+        v-model="form.complaintReference"
+        placeholder="Your Complaint Reference"
+      />
+
+      <BaseInput
+        label="Article Number"
+        v-model="form.articleNumber"
+        placeholder="Article Number"
+      />
+
+      <BaseInput
+        label="Your Article Reference"
+        v-model="form.articleReference"
+        placeholder="Your Article Reference"
+      />
+
+      <BaseSelect
+        label="Complaint Reason"
+        v-model="form.complaintReason"
+        :options="reasons"
+        placeholder="Complaint Reason"
+      />
+
+      <BaseTextarea
+        label="Complaint Description"
+        v-model="form.complaintDescription"
+        placeholder="Complaint Description."
+      />
     </form>
   </div>
 </template>
