@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen" style="background-color: #ffffff">
-    <div class="container mx-auto py-8 pt-[90px] px-4 sm:px-6 lg:px-8">
+    <div class="container mx-auto py-8 py-[90px] px-4 sm:px-6 lg:px-8">
       <Breadcrumb :items="['Crastino', 'Products', 'Curtains']" />
       <div class="flex flex-wrap items-center justify-between mb-6 mt-8 px-[0px] max-w-full">
         <div class="flex flex-wrap items-center gap-4">
@@ -30,37 +30,50 @@
           <p class="text-black text-xs font-normal">299 Products</p>
         </div>
       </div>
-      <AllFiltersModal
-        :open="showFiltersModal"
-        :flammability="selectedFlammability"
-        :width="selectedWidth"
-        :colour="selectedColour"
-        :transparency="selectedTransparency"
-        :acoustic="selectedAcoustic"
-        :categories="selectedCategories"
-        :lightfastness="selectedLightfastness"
-        :pattern="selectedPattern"
-        :washable="selectedWashable"
-        :composition="selectedComposition"
-        :turnable="selectedTurnable"
-        :metallised="selectedMetallised"
-        :environmental="selectedEnvironmental"
-        :flammabilityOptions="flammabilityOptions"
-        :widthOptions="widthOptions"
-        :colourOptions="colourOptions"
-        :transparencyOptions="transparencyOptions"
-        :acousticOptions="acousticOptions"
-        :categoriesOptions="categoriesOptions"
-        :lightfastnessOptions="lightfastnessOptions"
-        :patternOptions="patternOptions"
-        :washableOptions="washableOptions"
-        :compositionOptions="compositionOptions"
-        :turnableOptions="turnableOptions"
-        :metallisedOptions="metallisedOptions"
-        :environmentalOptions="environmentalOptions"
-        @close="showFiltersModal = false"
-        @apply-filters="applyFilters"
-      />
+     <AllFiltersModal
+      :open="showFiltersModal"
+      :flammability="selectedFlammability"
+      :width="selectedWidth"
+      :colour="selectedColour"
+      :transparency="selectedTransparency"
+      :acoustic="selectedAcoustic"
+      :categories="selectedCategories"
+      :lightfastness="selectedLightfastness"
+      :pattern="selectedPattern"
+      :washable="selectedWashable"
+      :composition="selectedComposition"
+      :turnable="selectedTurnable"
+      :metallised="selectedMetallised"
+      :environmental="selectedEnvironmental"
+
+      :inStock="selectedInStock"
+      :pilling="selectedPilling"
+      :fabricName="selectedFabricName"
+      :environmentalDesign="selectedEnvironmentalDesign"
+      :sortBy="selectedSortBy"
+
+      :flammabilityOptions="flammabilityOptions"
+      :widthOptions="widthOptions"
+      :colourOptions="colourOptions"
+      :transparencyOptions="transparencyOptions"
+      :acousticOptions="acousticOptions"
+      :categoriesOptions="categoriesOptions"
+      :lightfastnessOptions="lightfastnessOptions"
+      :patternOptions="patternOptions"
+      :washableOptions="washableOptions"
+      :compositionOptions="compositionOptions"
+      :turnableOptions="turnableOptions"
+      :metallisedOptions="metallisedOptions"
+      :environmentalOptions="environmentalOptions"
+      :inStockOptions="inStockOptions"
+      :pillingOptions="pillingOptions"
+      :fabricNameOptions="fabricNameOptions"
+      :environmentalDesignOptions="environmentalDesignOptions"
+      :sortByOptions="sortByOptions"
+      @close="showFiltersModal = false"
+      @apply-filters="applyFilters"
+    />
+
       <!-- Product Cards Grid -->
       <div class="grid grid-cols-4 gap-6 mt-8">
         <ProductCard
@@ -159,6 +172,37 @@ const environmentalOptions = [
   { label: 'Organic', value: 'organic' },
   { label: 'Low Emission', value: 'low-emission' }
 ]
+const inStockOptions = [
+  { label: 'In-Stock', value: '' },
+  { label: 'Yes', value: 'yes' },
+  { label: 'No', value: 'no' },
+]
+
+const pillingOptions = [
+  { label: 'Pilling', value: '' },
+  { label: 'High', value: 'high' },
+  { label: 'Medium', value: 'medium' },
+  { label: 'Low', value: 'low' },
+]
+
+const fabricNameOptions = [
+  { label: 'Fabric Name', value: '' },
+  { label: 'Fabric A', value: 'fabric-a' },
+  { label: 'Fabric B', value: 'fabric-b' },
+]
+
+const environmentalDesignOptions = [
+  { label: 'Environmental Design', value: '' },
+  { label: 'Sustainable', value: 'sustainable' },
+  { label: 'Eco Certified', value: 'eco' },
+]
+
+const sortByOptions = [
+  { label: 'Sort by (1)', value: '' },
+  { label: 'Price: Low to High', value: 'price-asc' },
+  { label: 'Price: High to Low', value: 'price-desc' },
+  { label: 'Newest', value: 'newest' },
+]
 
 // State for selected values
 const selectedFlammability = ref('')
@@ -174,6 +218,11 @@ const selectedComposition = ref('')
 const selectedTurnable = ref('')
 const selectedMetallised = ref('')
 const selectedEnvironmental = ref('')
+const selectedInStock = ref('')
+const selectedPilling = ref('')
+const selectedFabricName = ref('')
+const selectedEnvironmentalDesign = ref('')
+const selectedSortBy = ref('')
 
 const showFiltersModal = ref(false)
 
@@ -191,6 +240,14 @@ function applyFilters(filters) {
   selectedTurnable.value = filters.turnable
   selectedMetallised.value = filters.metallised
   selectedEnvironmental.value = filters.environmental
+  selectedInStock.value = filters.inStock
+  selectedPilling.value = filters.pilling
+  selectedFabricName.value = filters.fabricName
+  selectedEnvironmentalDesign.value = filters.environmentalDesign
+  selectedSortBy.value = filters.sortBy
+
+
+   showFiltersModal.value = false 
 }
 
 // Example static products array (replace with backend data in future)

@@ -7,15 +7,13 @@
       <!-- Header -->
       <div class="flex justify-end gap-6 py-8">
       
- <button class="flex items-center gap-2 px-4 py-2 rounded-full border border-[#C9C7C5] bg-white hover:bg-gray-100 transition" >
     
-     <a
+        <button
           class="text-[#3D3935] font-light text-xs uppercase p-0 border-b border-[#8A7C59] hover:border-[#6F6259] cursor-pointer transition-all"
-          @click="applyFilters"
+          @click="resetFilters"
         >
            Reset Filters
-        </a>
-  </button>
+        </button>
         <button
           class="px-4 py-2 rounded-full text-sm font-normal uppercase bg-[#8A7C59] text-white font-semibold hover:bg-[#6F6259] transition"
           @click="applyFilters"
@@ -25,7 +23,12 @@
       </div>
 
       <!-- Filter Selectors -->
-      <div class="flex flex-col gap-4 mb-6">
+            <div
+        class="overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-[#aaa] scrollbar-track-[#eee] "
+        style="max-height: calc(100vh - 130px);" 
+      >
+
+      <div class="flex flex-col gap-[11px] mb-6">
         <BaseSelectProduct v-model="localFlammability" :options="flammabilityOptions" />
         <BaseSelectProduct v-model="localWidth" :options="widthOptions" />
         <BaseSelectProduct v-model="localColour" :options="colourOptions" />
@@ -39,6 +42,12 @@
         <BaseSelectProduct v-model="localTurnable" :options="turnableOptions" />
         <BaseSelectProduct v-model="localMetallised" :options="metallisedOptions" />
         <BaseSelectProduct v-model="localEnvironmental" :options="environmentalOptions" />
+        <BaseSelectProduct v-model="localInStock" :options="inStockOptions"/>
+        <BaseSelectProduct v-model="localPilling" :options="pillingOptions"/>
+        <BaseSelectProduct v-model="localFabricName" :options="fabricNameOptions"/>
+        <BaseSelectProduct v-model="localEnvironmentalDesign" :options="environmentalDesignOptions"/>
+        <BaseSelectProduct v-model="localSortBy" :options="sortByOptions"/>
+      </div>
       </div>
     </div>
   </div>
@@ -64,6 +73,11 @@ const props = defineProps({
   turnable: String,
   metallised: String,
   environmental: String,
+  inStock: String,
+  pilling: String,
+  fabricName: String,
+  environmentalDesign: String,
+  sortBy: String,
   flammabilityOptions: Array,
   widthOptions: Array,
   colourOptions: Array,
@@ -77,6 +91,11 @@ const props = defineProps({
   turnableOptions: Array,
   metallisedOptions: Array,
   environmentalOptions: Array,
+  inStockOptions: Array,
+  pillingOptions: Array,
+  fabricNameOptions: Array,
+  environmentalDesignOptions: Array,
+  sortByOptions: Array,
 })
 
 // Emits
@@ -96,6 +115,11 @@ const localComposition = ref(props.composition)
 const localTurnable = ref(props.turnable)
 const localMetallised = ref(props.metallised)
 const localEnvironmental = ref(props.environmental)
+const localInStock = ref(props.inStock)
+const localPilling = ref(props.pilling)
+const localFabricName = ref(props.fabricName)
+const localEnvironmentalDesign = ref(props.environmentalDesign)
+const localSortBy = ref(props.sortBy)
 
 // Reset values when drawer opens
 watch(() => props.open, (val) => {
@@ -113,6 +137,11 @@ watch(() => props.open, (val) => {
     localTurnable.value = props.turnable
     localMetallised.value = props.metallised
     localEnvironmental.value = props.environmental
+    localInStock.value = props.inStock
+    localPilling.value = props.pilling
+    localFabricName.value = props.fabricName
+    localEnvironmentalDesign.value = props.environmentalDesign
+    localSortBy.value = props.sortBy
   }
 })
 
@@ -132,7 +161,71 @@ function applyFilters() {
     turnable: localTurnable.value,
     metallised: localMetallised.value,
     environmental: localMetallised.value,
+    inStock: localInStock.value,
+    pilling: localPilling.value,
+    fabricName: localFabricName.value,
+    environmentalDesign: localEnvironmentalDesign.value,
+    sortBy: localSortBy.value,
   })
   emit('close')
 }
+
+function resetFilters() {
+  // Clear local values
+  localFlammability.value = ''
+  localWidth.value = ''
+  localColour.value = ''
+  localTransparency.value = ''
+  localAcoustic.value = ''
+  localCategories.value = ''
+  localLightfastness.value = ''
+  localPattern.value = ''
+  localWashable.value = ''
+  localComposition.value = ''
+  localTurnable.value = ''
+  localMetallised.value = ''
+  localEnvironmental.value = ''
+  localInStock.value = ''
+  localPilling.value = ''
+  localFabricName.value = ''
+  localEnvironmentalDesign.value = ''
+  localSortBy.value = ''
+
+  emit('apply-filters', {
+    flammability: '',
+    width: '',
+    colour: '',
+    transparency: '',
+    acoustic: '',
+    categories: '',
+    lightfastness: '',
+    pattern: '',
+    washable: '',
+    composition: '',
+    turnable: '',
+    metallised: '',
+    environmental: '',
+    inStock: '',
+    pilling: '',
+    fabricName: '',
+    environmentalDesign: '',
+    sortBy: '',
+  })
+  emit('close')
+}
+
 </script>
+<style scoped>
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: #EDEBE7; /* light background */
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background-color: #C9C7C5; /* muted gray-brown */
+  border-radius: 10px;
+}
+</style>

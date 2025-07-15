@@ -3,7 +3,7 @@
     <label class="text-base font-medium text-[#6F6259] w-[280px]">{{ label }}</label>
     <div class="relative">
       <select
-        class="min-w-[220px] appearance-none rounded-[66px] px-6 py-3 text-sm border border-[#C9C7C5] focus:outline-none h-[50px] bg-white text-black" 
+        class="min-w-[220px] appearance-none rounded-[66px] px-6 py-3 text-sm border border-[#C9C7C5] focus:outline-none focus:border-[#2d2d2d] focus:border-[1px] h-[50px] bg-white text-black" 
         :value="modelValue"
         @change="$emit('update:modelValue', $event.target.value)"
       >

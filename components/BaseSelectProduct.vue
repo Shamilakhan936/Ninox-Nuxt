@@ -1,7 +1,7 @@
 <template>
   <div class="relative">
     <select
-      class="w-full appearance-none rounded-[66px] px-6 py-3 pr-14 text-sm border border-[#C9C7C5] focus:outline-none h-[50px] bg-white text-black"
+      class="w-full appearance-none rounded-[66px] py-3 px-6 text-sm border border-[#C9C7C5] focus:outline-none focus:border-[#2d2d2d] focus:border-[1px] h-[50px] bg-white text-black"
       v-model="internalValue"
     >
       <option
@@ -46,3 +46,9 @@ const internalValue = computed({
   set: (value) => emit('update:modelValue', value),
 })
 </script>
+<style scoped>
+.text-sm {
+  font-size: 16px !important;
+  line-height: 26px !important;
+}
+</style>
