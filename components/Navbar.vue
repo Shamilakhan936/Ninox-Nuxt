@@ -8,7 +8,7 @@
       <!-- Navigation Items with hover underlines -->
       <div class="nav-item-container products-container">
         <div class="hover-underline"></div>
-        <NuxtLink to="/products" class="nav-link products">Products</NuxtLink>
+        <NuxtLink to="/products/products" class="nav-link products">Products</NuxtLink>
       </div>
       
       <div class="nav-item-container cases-container">
@@ -72,7 +72,7 @@
       <!-- Mobile Menu -->
       <div class="mobile-menu" :class="{ 'active': isMobileMenuOpen }">
         <div class="mobile-menu-items">
-          <NuxtLink to="/products" class="mobile-nav-link" @click="closeMobileMenu">Products</NuxtLink>
+          <NuxtLink to="/products/products" class="mobile-nav-link" @click="closeMobileMenu">Products</NuxtLink>
           <NuxtLink to="/cases" class="mobile-nav-link" @click="closeMobileMenu">Cases</NuxtLink>
           <NuxtLink to="/about" class="mobile-nav-link" @click="closeMobileMenu">About</NuxtLink>
           <NuxtLink to="/customer-service" class="mobile-nav-link" @click="closeMobileMenu">Customer Service</NuxtLink>

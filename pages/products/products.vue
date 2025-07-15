@@ -30,59 +30,61 @@
           <p class="text-black text-xs font-normal">299 Products</p>
         </div>
       </div>
-     <AllFiltersModal
-      :open="showFiltersModal"
-      :flammability="selectedFlammability"
-      :width="selectedWidth"
-      :colour="selectedColour"
-      :transparency="selectedTransparency"
-      :acoustic="selectedAcoustic"
-      :categories="selectedCategories"
-      :lightfastness="selectedLightfastness"
-      :pattern="selectedPattern"
-      :washable="selectedWashable"
-      :composition="selectedComposition"
-      :turnable="selectedTurnable"
-      :metallised="selectedMetallised"
-      :environmental="selectedEnvironmental"
-
-      :inStock="selectedInStock"
-      :pilling="selectedPilling"
-      :fabricName="selectedFabricName"
-      :environmentalDesign="selectedEnvironmentalDesign"
-      :sortBy="selectedSortBy"
-
-      :flammabilityOptions="flammabilityOptions"
-      :widthOptions="widthOptions"
-      :colourOptions="colourOptions"
-      :transparencyOptions="transparencyOptions"
-      :acousticOptions="acousticOptions"
-      :categoriesOptions="categoriesOptions"
-      :lightfastnessOptions="lightfastnessOptions"
-      :patternOptions="patternOptions"
-      :washableOptions="washableOptions"
-      :compositionOptions="compositionOptions"
-      :turnableOptions="turnableOptions"
-      :metallisedOptions="metallisedOptions"
-      :environmentalOptions="environmentalOptions"
-      :inStockOptions="inStockOptions"
-      :pillingOptions="pillingOptions"
-      :fabricNameOptions="fabricNameOptions"
-      :environmentalDesignOptions="environmentalDesignOptions"
-      :sortByOptions="sortByOptions"
-      @close="showFiltersModal = false"
-      @apply-filters="applyFilters"
-    />
-
+      <AllFiltersModal
+        :open="showFiltersModal"
+        :flammability="selectedFlammability"
+        :width="selectedWidth"
+        :colour="selectedColour"
+        :transparency="selectedTransparency"
+        :acoustic="selectedAcoustic"
+        :categories="selectedCategories"
+        :lightfastness="selectedLightfastness"
+        :pattern="selectedPattern"
+        :washable="selectedWashable"
+        :composition="selectedComposition"
+        :turnable="selectedTurnable"
+        :metallised="selectedMetallised"
+        :environmental="selectedEnvironmental"
+        :inStock="selectedInStock"
+        :pilling="selectedPilling"
+        :fabricName="selectedFabricName"
+        :environmentalDesign="selectedEnvironmentalDesign"
+        :sortBy="selectedSortBy"
+        :flammabilityOptions="flammabilityOptions"
+        :widthOptions="widthOptions"
+        :colourOptions="colourOptions"
+        :transparencyOptions="transparencyOptions"
+        :acousticOptions="acousticOptions"
+        :categoriesOptions="categoriesOptions"
+        :lightfastnessOptions="lightfastnessOptions"
+        :patternOptions="patternOptions"
+        :washableOptions="washableOptions"
+        :compositionOptions="compositionOptions"
+        :turnableOptions="turnableOptions"
+        :metallisedOptions="metallisedOptions"
+        :environmentalOptions="environmentalOptions"
+        :inStockOptions="inStockOptions"
+        :pillingOptions="pillingOptions"
+        :fabricNameOptions="fabricNameOptions"
+        :environmentalDesignOptions="environmentalDesignOptions"
+        :sortByOptions="sortByOptions"
+        @close="showFiltersModal = false"
+        @apply-filters="applyFilters"
+      />
       <!-- Product Cards Grid -->
       <div class="grid grid-cols-4 gap-6 mt-8">
-        <ProductCard
+        <NuxtLink
           v-for="product in products"
           :key="product.id"
-          :image="product.image"
-          :name="product.name"
-          :price="product.price"
-        />
+          :to="`/products/${product.id}`"
+          class="cursor-pointer"
+        >
+          <ProductCard
+            :image="product.image"
+            :name="product.name"
+            :price="product.price"
+          />
+        </NuxtLink>
       </div>
     </div>
   </div>
