@@ -4,24 +4,28 @@
       <Breadcrumb :items="[{label:'Crastino'}, {label:'Products'}, {label:'Curtains'}]" />
       <div class="flex flex-wrap items-center justify-between mt-8 px-[0px] max-w-full">
         <div class="flex flex-wrap items-center gap-6">
-          <BaseSelectProduct
+          <CrastinoDropdown
             v-model="selectedFlammability"
             :options="flammabilityOptions"
+            placeholder="Flammability"
             class="w-48"
           />
-          <BaseSelectProduct
+          <CrastinoDropdown
             v-model="selectedWidth"
             :options="widthOptions"
+            placeholder="Width"
             class="w-48"
           />
-          <BaseSelectProduct
+          <CrastinoDropdown
             v-model="selectedColour"
             :options="colourOptions"
+            placeholder="Colour"
             class="w-48"
           />
-          <BaseSelectProduct
+          <CrastinoDropdown
             v-model="selectedTransparency"
             :options="transparencyOptions"
+            placeholder="Transparency"
             class="w-48"
           />
         </div>
@@ -94,7 +98,7 @@
 import { ref } from 'vue'
 import Breadcrumb from '@/components/Breadcrumb.vue'
 import NextArrow from "~/assets/icons/NextArrow.vue";
-import BaseSelectProduct from '@/components/BaseSelectProduct.vue'
+import CrastinoDropdown from '@/components/CrastinoDropdown.vue'
 import AllFiltersButton from '@/components/AllFiltersButton.vue'
 import AllFiltersModal from '@/components/AllFiltersModal.vue'
 import ProductCard from '@/components/ProductCard.vue'

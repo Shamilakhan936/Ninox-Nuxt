@@ -25,7 +25,6 @@
         </button>
       </div>
 
-      <!-- Filter Selectors -->
             <div
         class="overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-[#aaa] scrollbar-track-[#eee] "
         style="max-height: calc(100vh - 130px);" 

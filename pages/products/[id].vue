@@ -1,5 +1,5 @@
 <template>
-  <div class="">
+  <div class="bg-white">
     <div v-if="product" class="container mx-auto py-8 py-[90px] px-4 sm:px-6 lg:px-8">
       <Breadcrumb  :items="[
         { label: 'Products'},
