@@ -1,12 +1,15 @@
 <template>
   <div v-if="open" class="fixed inset-0 z-[99999]">
+     <div
+      class="fixed inset-0 bg-[#3D3935] bg-opacity-20 transition-opacity duration-300"
+      @click="emit('close')"
+    ></div>
     <div
-      class="fixed right-0 top-0 h-full w-full max-w-xl bg-white shadow-lg px-6 transition-transform duration-300 z-[99999]"
+      class="fixed right-0 top-0 h-full w-full max-w-xl bg-white shadow-lg px-8 transition-transform duration-300 z-[99999]"
       style="transform: translateX(0);"
     >
       <!-- Header -->
-      <div class="flex justify-end gap-6 py-8">
-      
+      <div class="flex justify-end gap-6 py-8">    
     
         <button
           class="text-[#3D3935] font-light text-xs uppercase p-0 border-b border-[#8A7C59] hover:border-[#6F6259] cursor-pointer transition-all"

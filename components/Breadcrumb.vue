@@ -4,9 +4,22 @@
       <li
         v-for="(crumb, index) in items"
         :key="index"
-        class="flex items-center text-sm text-black font-light uppercase"
+        class="flex items-center text-sm uppercase"
       >
-        <span>{{ crumb }}</span>
+        <router-link
+          v-if="index < items.length - 1"
+          :to="crumb.to"
+          class="text-black font-light hover:underline transition"
+        >
+          {{ crumb.label }}
+        </router-link>
+        <span
+          v-else
+          class="text-[#8A7C59] font-medium"
+        >
+          {{ crumb.label }}
+        </span>
+
         <NextArrow
           v-if="index < items.length - 1"
           class="ml-1 self-center flex-shrink-0"
@@ -24,7 +37,7 @@ export default {
   name: "Breadcrumb",
   props: {
     items: {
-      type: Array,
+      type: Array, // Array of { label: string, to?: string }
       required: true,
     },
   },
@@ -33,6 +46,7 @@ export default {
   },
 };
 </script>
+
 
 <style scoped>
 .text-sm {

@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-[#F7F7F5]">
+  <div class="min-h-screen bg-white">
     <Navbar />
 
     <!-- Two-column layout -->

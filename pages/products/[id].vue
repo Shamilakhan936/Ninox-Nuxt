@@ -1,7 +1,11 @@
 <template>
-  <div class="min-h-screen bg-white">
+  <div class="">
     <div v-if="product" class="container mx-auto py-8 py-[90px] px-4 sm:px-6 lg:px-8">
-      <Breadcrumb :items="['Products','Crastino',  product.name]" class="mb-8" />
+      <Breadcrumb  :items="[
+        { label: 'Products'},
+        { label: 'Curtains', to: '/products/curtains' },
+        { label: product.name }
+         ]" class="mb-8" />
       <ProductInfo
         :image="product.image"
         :name="product.name"

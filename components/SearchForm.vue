@@ -1,13 +1,13 @@
 <template>
   <form @submit.prevent="handleSubmit" class="space-y-8">
-    <div class="grid md:grid-cols-2 gap-x-20 gap-y-8">
+    <div class="grid md:grid-cols-2 gap-x-[10vw] gap-y-8">
       <div
         v-for="(field, index) in fields"
         :key="index"
         :class="[
           'flex items-center gap-4',
           fields.length === 3 && field.key === 'to'
-            ? 'justify-self-end md:col-span-2 w-[46.5%]'
+            ? 'col-start-2'
             : '',
         ]"
       >

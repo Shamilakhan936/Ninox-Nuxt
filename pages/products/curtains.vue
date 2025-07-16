@@ -1,9 +1,9 @@
 <template>
-  <div class="min-h-screen" style="background-color: #ffffff">
+  <div class="min-h-screen bg-white">
     <div class="container mx-auto py-8 py-[90px] px-4 sm:px-6 lg:px-8">
-      <Breadcrumb :items="['Crastino', 'Products', 'Curtains']" />
-      <div class="flex flex-wrap items-center justify-between mb-6 mt-8 px-[0px] max-w-full">
-        <div class="flex flex-wrap items-center gap-4">
+      <Breadcrumb :items="[{label:'Crastino'}, {label:'Products'}, {label:'Curtains'}]" />
+      <div class="flex flex-wrap items-center justify-between mt-8 px-[0px] max-w-full">
+        <div class="flex flex-wrap items-center gap-6">
           <BaseSelectProduct
             v-model="selectedFlammability"
             :options="flammabilityOptions"
