@@ -32,7 +32,7 @@
         <!-- Search button -->
         <button
           class="search-button"
-          :disabled="isLoading"
+          :disabled="isLoading || searchTerm.length < 3"
           @click="search"
         >
           <span v-if="!isLoading">SEARCH</span>
@@ -65,22 +65,22 @@
         
         <!-- No results message -->
         <UAlert
-          v-else-if="clients.length === 0 && searchTerm"
+          v-else-if="customers.length === 0 && searchTerm"
           color="amber"
           variant="soft"
           icon="i-heroicons-exclamation-triangle"
           class="mb-4"
         >
-          No clients found matching "{{ searchTerm }}". Try a different search term.
+          No customers found matching "{{ searchTerm }}". Try a different search term.
         </UAlert>
         
         <!-- Search results -->
-        <div v-if="clients.length > 0" class="border rounded-lg overflow-hidden">
+        <div v-if="customers.length > 0" class="border rounded-lg overflow-hidden">
           <div class="bg-gray-50 p-2 flex justify-between items-center">
             <span class="text-sm text-gray-600">
-              Found {{ pagination.total }} client(s)
+              Found {{ pagination.total }} customer(s)
               <span v-if="pagination.total > pagination.limit">
-                (showing {{ clients.length }} of {{ pagination.total }})
+                (showing {{ customers.length }} of {{ pagination.total }})
               </span>
             </span>
             
@@ -111,24 +111,24 @@
           <UTable
             :columns="[
               { key: 'name', label: 'Name', sortable: true },
-              { key: 'company', label: 'Company' },
               { key: 'email', label: 'Email' },
               { key: 'phone', label: 'Phone' },
+              { key: 'country', label: 'Country' },
               { key: 'actions', label: '' }
             ]"
-            :rows="formattedClients"
+            :rows="formattedCustomers"
             hover
             :sort="{ column: 'name', direction: 'asc' }"
           >
-            <template #company-data="{ row }">
-              {{ row.company || '-' }}
+            <template #phone-data="{ row }">
+              {{ row.phone || '-' }}
             </template>
             <template #actions-data="{ row }">
               <UButton
                 color="primary"
                 variant="ghost"
                 size="xs"
-                @click="selectClient(row._original)"
+                @click="selectCustomer(row._original)"
               >
                 Select
               </UButton>
@@ -142,7 +142,7 @@
             Cancel
           </UButton>
           <UButton 
-            v-if="clients.length > 0" 
+            v-if="customers.length > 0" 
             color="primary" 
             @click="close"
           >
@@ -174,7 +174,7 @@ const isOpen = computed({
 
 // Search state
 const searchTerm = ref('')
-const clients = ref([])
+const customers = ref([])
 const isLoading = ref(false)
 const error = ref('')
 const showResults = ref(false)
@@ -187,18 +187,18 @@ const pagination = ref({
   totalPages: 1
 })
 
-// Format clients for display in the table
-const formattedClients = computed(() => {
-  return clients.value.map(client => ({
-    _original: client,
-    name: `${client.fields['First Name'] || ''} ${client.fields['Last Name'] || ''}`.trim(),
-    email: client.fields['Email'] || '',
-    phone: client.fields['Phone Number'] || '',
-    company: client.fields['Company'] || ''
+// Format customers for display in the table
+const formattedCustomers = computed(() => {
+  return customers.value.map(customer => ({
+    _original: customer,
+    name: `${customer.firstName || ''} ${customer.lastName || ''}`.trim(),
+    email: customer.email || '',
+    phone: customer.phoneNumber || '',
+    country: customer.country || ''
   }))
 })
 
-// Function to trigger client search
+// Function to trigger customer search
 async function search() {
   if (!searchTerm.value || searchTerm.value.length < 3) {
     error.value = 'Please enter at least 3 characters to search'
@@ -210,40 +210,52 @@ async function search() {
   showResults.value = true
   
   try {
-    const response = await fetch(`/api/ninox/clients?page=${pagination.value.page}&limit=${pagination.value.limit}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        search: searchTerm.value
-      })
+    const response = await $fetch('/api/customers', {
+      method: 'GET',
+      query: {
+        search: searchTerm.value,
+        page: pagination.value.page,
+        limit: pagination.value.limit
+      }
     })
     
-    const data = await response.json()
-    
-    if (data.success) {
-      clients.value = data.clients
-      pagination.value = data.pagination
+    if (response.success) {
+      customers.value = response.data
       
-      if (data.clients.length === 0) {
-        error.value = data.message || 'No clients found matching your search'
-      } else if (data.clients.length === 1) {
+      // Handle pagination data if available
+      if (response.pagination) {
+        pagination.value = response.pagination
+      } else {
+        // No pagination means all results returned
+        pagination.value = {
+          total: response.data.length,
+          page: 1,
+          limit: response.data.length,
+          totalPages: 1,
+          hasNext: false,
+          hasPrev: false
+        }
+      }
+      
+      if (response.data.length === 0) {
+        error.value = 'No customers found matching your search'
+      } else if (response.data.length === 1) {
         // Emit notification event
         emit('notification', {
-          title: 'Client Found',
-          description: 'One client was found and has been selected.',
+          title: 'Customer Found',
+          description: 'One customer was found and has been selected.',
           color: 'blue'
         })
         
-        // Auto-select if only one client is found
-        selectClient(data.clients[0])
+        // Auto-select if only one customer is found
+        selectCustomer(response.data[0])
       }
     } else {
-      error.value = data.error || 'Failed to search clients'
+      error.value = response.error || 'Failed to search customers'
     }
   } catch (err) {
-    error.value = err.message || 'An error occurred while searching'
+    console.error('Customer search error:', err)
+    error.value = err.data?.message || err.message || 'An error occurred while searching'
   } finally {
     isLoading.value = false
   }
@@ -255,12 +267,12 @@ function changePage(newPage) {
   search()
 }
 
-// Function to select a client
-function selectClient(client) {
-  emit('select', client)
+// Function to select a customer
+function selectCustomer(customer) {
+  emit('select', customer)
   emit('notification', {
-    title: 'Client Selected',
-    description: `${client.fields['First Name']} ${client.fields['Last Name']} has been selected.`,
+    title: 'Customer Selected',
+    description: `${customer.firstName} ${customer.lastName} has been selected.`,
     color: 'blue'
   })
   close()
@@ -275,7 +287,7 @@ function close() {
 // Reset state when opening modal
 function reset() {
   searchTerm.value = ''
-  clients.value = []
+  customers.value = []
   error.value = ''
   showResults.value = false
   pagination.value.page = 1

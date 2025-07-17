@@ -73,30 +73,30 @@
                   <div v-if="activeTabIndex === index">
                     <div v-if="orders[activeTabIndex].client" class="flex items-center space-x-1 px-2 py-0.5 rounded-full text-xs pointer-events-auto" style="background-color: #E5E5E5;">
                       <span class="font-medium" style="color: #2D2D2D;">
-                    {{ orders[activeTabIndex].client.fields['First Name'] }} {{ orders[activeTabIndex].client.fields['Last Name'] }}
-              </span>
-              <UButton
-                color="gray"
-                variant="ghost"
-                icon="i-heroicons-x-mark"
-                size="xs"
-                    @click="removeOrderClient"
-              />
-            </div>
-            <UButton
-              v-else
+                        {{ orders[activeTabIndex].client.firstName }} {{ orders[activeTabIndex].client.lastName }}
+                      </span>
+                      <UButton
+                        color="gray"
+                        variant="ghost"
+                        icon="i-heroicons-x-mark"
+                        size="xs"
+                        @click="removeOrderClient"
+                      />
+                    </div>
+                    <UButton
+                      v-else
                       class="px-3 py-0.5 rounded-full text-xs font-medium pointer-events-auto"
                       style="background-color: #BFB7B0; color: #FFFFFF; min-width: 120px;"
-                  @click="openOrderClientModal"
-            >
+                      @click="openOrderClientModal"
+                    >
                       SELECT CLIENT
-            </UButton>
-          </div>
+                    </UButton>
+                  </div>
                   <!-- Empty space for inactive tabs to maintain consistent height -->
                   <div v-else class="h-[18px]"></div>
-          </div>
-        </div>
-          </div>
+                </div>
+              </div>
+            </div>
             
             <!-- Create New Order Tab -->
           <div class="relative">
@@ -1365,14 +1365,35 @@ const removeOrderClient = () => {
   orders.value[activeTabIndex.value].client = null
 }
 
-const selectClient = (client) => {
+const selectClient = (customer) => {
   if (activeTabIndex.value < 0 || activeTabIndex.value >= orders.value.length) return
   
-  orders.value[activeTabIndex.value].client = client
+  // Transform customer data to match expected format
+  const clientData = {
+    id: customer.id,
+    firstName: customer.firstName,
+    lastName: customer.lastName,
+    email: customer.email,
+    phoneNumber: customer.phoneNumber,
+    country: customer.country,
+    deliveryAddress: customer.deliveryAddress,
+    // Legacy format for backward compatibility
+    fields: {
+      'Customer ID': customer.id,
+      'First Name': customer.firstName,
+      'Last Name': customer.lastName,
+      'Email': customer.email,
+      'Phone Number': customer.phoneNumber,
+      'Country': customer.country,
+      'Delivery Address': customer.deliveryAddress
+    }
+  }
+  
+  orders.value[activeTabIndex.value].client = clientData
   
   showNotification({
-    title: 'Client Selected',
-    description: `${client.fields['First Name']} ${client.fields['Last Name']} has been selected for this order.`,
+    title: 'Customer Selected',
+    description: `${customer.firstName} ${customer.lastName} has been selected for this order.`,
     color: 'blue'
   })
 }
@@ -1492,8 +1513,8 @@ const submitOrder = async () => {
   
   if (!currentOrderData.client) {
     showNotification({
-      title: 'Client Required',
-      description: 'Please select a client before submitting the order.',
+      title: 'Customer Required',
+      description: 'Please select a customer before submitting the order.',
       color: 'red'
     })
     return
@@ -1502,11 +1523,11 @@ const submitOrder = async () => {
   isSubmitting.value = true
 
   try {
-    // Map frontend client data to backend customerId
-    const customerId = currentOrderData.client.id || currentOrderData.client.fields?.['Customer ID']
+    // Map frontend customer data to backend customerId
+    const customerId = currentOrderData.client.id
     
     if (!customerId) {
-      throw new Error('Client ID not found. Please ensure the client has a valid ID.')
+      throw new Error('Customer ID not found. Please ensure the customer has a valid ID.')
     }
 
     // Map frontend products to backend format
@@ -1550,7 +1571,7 @@ const submitOrder = async () => {
       status: 'Defining Order',
       fulfillment: null, // You may want to make this selectable
       installationDate: null, // You may want to add a date picker
-      customerLocation: currentOrderData.client.fields?.['Delivery Address'] || null,
+      customerLocation: currentOrderData.client.deliveryAddress || null,
       notes: currentOrderData.specialInstructions || null
     }
 
