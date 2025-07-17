@@ -14,7 +14,7 @@
       />
     </div>
     
-    <!-- Product Selection -->
+   
     <div class="bg-gray-800 p-3 rounded-md border border-gray-700 mb-4">
       <h4 class="text-sm font-medium text-gray-300 mb-2">
         Product Details
@@ -33,7 +33,7 @@
           />
         </UFormGroup>
         
-        <!-- Fabric Selection -->
+        
         <div v-if="formData.productType">
           <UFormGroup label="Fabric" class="text-gray-300">
             <div class="flex flex-col space-y-2">
@@ -42,7 +42,7 @@
                 v-if="selectedFabric" 
                 class="bg-gray-700 p-2 rounded-md border border-gray-600 flex items-center"
               >
-                <!-- Fabric preview -->
+               
                 <div class="w-10 h-10 rounded-md overflow-hidden mr-3">
                   <img 
                     v-if="selectedFabric.fields['Image URL']" 

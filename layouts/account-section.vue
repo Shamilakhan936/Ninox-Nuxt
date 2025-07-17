@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-[#F7F7F5]">
+  <div class="min-h-screen bg-white">
     <Navbar />
 
     <!-- Two-column layout -->
@@ -22,21 +22,28 @@
     </div>
 
     <!-- Order Upload Modal -->
-    <UModal v-model="showOrderUploadModal">
-      <UCard>
-        <template #header>
-          <div class="flex justify-between items-center">
-            <h3 class="text-lg font-medium">Upload Order File</h3>
-            <UButton
+    <UModal v-model="showOrderUploadModal" class="orderModal">
+      <UCard class="upload-order-container" :ui="{
+    body: 'p-0',
+    header: 'p-0',
+    footer: 'p-0',
+    base: 'p-0'
+  }">
+       <UButton
               icon="i-heroicons-x-mark"
               color="gray"
               variant="ghost"
               @click="closeOrderUploadModal"
+                class="close-button"
             />
+        <template #header>
+          <div class="flex justify-center items-center w-full">
+            <h3 class="upload-title">Upload Order File</h3>
+           
           </div>
         </template>
 
-        <div class="space-y-4">
+        <div class="space-y-4 my-5">
           <div class="text-sm text-gray-600 mb-4">
             Upload a CSV or Excel file with your order data. The file should
             contain columns for product type, dimensions, fabric details, and
@@ -48,7 +55,8 @@
               type="file"
               accept=".csv,.xlsx,.xls"
               @change="handleFileSelection"
-              ref="fileInput"
+              ref="fileInput"   
+                class="inputStyles"           
             />
           </UFormGroup>
 
@@ -67,7 +75,7 @@
         </div>
 
         <template #footer>
-          <div class="flex justify-end gap-2">
+          <div class="flex justify-end gap-2 mt-5">
             <UButton color="gray" variant="soft" @click="closeOrderUploadModal">
               Cancel
             </UButton>
@@ -218,3 +226,51 @@ const handleFileUpload = async () => {
   }
 };
 </script>
+
+<style scoped>
+/* Import Albert Sans font */
+@import url('https://fonts.googleapis.com/css2?family=Albert+Sans:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+.upload-order-container {
+  width: 100%;
+  position: relative;
+  min-height: 330px;
+  max-width: 860px;
+  margin: 0 auto;
+  text-align: center;
+  font-size: 12px;
+  color: #000;
+  font-family: 'Albert Sans', sans-serif;
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 60px 56px 60px 56px;
+}
+.close-button {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid #E5E5E5;
+  background-color: #fff;
+  color: #666;
+  font-size: 18px;
+  font-weight: 300;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  font-family: 'Albert Sans', sans-serif;
+}
+.upload-title {
+  text-align: center;
+  font-size: 30px;
+  line-height: 40px;
+  font-weight: 300;
+  color: #000;
+  margin-bottom: 16px;
+}
+
+</style>

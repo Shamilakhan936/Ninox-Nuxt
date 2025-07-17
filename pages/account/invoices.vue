@@ -30,7 +30,7 @@ definePageMeta({ layout: "account-section" });
 import InvoiceSearchForm from "~/components/SearchForm.vue";
 import InvoiceTable from "~/components/InvoiceTable.vue";
 const searchFields = [
-  { key: "order", label: "Order no", type: "text", placeholder: "#" },
+  { key: "document", label: "document no.", type: "text", placeholder: "#" },
   { key: "from", label: "From", type: "date" },
   { key: "to", label: "To", type: "date" },
 ];

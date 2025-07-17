@@ -17,7 +17,7 @@
     <ComplaintSearchBar/>
 
     <div>
-      <h3 class="text-3xl font-light mb-4 text-[#2D1713]">Recent Invoices</h3>
+      <h3 class="text-3xl font-light mb-4 text-[#2D1713]">Recent Complaints</h3>
       <ComplaintTable :complaints="dummyComplaints" />
     </div>
     <FaqAccordion/>
@@ -36,11 +36,6 @@ definePageMeta({ layout: "account-section" });
 
 import ComplaintSearchBar from "~/components/ComplaintSearchBar.vue";
 import ComplaintTable from "~/components/ComplaintTable.vue";
-// const searchFields = [
-//   { key: "order", label: "Order no", type: "text", placeholder: "#" },
-//   { key: "from", label: "From", type: "date" },
-//   { key: "to", label: "To", type: "date" },
-// ];
 
 const handleSearch = (formValues) => {
   console.log("Search submitted with values:", formValues);

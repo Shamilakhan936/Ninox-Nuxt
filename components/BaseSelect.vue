@@ -1,24 +1,18 @@
 <template>
   <div class="flex items-center relative">
-    <label class="text-base font-medium text-[#6F6259] w-[280px]">{{
-      label
-    }}</label>
-
+    <label class="text-base font-medium text-[#6F6259] w-[280px]">{{ label }}</label>
     <div class="relative">
       <select
-        class="min-w-[220px] appearance-none rounded-[66px] px-6 py-3 text-sm border border-[#C9C7C5] focus:outline-none h-[50px]"
+        class="min-w-[220px] appearance-none rounded-[66px] px-6 py-3 text-sm border border-[#C9C7C5] focus:outline-none focus:border-[#2d2d2d] focus:border-[1px] h-[50px] bg-white text-black" 
         :value="modelValue"
         @change="$emit('update:modelValue', $event.target.value)"
       >
-        <option disabled value="">{{ placeholder }}</option>
-        <option v-for="option in options" :key="option" :value="option">
+        <option v-if="placeholder" disabled value="" class="text-black"> {{ placeholder }}</option>
+        <option  v-for="option in options" :key="option" :value="option">
           {{ option }}
         </option>
       </select>
-
-      <div
-        class="pointer-events-none absolute inset-y-0 right-4 flex items-center"
-      >
+      <div class="pointer-events-none absolute inset-y-0 right-4 flex items-center">
         <svg
           class="w-4 h-4 text-gray-500"
           fill="none"

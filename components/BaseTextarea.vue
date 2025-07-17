@@ -6,7 +6,7 @@
     <textarea
       ref="textareaRef"
       rows="1"
-      class="rounded-[66px] px-6 py-3 text-sm border border-[#C9C7C5] h-[50px] resize-none focus:outline-none"
+      class="rounded-[66px] px-6 py-3 text-sm border border-[#C9C7C5] h-[50px] resize-none focus:outline-none focus:border-[#2d2d2d] focus:border-[1px] bg-white text-black"
       :placeholder="placeholder"
       :style="{ width: inputWidth + 'px' }"
       :value="modelValue"

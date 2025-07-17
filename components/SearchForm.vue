@@ -1,13 +1,13 @@
 <template>
   <form @submit.prevent="handleSubmit" class="space-y-8">
-    <div class="grid md:grid-cols-2 gap-x-20 gap-y-8">
+    <div class="grid md:grid-cols-2 gap-x-[10vw] gap-y-8">
       <div
         v-for="(field, index) in fields"
         :key="index"
         :class="[
           'flex items-center gap-4',
           fields.length === 3 && field.key === 'to'
-            ? 'justify-self-end md:col-span-2 w-[46.5%]'
+            ? 'col-start-2'
             : '',
         ]"
       >
@@ -21,7 +21,7 @@
           v-model="formData[field.key]"
           :id="field.key"
           :type="field.type"
-          class="flex-1 rounded-[66px] px-6 py-3 text-[#6F6259] font-light border border-[#C9C7C5] focus:outline-none h-[50px]"
+          class="flex-1 rounded-[66px] px-6 py-3 text-[#6F6259] font-light border border-[#C9C7C5] focus:outline-none focus:border-[#2d2d2d] focus:border-[1px] h-[50px] bg-white"
           :placeholder="field.placeholder || ''"
         />
       </div>

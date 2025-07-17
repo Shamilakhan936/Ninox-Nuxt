@@ -1,7 +1,7 @@
 <template>
   <div class="overflow-x-auto mt-10">
     <table class="w-full text-left border-collapse">
-      <thead>
+      <thead class="bg-[#F7F7F5]">
         <tr class="text-base text-[#3D3935] uppercase font-normal pb-3">
           <th
             v-for="(col, idx) in columns"
