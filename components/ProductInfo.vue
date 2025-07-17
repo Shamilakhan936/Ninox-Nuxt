@@ -1,7 +1,7 @@
 <template>
-  <div class="flex flex-col md:flex-row  overflow-hidden mx-auto">
+  <div class="flex flex-col lg:flex-row  overflow-hidden mx-auto">
     <!-- Left: Image and Description -->
-    <div class="flex flex-col items-center md:items-start md:w-[732px] w-full ">
+    <div class="flex flex-col items-center md:items-start md:w-[732px] w-full md:px-0 px-4 ">
       <img :src="image" alt="Product Image" class="md:w-[732px] md:h-[732px] object-cover" />
       <div class="w-full mt-6">
       
@@ -9,8 +9,8 @@
       </div>
     </div>
     <!-- Right: Name and Variants -->
-    <div class="flex-1 flex flex-col px-8">
-      <h2 class="text-xl font-light text-black  mb-6 w-[516px]">{{ name }}</h2>
+    <div class="flex-1 flex flex-col px-4">
+      <h2 class="text-xl  font-light text-black  mb-6 md:w-[516px]">{{ name }}</h2>
       <div class="flex mb-6">
        
         <div class="flex flex-wrap gap-2" style="max-width: calc(7 * 3rem + 6 * 0.5rem);">

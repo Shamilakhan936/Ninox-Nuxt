@@ -22,11 +22,12 @@
         class="dropdown-menu"
         @click.stop
         :style="{ 
-          minWidth: minWidth,
-          top: dropdownPosition.top + 'px',
-          left: dropdownPosition.left + 'px',
-          maxHeight: dropdownPosition.maxHeight + 'px'
-        }"
+  minWidth: dropdownWidth,
+  top: dropdownPosition.top + 'px',
+  left: dropdownPosition.left + 'px',
+  maxHeight: dropdownPosition.maxHeight + 'px'
+}"
+
       >
         <div class="dropdown-content">
           <div 
@@ -79,15 +80,35 @@ const props = defineProps({
   minWidth: {
     type: String,
     default: '120px'
+  },
+  open: {
+    type: Boolean,
+    default: undefined
   }
 })
 
-const emit = defineEmits(['update:modelValue', 'click'])
+const emit = defineEmits(['update:modelValue', 'click', 'open', 'close'])
 
-const isOpen = ref(false)
+// Controlled open state
+const isControlled = computed(() => props.open !== undefined)
+const isOpen = computed({
+  get() {
+    return isControlled.value ? props.open : localOpen.value
+  },
+  set(val) {
+    if (isControlled.value) {
+      if (val) emit('open')
+      else emit('close')
+    } else {
+      localOpen.value = val
+    }
+  }
+})
+const localOpen = ref(false)
 const containerRef = ref(null)
 const dropdownRef = ref(null)
 const dropdownPosition = ref({ top: 0, left: 0, maxHeight: 244 })
+
 
 // Computed property for display value
 const displayValue = computed(() => {
@@ -134,15 +155,16 @@ function isSelected(option) {
 
 function toggleDropdown() {
   if (props.disabled) return
-  
-  isOpen.value = !isOpen.value
-  
-  // Calculate position when opening
-  if (isOpen.value) {
+  if (!isOpen.value) {
+    isOpen.value = true
     nextTick(() => {
       updateDropdownPosition()
     })
     emit('click')
+    if (isControlled.value) emit('open')
+  } else {
+    isOpen.value = false
+    if (isControlled.value) emit('close')
   }
 }
 
@@ -164,8 +186,9 @@ function updateDropdownPosition() {
   const spaceBelow = viewportHeight - rect.bottom - EDGE_BUFFER
   const spaceAbove = rect.top - EDGE_BUFFER
   
-  // Determine dropdown width
-  const dropdownWidth = Math.max(parseInt(props.minWidth) || 200, rect.width)
+const dropdownWidth = computed(() => {
+  return window.innerWidth >= 768 ? '500px' : 'auto'
+})
   
   // Determine position and constraints
   let finalTop
@@ -234,6 +257,7 @@ function updateDropdownPosition() {
 
 function closeDropdown() {
   isOpen.value = false
+  if (isControlled.value) emit('close')
 }
 
 function selectOption(option) {
@@ -298,10 +322,9 @@ function handleKeydown(event) {
   }
 }
 
-// Add/remove event listeners when dropdown opens/closes
+// Remove watch on isOpen, and instead watch isOpen (computed) for event listeners
 watch(isOpen, (newValue) => {
   if (newValue) {
-    // Use setTimeout to ensure the dropdown is rendered first
     setTimeout(() => {
       document.addEventListener('click', handleClickOutside, true)
       document.addEventListener('keydown', handleKeydown, true)
@@ -407,7 +430,7 @@ onUnmounted(() => {
   border: 1px solid #8a7c59;
   box-sizing: border-box;
   overflow-y: auto;
-  z-index: 10101; /* Higher than modal's 10001 and overlay's 10100 */
+  z-index: 99999 !important; /* Higher than modal's 10001 and overlay's 10100 */
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   width: max-content;
   min-width: 200px;

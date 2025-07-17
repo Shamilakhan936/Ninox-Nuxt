@@ -31,24 +31,24 @@
       >
 
       <div class="flex flex-col gap-[11px] mb-6">
-        <BaseSelectProduct v-model="localFlammability" :options="flammabilityOptions" />
-        <BaseSelectProduct v-model="localWidth" :options="widthOptions" />
-        <BaseSelectProduct v-model="localColour" :options="colourOptions" />
-        <BaseSelectProduct v-model="localTransparency" :options="transparencyOptions" />
-        <BaseSelectProduct v-model="localAcoustic" :options="acousticOptions" />
-        <BaseSelectProduct v-model="localCategories" :options="categoriesOptions" />
-        <BaseSelectProduct v-model="localLightfastness" :options="lightfastnessOptions" />
-        <BaseSelectProduct v-model="localPattern" :options="patternOptions" />
-        <BaseSelectProduct v-model="localWashable" :options="washableOptions" />
-        <BaseSelectProduct v-model="localComposition" :options="compositionOptions" />
-        <BaseSelectProduct v-model="localTurnable" :options="turnableOptions" />
-        <BaseSelectProduct v-model="localMetallised" :options="metallisedOptions" />
-        <BaseSelectProduct v-model="localEnvironmental" :options="environmentalOptions" />
-        <BaseSelectProduct v-model="localInStock" :options="inStockOptions"/>
-        <BaseSelectProduct v-model="localPilling" :options="pillingOptions"/>
-        <BaseSelectProduct v-model="localFabricName" :options="fabricNameOptions"/>
-        <BaseSelectProduct v-model="localEnvironmentalDesign" :options="environmentalDesignOptions"/>
-        <BaseSelectProduct v-model="localSortBy" :options="sortByOptions"/>
+        <CrastinoDropdown v-model="localFlammability" :options="flammabilityOptions" placeholder="Flammability" min-width="100%" :open="openDropdown === 'flammability'" @open="openDropdown = 'flammability'" @close="openDropdown = null" />
+        <CrastinoDropdown v-model="localWidth" :options="widthOptions" placeholder="Width" min-width="100%" :open="openDropdown === 'width'" @open="openDropdown = 'width'" @close="openDropdown = null" />
+        <CrastinoDropdown v-model="localColour" :options="colourOptions" placeholder="Colour" min-width="100%" :open="openDropdown === 'colour'" @open="openDropdown = 'colour'" @close="openDropdown = null" />
+        <CrastinoDropdown v-model="localTransparency" :options="transparencyOptions" placeholder="Transparency" min-width="100%" :open="openDropdown === 'transparency'" @open="openDropdown = 'transparency'" @close="openDropdown = null" />
+        <CrastinoDropdown v-model="localAcoustic" :options="acousticOptions" placeholder="Acoustic" min-width="100%" :open="openDropdown === 'acoustic'" @open="openDropdown = 'acoustic'" @close="openDropdown = null" />
+        <CrastinoDropdown v-model="localCategories" :options="categoriesOptions" placeholder="Categories" min-width="100%" :open="openDropdown === 'categories'" @open="openDropdown = 'categories'" @close="openDropdown = null" />
+        <CrastinoDropdown v-model="localLightfastness" :options="lightfastnessOptions" placeholder="Lightfastness" min-width="100%" :open="openDropdown === 'lightfastness'" @open="openDropdown = 'lightfastness'" @close="openDropdown = null" />
+        <CrastinoDropdown v-model="localPattern" :options="patternOptions" placeholder="Pattern" min-width="100%" :open="openDropdown === 'pattern'" @open="openDropdown = 'pattern'" @close="openDropdown = null" />
+        <CrastinoDropdown v-model="localWashable" :options="washableOptions" placeholder="Washable" min-width="100%" :open="openDropdown === 'washable'" @open="openDropdown = 'washable'" @close="openDropdown = null" />
+        <CrastinoDropdown v-model="localComposition" :options="compositionOptions" placeholder="Composition" min-width="100%" :open="openDropdown === 'composition'" @open="openDropdown = 'composition'" @close="openDropdown = null" />
+        <CrastinoDropdown v-model="localTurnable" :options="turnableOptions" placeholder="Turnable" min-width="100%" :open="openDropdown === 'turnable'" @open="openDropdown = 'turnable'" @close="openDropdown = null" />
+        <CrastinoDropdown v-model="localMetallised" :options="metallisedOptions" placeholder="Metallised" min-width="100%" :open="openDropdown === 'metallised'" @open="openDropdown = 'metallised'" @close="openDropdown = null" />
+        <CrastinoDropdown v-model="localEnvironmental" :options="environmentalOptions" placeholder="Environmental" min-width="100%" :open="openDropdown === 'environmental'" @open="openDropdown = 'environmental'" @close="openDropdown = null" />
+        <CrastinoDropdown v-model="localInStock" :options="inStockOptions" placeholder="In Stock" min-width="100%" :open="openDropdown === 'inStock'" @open="openDropdown = 'inStock'" @close="openDropdown = null" />
+        <CrastinoDropdown v-model="localPilling" :options="pillingOptions" placeholder="Pilling" min-width="100%" :open="openDropdown === 'pilling'" @open="openDropdown = 'pilling'" @close="openDropdown = null" />
+        <CrastinoDropdown v-model="localFabricName" :options="fabricNameOptions" placeholder="Fabric Name" min-width="100%" :open="openDropdown === 'fabricName'" @open="openDropdown = 'fabricName'" @close="openDropdown = null" />
+        <CrastinoDropdown v-model="localEnvironmentalDesign" :options="environmentalDesignOptions" placeholder="Environmental Design" min-width="100%" :open="openDropdown === 'environmentalDesign'" @open="openDropdown = 'environmentalDesign'" @close="openDropdown = null" />
+        <CrastinoDropdown v-model="localSortBy" :options="sortByOptions" placeholder="Sort By" min-width="100%" :open="openDropdown === 'sortBy'" @open="openDropdown = 'sortBy'" @close="openDropdown = null" />
       </div>
       </div>
     </div>
@@ -57,7 +57,7 @@
 
 <script setup>
 import { ref, watch } from 'vue'
-import BaseSelectProduct from './BaseSelectProduct.vue'
+import CrastinoDropdown from './CrastinoDropdown.vue'
 
 // Props
 const props = defineProps({
@@ -122,6 +122,8 @@ const localPilling = ref(props.pilling)
 const localFabricName = ref(props.fabricName)
 const localEnvironmentalDesign = ref(props.environmentalDesign)
 const localSortBy = ref(props.sortBy)
+
+const openDropdown = ref(null)
 
 // Reset values when drawer opens
 watch(() => props.open, (val) => {
