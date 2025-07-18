@@ -29,7 +29,7 @@
             class="w-48"
           />
         </div>
-        <div class="flex items-center gap-6">
+        <div class="flex items-center gap-6 md:mt-0 mt-4">
           <AllFiltersButton class="w-auto" @open-filters="showFiltersModal = true" />
           <p class="text-black text-xs font-normal">299 Products</p>
         </div>
@@ -76,7 +76,7 @@
         @apply-filters="applyFilters"
       />
       <!-- Product Cards Grid -->
-      <div class="grid grid-cols-4 gap-6 mt-8">
+      <div class="grid lg:grid-cols-4 md:grid-cols-2 sm:grid-cols-1 gap-6 mt-8">
         <NuxtLink
           v-for="product in products"
           :key="product.id"
