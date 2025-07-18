@@ -232,4 +232,7 @@ function resetFilters() {
   background-color: #C9C7C5; /* muted gray-brown */
   border-radius: 10px;
 }
+.bg-opacity-20 {
+  background-color: rgba(61, 57, 53, 0.2) !important; 
+}
 </style>
