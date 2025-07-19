@@ -16,7 +16,7 @@
       <!-- Trigger -->
       <div
         :class="[
-          'rounded-[66px] px-6 py-3 pr-10 text-sm border border-[#C9C7C5] bg-white text-black flex items-center justify-between cursor-pointer',
+          'rounded-[66px] px-6 py-3 pr-10 text-sm border border-[#C9C7C5] bg-white text-[#6F6259] flex items-center justify-between cursor-pointer',
           { 'ring-2 ring-[#2d2d2d]': isOpen }
         ]"
         @click="toggleDropdown"
