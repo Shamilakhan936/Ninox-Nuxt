@@ -12,7 +12,7 @@ Access our portal to quickly order samples, download certificates, and more. Com
         <form class="space-y-6">
             <div>
  <div>
-    <p class="text-base font-light uppercase  text-[#6F6259] mb-6"> customer Information</p>
+    <p class="text-base font-light uppercase  text-[#000000] mb-6"> customer Information</p>
            <BaseInput
   id="email"
   name="email"
@@ -57,7 +57,7 @@ Access our portal to quickly order samples, download certificates, and more. Com
             </div>
           <div>
  <div>
-    <p class="text-base font-light uppercase  text-[#6F6259] mb-6"> Company Information</p>
+    <p class="text-base font-light uppercase  text-[#000000] mb-6"> Company Information</p>
             <BaseInput
               id="companyName"
               name="companyName"
