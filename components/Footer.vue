@@ -1,5 +1,5 @@
 <template>
-  <footer class="footer-container">
+  <footer class="footer-container bg-[#3d3935]">
     <!-- Footer Background -->
     <div class="footer-background" />
     
@@ -8,8 +8,14 @@
       <div class="copyright-section">
         <!-- Copyright symbol using Unicode -->
         <span class="copyright-symbol">©</span>
-        <span class="company-text">2025, CRASTINO</span>
+        <span class="company-text ">2025, CRASTINO</span>
       </div>
+      <div class="flex items-center justify-center gap-2 mt-4">
+      <NuxtLink to="/cookie-policy" class="text-white hover:underline text-sm">Cookie Policy</NuxtLink><span class="text-white"> | </span>
+      <NuxtLink to="/disclaimer" class="text-white hover:underline text-sm">Disclaimer</NuxtLink><span class="text-white"> | </span>
+      <NuxtLink to="/terms-condition" class="text-white hover:underline text-sm">Terms and conditions</NuxtLink><span class="text-white"> | </span>
+      <NuxtLink to="/privacy-statement" class="text-white hover:underline text-sm">Privacy Statement</NuxtLink>
+    </div>
     </div>
     
     <!-- Address with Location Pin -->
@@ -19,6 +25,7 @@
       </div>
       <div class="address-text">Søborg Hovedgade 3, 2870 Dyssegård, Denmark</div>
     </div>
+    
   </footer>
 </template>
 
@@ -33,7 +40,7 @@
 .footer-container {
   position: relative;
   width: 100%;
-  height: 82px;
+  height: 102px;
   font-family: 'Albert Sans', sans-serif;
 }
 
@@ -43,7 +50,7 @@
   top: 0;
   left: 0;
   background-color: #3d3935;
-  height: 82px;
+  /* height: 82px;   */
 }
 
 .company-info {
