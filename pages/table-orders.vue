@@ -1498,7 +1498,29 @@ onMounted(async () => {
   }
 })
 
-// Add this function before the lifecycle hooks
+// Add a helper function to get user ID from the database
+const getUserIdFromDatabase = async (email) => {
+  try {
+    const response = await $fetch('/api/users', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    
+    if (response.success) {
+      const users = response.data
+      const foundUser = users.find(u => u.email === email)
+      return foundUser?.id || null
+    }
+    return null
+  } catch (error) {
+    console.error('Error fetching user ID:', error)
+    return null
+  }
+}
+
+// Update the submitOrder function (around line 1400)
 const submitOrder = async () => {
   if (!isFormValid.value) {
     showNotification({
@@ -1520,9 +1542,27 @@ const submitOrder = async () => {
     return
   }
 
+  // Get current user information
+  const currentUser = user.value
+  if (!currentUser || !currentUser.email) {
+    showNotification({
+      title: 'Authentication Error',
+      description: 'Please log in again to submit orders.',
+      color: 'red'
+    })
+    return
+  }
+
   isSubmitting.value = true
 
   try {
+    // Get userId from database
+    const userId = await getUserIdFromDatabase(currentUser.email)
+    
+    if (!userId) {
+      throw new Error('User not found in database. Please contact support.')
+    }
+
     // Map frontend customer data to backend customerId
     const customerId = currentOrderData.client.id
     
@@ -1565,12 +1605,13 @@ const submitOrder = async () => {
       }
     })
 
-    // Prepare order data
+    // Prepare order data with userId
     const orderData = {
       customerId: Number(customerId),
+      userId: Number(userId), // Add userId
       status: 'Defining Order',
-      fulfillment: null, // You may want to make this selectable
-      installationDate: null, // You may want to add a date picker
+      fulfillment: null,
+      installationDate: null,
       customerLocation: currentOrderData.client.deliveryAddress || null,
       notes: currentOrderData.specialInstructions || null
     }
