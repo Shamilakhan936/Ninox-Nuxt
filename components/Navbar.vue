@@ -113,7 +113,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import CrastinoDropdown from './CrastinoDropdown.vue';
 
 // Cart count - you can replace this with actual cart state
@@ -191,6 +191,30 @@ function handleUserMenuSelection(selectedOption) {
       break;
   }
 }
+
+// Add this function to handle user creation
+async function ensureUserInDatabase(user) {
+  if (!user || !user.email) return;
+  
+  try {
+    await $fetch('/api/users', {
+      method: 'POST',
+      body: {
+        username: user.given_name || user.preferred_username || user.email.split('@')[0],
+        email: user.email
+      }
+    });
+  } catch (error) {
+    console.error('Error creating user in database:', error);
+  }
+}
+
+// Call this when component mounts and user is logged in
+onMounted(() => {
+  if (isLoggedIn.value && user.value) {
+    ensureUserInDatabase(user.value);
+  }
+});
 </script>
 
 <style scoped>
