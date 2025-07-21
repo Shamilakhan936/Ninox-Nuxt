@@ -54,3 +54,11 @@ const measurePlaceholder = () => {
 onMounted(measurePlaceholder)
 watch(() => props.placeholder, measurePlaceholder)
 </script>
+<style scoped>
+.signin-label .text-xs {
+font-size: 12px !important;
+font-weight: 300 !important;
+letter-spacing: 1px !important;
+line-height: 16px !important;
+}
+</style>
