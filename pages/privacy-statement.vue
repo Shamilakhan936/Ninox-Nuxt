@@ -19,7 +19,7 @@
       <span class=" py-1  text-[#2D1713] p-0 m-0 font-normal cursor-pointer"><a href="#" class="underline">PL</a></span>
     </div>
     <!-- Content -->
-   <privacy-content/>
+   <PrivacyContent/>
   </div>
 </template>
 <script setup>

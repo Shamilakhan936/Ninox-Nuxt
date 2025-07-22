@@ -3,7 +3,7 @@
      <div class=" mx-auto  py-6">
       <Breadcrumb :items="breadcrumbItems" />
     </div>
-   <policy-content/>
+   <PolicyContent/>
   </div>
 </template>
 <script setup>
