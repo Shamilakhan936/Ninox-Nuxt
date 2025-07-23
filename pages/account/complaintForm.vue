@@ -12,24 +12,32 @@
         label="E-mail"
         v-model="form.email"
         placeholder="esraeliasson@gmail.com"
+          :vertical="false"
+
       />
 
       <BaseInput
         label="Your Complaint Reference"
         v-model="form.complaintReference"
         placeholder="Your Complaint Reference"
+          :vertical="false"
+
       />
 
       <BaseInput
         label="Article Number"
         v-model="form.articleNumber"
         placeholder="Article Number"
+          :vertical="false"
+
       />
 
       <BaseInput
         label="Your Article Reference"
         v-model="form.articleReference"
         placeholder="Your Article Reference"
+          :vertical="false"
+
       />
 
       <BaseSelect
@@ -37,12 +45,16 @@
         v-model="form.complaintReason"
         :options="reasons"
         placeholder="Complaint Reason"
+          :vertical="false"
+
       />
 
       <BaseTextarea
         label="Complaint Description"
         v-model="form.complaintDescription"
         placeholder="Complaint Description."
+          :vertical="false"
+
       />
     </form>
   </div>
