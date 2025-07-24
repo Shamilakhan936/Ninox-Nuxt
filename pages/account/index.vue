@@ -16,11 +16,11 @@
         <!-- Main Content Area -->
         <div class="ml-[86px]">
           <!-- Title Section -->
-          <div class="mb-[184px]">
+          <div class="mb-16">
             <h1 class="text-[30px] font-light text-[#2d1713] mb-4">
               Hello, {{ userName || "User" }}
             </h1>
-            <p class="text-[16px] leading-[24px] text-[#6f6259] max-w-[869px]">
+            <p class="text-base font-normal leading-[24px] text-[#6f6259] max-w-[869px]">
               Welcome to your account dashboard. Here you can manage your
               personal information, view your company details, and access all
               your account features. Use the navigation menu to explore
@@ -29,7 +29,7 @@
           </div>
 
           <!-- Personal Information and Company Information Side by Side -->
-          <div class="flex gap-[138px] mb-[120px]">
+          <div class="flex gap-[138px] mb-8">
             <!-- Personal Information -->
             <div class="flex-1 max-w-[402px]">
               <h2
@@ -39,78 +39,33 @@
               </h2>
 
               <div class="space-y-3 text-[#6f6259]">
-                <div class="flex justify-between items-center">
-                  <span class="text-[16px] leading-[24px] font-medium"
-                    >First name</span
-                  >
-                  <span class="text-[16px] leading-[24px] font-light">{{
-                    user.given_name || "-"
-                  }}</span>
-                </div>
+  <div class="grid grid-cols-2 gap-x-4">
+    <span class="text-base leading-[24px] font-medium pb-3">First name</span>
+    <span class="text-base leading-[24px] font-light">{{ user.given_name || "-" }}</span>
 
-                <div class="flex justify-between items-center">
-                  <span class="text-[16px] leading-[24px] font-medium"
-                    >Last name</span
-                  >
-                  <span class="text-[16px] leading-[24px] font-light">{{
-                    user.family_name || "-"
-                  }}</span>
-                </div>
+    <span class="text-base leading-[24px] font-medium pb-3">Last name</span>
+    <span class="text-base leading-[24px] font-light">{{ user.family_name || "-" }}</span>
 
-                <div class="flex justify-between items-center">
-                  <span class="text-[16px] leading-[24px] font-medium"
-                    >E-mail</span
-                  >
-                  <span class="text-[16px] leading-[24px] font-light">{{
-                    user.email || "-"
-                  }}</span>
-                </div>
+    <span class="text-base leading-[24px] font-medium pb-3">E-mail</span>
+    <span class="text-base leading-[24px] font-light">{{ user.email || "-" }}</span>
 
-                <div class="flex justify-between items-center">
-                  <span class="text-[16px] leading-[24px] font-medium"
-                    >Phone number</span
-                  >
-                  <span class="text-[16px] leading-[24px] font-light">{{
-                    userProfile.phone || "-"
-                  }}</span>
-                </div>
+    <span class="text-base leading-[24px] font-medium pb-3">Phone number</span>
+    <span class="text-base leading-[24px] font-light">{{ userProfile.phone || "-" }}</span>
 
-                <div class="flex justify-between items-center">
-                  <span class="text-[16px] leading-[24px] font-medium"
-                    >Mobile number</span
-                  >
-                  <span class="text-[16px] leading-[24px] font-light">{{
-                    userProfile.mobile || "-"
-                  }}</span>
-                </div>
+    <span class="text-base leading-[24px] font-medium pb-3">Mobile number</span>
+    <span class="text-base leading-[24px] font-light">{{ userProfile.mobile || "-" }}</span>
 
-                <div class="flex justify-between items-center">
-                  <span class="text-[16px] leading-[24px] font-medium"
-                    >Language</span
-                  >
-                  <span class="text-[16px] leading-[24px] font-light">{{
-                    userProfile.language || "English"
-                  }}</span>
-                </div>
+    <span class="text-base leading-[24px] font-medium pb-3">Language</span>
+    <span class="text-base leading-[24px] font-light">{{ userProfile.language || "English" }}</span>
 
-                <div class="flex justify-between items-center">
-                  <span class="text-[16px] leading-[24px] font-medium"
-                    >Administrator</span
-                  >
-                  <span class="text-[16px] leading-[24px] font-light">{{
-                    userProfile.isAdmin ? "Yes" : "No"
-                  }}</span>
-                </div>
+    <span class="text-base leading-[24px] font-medium pb-3">Administrator</span>
+    <span class="text-base leading-[24px] font-light">{{ userProfile.isAdmin ? "Yes" : "No" }}</span>
 
-                <div class="flex justify-between items-center">
-                  <span class="text-[16px] leading-[24px] font-medium"
-                    >User Profile</span
-                  >
-                  <span class="text-[16px] leading-[24px] font-light">{{
-                    userProfile.role || "Order products"
-                  }}</span>
-                </div>
-              </div>
+    <span class="text-base leading-[24px] font-medium pb-3">User Profile</span>
+    <span class="text-base leading-[24px] font-light">{{ userProfile.role || "Order products" }}</span>
+  </div>
+</div>
+
             </div>
 
             <!-- Company Information -->

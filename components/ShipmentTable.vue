@@ -1,6 +1,6 @@
 <template>
   <GenericTable :columns="columns" :rows="shipments">
-    <template #actions="{ row }">
+    <template>
       <button
         class="btn-secondary flex items-center gap-2 uppercase text-[#6F6259] text-base font-light"
       >

@@ -7,7 +7,7 @@
       </p>
       <button
         type="button"
-        class="bg-[#8A7C59] rounded-full text-white py-3 px-5 mt-8"
+        class="bg-[#8A7C59] rounded-full uppercase text-white py-3 px-5 mt-8"
         @click="goToComplaintForm"
       >
        + Add complaint

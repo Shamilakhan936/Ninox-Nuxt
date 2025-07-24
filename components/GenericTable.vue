@@ -1,5 +1,5 @@
 <template>
-  <div class="overflow-x-auto mt-10">
+  <div class="overflow-x-auto my-8 ">
     <table class="w-full text-left border-collapse">
       <thead class="bg-[#F7F7F5]">
         <tr class="text-base text-[#3D3935] uppercase font-normal pb-3">
@@ -38,7 +38,7 @@
       </tbody>
     </table>
 
-    <div v-if="$slots.footer" class="mt-4 flex justify-start">
+    <div v-if="$slots.footer" class="mt-8 flex justify-start">
       <slot name="footer" />
     </div>
   </div>

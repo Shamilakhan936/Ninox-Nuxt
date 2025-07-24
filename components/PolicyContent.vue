@@ -97,16 +97,23 @@
         </div>
         <div>
           <h2 class="text-xl font-normal mb-4 text-black">5. More information on cookies</h2>
-          <p class="text-base leading-[1.5] font-light ">
-            You can find more information about cookies on the following websites:
-            <br>
-            <div class="space-y-8">
-                        <a href="https://www.consumentenbond.nl/internet-privacy/wat-zijn-cookies" class="text-blue-400 underline" target="_blank">Dutch Consumer Association: “What are cookies?”</a><br>
-            <a href="https://www.consumentenbond.nl/internet-privacy/cookies-verwijderen" class="text-blue-400 underline" target="_blank">Dutch Consumer Association: “Deleting cookies”</a><br>
-            <a href="https://www.consumentenbond.nl/internet-privacy/cookies-uitzetten" class="text-blue-400 underline" target="_blank">Dutch Consumer Association: “Disabling cookies”</a>
-            </div>
+         <div class="text-base leading-[1.5] font-light">
+  <p>
+    You can find more information about cookies on the following websites:
+  </p>
+  <div class="space-y-8 mt-4">
+    <a href="https://www.consumentenbond.nl/internet-privacy/wat-zijn-cookies" class="text-blue-400 underline" target="_blank">
+      Dutch Consumer Association: “What are cookies?”
+    </a><br>
+    <a href="https://www.consumentenbond.nl/internet-privacy/cookies-verwijderen" class="text-blue-400 underline" target="_blank">
+      Dutch Consumer Association: “Deleting cookies”
+    </a><br>
+    <a href="https://www.consumentenbond.nl/internet-privacy/cookies-uitzetten" class="text-blue-400 underline" target="_blank">
+      Dutch Consumer Association: “Disabling cookies”
+    </a>
+  </div>
+</div>
 
-          </p>
           <p class="text-base leading-[1.5] font-light mt-8">
             Please don’t hesitate to contact us if you have any questions.
           </p>

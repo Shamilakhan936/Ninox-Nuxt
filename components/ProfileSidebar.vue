@@ -14,7 +14,7 @@
           'leading-[27.82px] uppercase font-light transition-all',
           menuItem.name === currentActiveItem
             ? 'text-base font-medium text-black'
-            : 'text-[16px] font-light',
+            : 'text-base font-light',
         ]"
       >
         {{ menuItem.name }}

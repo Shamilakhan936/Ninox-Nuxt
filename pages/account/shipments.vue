@@ -17,7 +17,7 @@
       @submit="handleSearch"
     />
 
-    <div>
+    <div class="mt-[90px]">
       <h3 class="text-3xl font-light mb-4 text-[#2D1713]">Recent Shipments</h3>
       <ShipmentTable :shipments="dummyShipments" />
     </div>
