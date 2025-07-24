@@ -6,12 +6,12 @@
           v-model="searchQuery"
           type="text"
           placeholder="Complaint Number/Article Number"
-          class="w-full px-6 py-3 bg-transparent focus:outline-none text-sm placeholder-[#6F6259] w-full rounded-[66px] border border-[#C9C7C5] bg-white text-[#6F6259] h-[50px] focus:border-[#2d2d2d] focus:border-[1px]"
+          class="w-full md:w-[325px]  px-6 py-3 bg-transparent focus:outline-none text-sm placeholder-[#6F6259] w-full rounded-[66px] border border-[#C9C7C5] bg-white text-[#6F6259] h-[50px] focus:border-[#2d2d2d] focus:border-[1px]"
         />
       </div>
     </div>
 
-    <div class="w-full md:w-[40%] lg:w-[30%] relative">
+    <div class="w-full w-full md:w-[325px]  lg:w-[30%] relative">
       <div
         @click="toggleDatePicker"
         class="flex items-center rounded-full border border border-[#C9C7C5] bg-white px-4 py-3 gap-2 text-[#6F6259] w-full text-sm cursor-pointer hover:border-[#B8B0A8] transition-colors h-[50px]"

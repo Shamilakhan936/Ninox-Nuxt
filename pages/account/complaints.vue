@@ -1,8 +1,8 @@
 <template>
   <div class="ml-[86px]">
-    <div class="mb-[90px]">
+    <div class="mb-[60px]">
       <h2 class="text-3xl font-light mb-6 text-[#2D1713]">My Complaints and Returns</h2>
-      <p class="text-base font-normal text-[#6F6259] leading-6">
+      <p class="text-base font-normal text-[#6F6259] ">
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam eu turpis molestie, dictum est a, mattis tellus. Sed dignissim, metus nec fringilla accumsan, risus. sem sollicitudin lacus, ut interdum tellus elit sed risus. Maecenas eget condimentum velit, sit amet feugiat lectus. 
       </p>
       <button
