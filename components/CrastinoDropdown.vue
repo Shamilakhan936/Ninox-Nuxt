@@ -6,6 +6,7 @@
         'top-box',
         { 'open': isOpen, 'disabled': disabled }
       ]"
+      :style="{height: height}"
       @click="toggleDropdown"
     >
       <div class="selected-text">{{ displayValue || placeholder }}</div>
@@ -22,11 +23,11 @@
         class="dropdown-menu"
         @click.stop
         :style="{ 
-  minWidth: dropdownWidth,
-  top: dropdownPosition.top + 'px',
-  left: dropdownPosition.left + 'px',
-  maxHeight: dropdownPosition.maxHeight + 'px'
-}"
+        minWidth: dropdownWidth,
+        top: dropdownPosition.top + 'px',
+        left: dropdownPosition.left + 'px',
+        maxHeight: dropdownPosition.maxHeight + 'px'
+      }"
 
       >
         <div class="dropdown-content">
@@ -84,6 +85,12 @@ const props = defineProps({
   open: {
     type: Boolean,
     default: undefined
+  },
+  dropdownWidth : {
+    type: String
+  },
+  height : {
+   type: String
   }
 })
 
@@ -360,14 +367,14 @@ onUnmounted(() => {
 .top-box {
   border-radius: 48px;
   background-color: #fff;
-  border: 1px solid #8a7c59;
+  border: 1px solid #BFB7B0;
   box-sizing: border-box;
   height: 35px;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  padding: 8.8px 16.1px;
+  padding: 12px 24px;
   cursor: pointer;
   transition: all 0.2s ease;
   font-size: 11.74px;

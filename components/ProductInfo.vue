@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col lg:flex-row  overflow-hidden mx-auto">
+  <div class="flex flex-col lg:flex-row  overflow-hidden mx-auto gap-8">
     <!-- Left: Image and Description -->
     <div class="flex flex-col items-center md:items-start md:w-[732px] w-full md:px-0 px-4 ">
       <img :src="image" alt="Product Image" class="md:w-[732px] md:h-[732px] object-cover" />
@@ -9,18 +9,18 @@
       </div>
     </div>
     <!-- Right: Name and Variants -->
-    <div class="flex-1 flex flex-col px-4">
-      <h2 class="text-xl  font-light text-black  mb-6 md:w-[516px]">{{ name }}</h2>
-      <div class="flex mb-6">
-       
-        <div class="flex flex-wrap gap-2" style="max-width: calc(7 * 3rem + 6 * 0.5rem);">
+    <div class="flex-1 flex flex-col">
+      <h2 class="text-xl  font-light text-black  mb-[26px] md:w-[516px]">{{ name }}</h2>
+      <div class="flex mb-[48px]">       
+        <div class="flex flex-wrap gap-[6px]" style="max-width: calc(7 * 4rem + 6 * 0.5rem);">
           <div
             v-for="variant in variants"
             :key="variant.value"
-            class="flex flex-col items-center"
+            class="flex flex-col items-center p-[6px] hover:bg-[#D9D9D980]"
+
           >
             <div
-              class="w-12 h-12 flex items-center justify-center   bg-[#D9D9D9] cursor-pointer hover:border-[#8A7C59] transition"
+              class="w-[57px] h-[57px] flex items-center justify-center   bg-[#D9D9D9] cursor-pointer hover:border-[#8A7C59] transition"
             ></div>
             <span class="text-xs text-[#3D3935] font-light mt-1">{{ variant.label }}</span>
             <div class="w-8 h-px bg-[#8A7C59] "></div>

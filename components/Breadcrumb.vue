@@ -1,13 +1,13 @@
 <template>
   <nav>
     <ul class="flex space-x-2 items-center">
-      <li
+     <li
         v-for="(crumb, index) in items"
         :key="index"
         class="flex items-center text-sm uppercase"
       >
         <router-link
-          v-if="index < items.length - 1"
+          v-if="crumb.to"
           :to="crumb.to"
           class="text-black font-light hover:underline transition"
         >
@@ -25,7 +25,8 @@
           class="ml-1 self-center flex-shrink-0"
           :size="12"
         />
-      </li>
+</li>
+
     </ul>
   </nav>
 </template>
