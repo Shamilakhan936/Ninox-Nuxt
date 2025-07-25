@@ -16,7 +16,7 @@
         <!-- Main Content Area -->
         <div class="ml-[86px]">
           <!-- Title Section -->
-          <div class="mb-16">
+          <div class="mb-[60px]">
             <h1 class="text-[30px] font-light text-[#2d1713] mb-4">
               Hello, {{ userName || "User" }}
             </h1>

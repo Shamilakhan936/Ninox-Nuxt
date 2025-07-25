@@ -21,7 +21,7 @@
       </div>
       <UIcon
         name="i-heroicons-chevron-right"
-        class="w-[25px] h-[25px] text-black"
+        class="w-[25px] h-[25px] text-[#3D3935]"
       />
     </div>
 
@@ -36,7 +36,7 @@
       </div>
       <UIcon
         name="i-heroicons-chevron-right"
-        class="w-[25px] h-[25px] text-black"
+        class="w-[25px] h-[25px] text-[#3D3935]"
       />
     </div>
   </div>
