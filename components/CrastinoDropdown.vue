@@ -2,10 +2,7 @@
   <div ref="containerRef" class="custom-dropdown-container" :style="{ minWidth: minWidth }">
     <!-- Top Box (Trigger) -->
     <div 
-      :class="[
-        'top-box',
-        { 'open': isOpen, 'disabled': disabled }
-      ]"
+     :class="['top-box', topBoxClass, { open: isOpen, disabled: disabled }]"
       :style="{height: height}"
       @click="toggleDropdown"
     >
@@ -20,7 +17,7 @@
       <div 
         v-if="isOpen" 
         ref="dropdownRef"
-        class="dropdown-menu"
+        :class="['dropdown-menu', dropdownClass]"
         @click.stop
         :style="{ 
         minWidth: dropdownWidth,
@@ -91,6 +88,13 @@ const props = defineProps({
   },
   height : {
    type: String
+  },
+  topBoxClass: {
+  type: String
+  },
+   dropdownClass: {
+    type: String,
+    default: ''
   }
 })
 
@@ -385,11 +389,20 @@ onUnmounted(() => {
 .top-box:hover {
   border-color: #6B5B42;
 }
+.filterTopBoxClass:hover {
+border-color: #BFB7B0 !important;
+}
 
 .top-box.open {
   border-color: #2D2D2D;
   border-width: 1.5px;
 }
+
+.filterTopBoxClass.open{
+border-color: #BFB7B0 !important;
+ border-width: 1px;
+}
+
 
 .top-box.disabled {
   opacity: 0.5;
@@ -445,12 +458,30 @@ onUnmounted(() => {
   /* Smooth transitions for position changes */
   transition: opacity 0.15s ease, transform 0.15s ease;
 }
+.filterDropdownMenu {
+  border: 0 !important;
+  border-bottom-left-radius: 26px !important;
+  border-bottom-right-radius: 26px !important;
+  border-top-left-radius: 0 !important;
+  border-top-right-radius: 0 !important;
+  box-shadow: 0 1px 0px 1px rgba(0, 0, 0, 0.15) !important;
+}
+.navDropdownMenu {
+  border-radius: 0 !important;
+  background-color: #F7F7F5 !important;
+  border: 0.5px solid #6F6259 !import;
+}
 
 .dropdown-content {
   padding: 20px;
   position: relative;
 }
-
+.filterDropdownMenu .dropdown-content {
+  padding-top: 0 !important;
+}
+.navDropdownMenu .dropdown-content {
+    padding: 4px 16px !important;
+}
 .dropdown-option {
   line-height: 26px;
   font-weight: 300;
@@ -461,6 +492,9 @@ onUnmounted(() => {
   font-size: 11.74px;
   position: relative;
   white-space: nowrap;
+}
+.navDropdownMenu .dropdown-option {
+    padding: 4px 0 !important;
 }
 
 .dropdown-option:hover {
@@ -479,6 +513,9 @@ onUnmounted(() => {
   right: 0;
   background-color: #bfb7b0;
   height: 1px;
+}
+.navDropdownMenu .option-separator {
+  display : none !important;
 }
 
 /* Custom scrollbar */

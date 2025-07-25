@@ -6,25 +6,25 @@
         <div class="flex flex-wrap items-center gap-6">
           <CrastinoDropdown
             v-model="selectedFlammability"
-            :options="flammabilityOptions"
+            :options="filters.flammability"
             placeholder="Flammability"
             class="w-48"
           />
           <CrastinoDropdown
             v-model="selectedWidth"
-            :options="widthOptions"
+            :options="filters.width"
             placeholder="Width"
             class="w-48"
           />
           <CrastinoDropdown
             v-model="selectedColour"
-            :options="colourOptions"
+            :options="filters.colour"
             placeholder="Colour"
             class="w-48"
           />
           <CrastinoDropdown
             v-model="selectedTransparency"
-            :options="transparencyOptions"
+            :options="filters.transparency"
             placeholder="Transparency"
             class="w-48"
           />
@@ -36,46 +36,12 @@
       </div>
       <AllFiltersModal
         :open="showFiltersModal"
-        :flammability="selectedFlammability"
-        :width="selectedWidth"
-        :colour="selectedColour"
-        :transparency="selectedTransparency"
-        :acoustic="selectedAcoustic"
-        :categories="selectedCategories"
-        :lightfastness="selectedLightfastness"
-        :pattern="selectedPattern"
-        :washable="selectedWashable"
-        :composition="selectedComposition"
-        :turnable="selectedTurnable"
-        :metallised="selectedMetallised"
-        :environmental="selectedEnvironmental"
-        :inStock="selectedInStock"
-        :pilling="selectedPilling"
-        :fabricName="selectedFabricName"
-        :environmentalDesign="selectedEnvironmentalDesign"
-        :sortBy="selectedSortBy"
-        :flammabilityOptions="flammabilityOptions"
-        :widthOptions="widthOptions"
-        :colourOptions="colourOptions"
-        :transparencyOptions="transparencyOptions"
-        :acousticOptions="acousticOptions"
-        :categoriesOptions="categoriesOptions"
-        :lightfastnessOptions="lightfastnessOptions"
-        :patternOptions="patternOptions"
-        :washableOptions="washableOptions"
-        :compositionOptions="compositionOptions"
-        :turnableOptions="turnableOptions"
-        :metallisedOptions="metallisedOptions"
-        :environmentalOptions="environmentalOptions"
-        :inStockOptions="inStockOptions"
-        :pillingOptions="pillingOptions"
-        :fabricNameOptions="fabricNameOptions"
-        :environmentalDesignOptions="environmentalDesignOptions"
-        :sortByOptions="sortByOptions"
-        @close="showFiltersModal = false"
+        :filters="filters"
+        :values="filterValues"
         @apply-filters="applyFilters"
+        @close="showFiltersModal = false"
       />
-      <!-- Product Cards Grid -->
+
       <div class="grid lg:grid-cols-4 md:grid-cols-2 sm:grid-cols-1 gap-6 mt-8">
         <NuxtLink
           v-for="product in products"
@@ -97,120 +63,100 @@
 <script setup>
 import { ref } from 'vue'
 import Breadcrumb from '@/components/Breadcrumb.vue'
-import NextArrow from "~/assets/icons/NextArrow.vue";
 import CrastinoDropdown from '@/components/CrastinoDropdown.vue'
 import AllFiltersButton from '@/components/AllFiltersButton.vue'
 import AllFiltersModal from '@/components/AllFiltersModal.vue'
 import ProductCard from '@/components/ProductCard.vue'
 
-// Options for each selector with label as default option
-const flammabilityOptions = [
-  { label: 'Flammability', value: '' },
-  { label: 'Low', value: 'low' },
-  { label: 'Medium', value: 'medium' },
-  { label: 'High', value: 'high' }
-]
-const widthOptions = [
-  { label: 'Width', value: '' },
-  { label: '100cm', value: '100' },
-  { label: '150cm', value: '150' },
-  { label: '200cm', value: '200' }
-]
-const colourOptions = [
-  { label: 'Colour', value: '' },
-  { label: 'Red', value: 'red' },
-  { label: 'Blue', value: 'blue' },
-  { label: 'Green', value: 'green' }
-]
-const transparencyOptions = [
-  { label: 'Transparency', value: '' },
-  { label: 'Opaque', value: 'opaque' },
-  { label: 'Semi-transparent', value: 'semi' },
-  { label: 'Transparent', value: 'transparent' }
-]
-const acousticOptions = [
-  { label: 'Acoustic', value: '' },
-  { label: 'Yes', value: 'yes' },
-  { label: 'No', value: 'no' }
-]
-const categoriesOptions = [
-  { label: 'Categories', value: '' },
-  { label: 'Curtains', value: 'curtains' },
-  { label: 'Blinds', value: 'blinds' },
-  { label: 'Shades', value: 'shades' }
-]
-const lightfastnessOptions = [
-  { label: 'Lightfastness', value: '' },
-  { label: 'High', value: 'high' },
-  { label: 'Medium', value: 'medium' },
-  { label: 'Low', value: 'low' }
-]
-const patternOptions = [
-  { label: 'Pattern', value: '' },
-  { label: 'Solid', value: 'solid' },
-  { label: 'Striped', value: 'striped' },
-  { label: 'Floral', value: 'floral' }
-]
-const washableOptions = [
-  { label: 'Washable', value: '' },
-  { label: 'Yes', value: 'yes' },
-  { label: 'No', value: 'no' }
-]
-const compositionOptions = [
-  { label: 'Composition', value: '' },
-  { label: 'Cotton', value: 'cotton' },
-  { label: 'Polyester', value: 'polyester' },
-  { label: 'Blend', value: 'blend' }
-]
-const turnableOptions = [
-  { label: 'Turnable', value: '' },
-  { label: 'Yes', value: 'yes' },
-  { label: 'No', value: 'no' }
-]
-const metallisedOptions = [
-  { label: 'Metallised', value: '' },
-  { label: 'Yes', value: 'yes' },
-  { label: 'No', value: 'no' }
-]
-const environmentalOptions = [
-  { label: 'Environmental', value: '' },
-  { label: 'Recycled', value: 'recycled' },
-  { label: 'Organic', value: 'organic' },
-  { label: 'Low Emission', value: 'low-emission' }
-]
-const inStockOptions = [
-  { label: 'In-Stock', value: '' },
-  { label: 'Yes', value: 'yes' },
-  { label: 'No', value: 'no' },
-]
+const filters = {
+  flammability: [
+    { label: 'Low', value: 'low' },
+    { label: 'Medium', value: 'medium' },
+    { label: 'High', value: 'high' }
+  ],
+  width: [
+    { label: '100cm', value: '100' },
+    { label: '150cm', value: '150' },
+    { label: '200cm', value: '200' }
+  ],
+  colour: [
+    { label: 'Red', value: 'red' },
+    { label: 'Blue', value: 'blue' },
+    { label: 'Green', value: 'green' }
+  ],
+  transparency: [
+    { label: 'Opaque', value: 'opaque' },
+    { label: 'Semi-transparent', value: 'semi' },
+    { label: 'Transparent', value: 'transparent' }
+  ],
+  acoustic: [
+    { label: 'Yes', value: 'yes' },
+    { label: 'No', value: 'no' }
+  ],
+  categories: [
+    { label: 'Curtains', value: 'curtains' },
+    { label: 'Blinds', value: 'blinds' },
+    { label: 'Shades', value: 'shades' }
+  ],
+  lightfastness: [
+    { label: 'High', value: 'high' },
+    { label: 'Medium', value: 'medium' },
+    { label: 'Low', value: 'low' }
+  ],
+  pattern: [
+    { label: 'Solid', value: 'solid' },
+    { label: 'Striped', value: 'striped' },
+    { label: 'Floral', value: 'floral' }
+  ],
+  washable: [
+    { label: 'Yes', value: 'yes' },
+    { label: 'No', value: 'no' }
+  ],
+  composition: [
+    { label: 'Cotton', value: 'cotton' },
+    { label: 'Polyester', value: 'polyester' },
+    { label: 'Blend', value: 'blend' }
+  ],
+  turnable: [
+    { label: 'Yes', value: 'yes' },
+    { label: 'No', value: 'no' }
+  ],
+  metallised: [
+    { label: 'Yes', value: 'yes' },
+    { label: 'No', value: 'no' }
+  ],
+  environmental: [
+    { label: 'Recycled', value: 'recycled' },
+    { label: 'Organic', value: 'organic' },
+    { label: 'Low Emission', value: 'low-emission' }
+  ],
+  inStock: [
+    { label: 'Yes', value: 'yes' },
+    { label: 'No', value: 'no' }
+  ],
+  pilling: [
+    { label: 'High', value: 'high' },
+    { label: 'Medium', value: 'medium' },
+    { label: 'Low', value: 'low' }
+  ],
+  fabricName: [
+    { label: 'Fabric A', value: 'fabric-a' },
+    { label: 'Fabric B', value: 'fabric-b' }
+  ],
+  environmentalDesign: [
+    { label: 'Sustainable', value: 'sustainable' },
+    { label: 'Eco Certified', value: 'eco' }
+  ],
+  sortBy: [
+    { label: 'Price: Low to High', value: 'price-asc' },
+    { label: 'Price: High to Low', value: 'price-desc' },
+    { label: 'Newest', value: 'newest' }
+  ]
+}
 
-const pillingOptions = [
-  { label: 'Pilling', value: '' },
-  { label: 'High', value: 'high' },
-  { label: 'Medium', value: 'medium' },
-  { label: 'Low', value: 'low' },
-]
+const filterValues = ref(Object.fromEntries(Object.keys(filters).map(key => [key, ''])))
+const showFiltersModal = ref(false)
 
-const fabricNameOptions = [
-  { label: 'Fabric Name', value: '' },
-  { label: 'Fabric A', value: 'fabric-a' },
-  { label: 'Fabric B', value: 'fabric-b' },
-]
-
-const environmentalDesignOptions = [
-  { label: 'Environmental Design', value: '' },
-  { label: 'Sustainable', value: 'sustainable' },
-  { label: 'Eco Certified', value: 'eco' },
-]
-
-const sortByOptions = [
-  { label: 'Sort by (1)', value: '' },
-  { label: 'Price: Low to High', value: 'price-asc' },
-  { label: 'Price: High to Low', value: 'price-desc' },
-  { label: 'Newest', value: 'newest' },
-]
-
-// State for selected values
 const selectedFlammability = ref('')
 const selectedWidth = ref('')
 const selectedColour = ref('')
@@ -230,33 +176,31 @@ const selectedFabricName = ref('')
 const selectedEnvironmentalDesign = ref('')
 const selectedSortBy = ref('')
 
-const showFiltersModal = ref(false)
-
-function applyFilters(filters) {
-  selectedFlammability.value = filters.flammability
-  selectedWidth.value = filters.width
-  selectedColour.value = filters.colour
-  selectedTransparency.value = filters.transparency
-  selectedAcoustic.value = filters.acoustic
-  selectedCategories.value = filters.categories
-  selectedLightfastness.value = filters.lightfastness
-  selectedPattern.value = filters.pattern
-  selectedWashable.value = filters.washable
-  selectedComposition.value = filters.composition
-  selectedTurnable.value = filters.turnable
-  selectedMetallised.value = filters.metallised
-  selectedEnvironmental.value = filters.environmental
-  selectedInStock.value = filters.inStock
-  selectedPilling.value = filters.pilling
-  selectedFabricName.value = filters.fabricName
-  selectedEnvironmentalDesign.value = filters.environmentalDesign
-  selectedSortBy.value = filters.sortBy
-
-
-   showFiltersModal.value = false 
+function applyFilters(newValues) {
+  Object.entries(newValues).forEach(([k, v]) => {
+    if (k in filterValues.value) filterValues.value[k] = v
+  })
+  selectedFlammability.value = newValues.flammability
+  selectedWidth.value = newValues.width
+  selectedColour.value = newValues.colour
+  selectedTransparency.value = newValues.transparency
+  selectedAcoustic.value = newValues.acoustic
+  selectedCategories.value = newValues.categories
+  selectedLightfastness.value = newValues.lightfastness
+  selectedPattern.value = newValues.pattern
+  selectedWashable.value = newValues.washable
+  selectedComposition.value = newValues.composition
+  selectedTurnable.value = newValues.turnable
+  selectedMetallised.value = newValues.metallised
+  selectedEnvironmental.value = newValues.environmental
+  selectedInStock.value = newValues.inStock
+  selectedPilling.value = newValues.pilling
+  selectedFabricName.value = newValues.fabricName
+  selectedEnvironmentalDesign.value = newValues.environmentalDesign
+  selectedSortBy.value = newValues.sortBy
+  showFiltersModal.value = false
 }
 
-// Example static products array (replace with backend data in future)
 const products = ref([
   {
     id: 1,
@@ -310,7 +254,6 @@ const products = ref([
 </script>
 
 <style scoped>
-/* Import Albert Sans font */
 @import url("https://fonts.googleapis.com/css2?family=Albert+Sans:wght@100;200;300;400;500;600;700;800;900&display=swap");
 
 .min-h-screen {

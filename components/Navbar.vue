@@ -5,28 +5,47 @@
     
     <!-- Desktop Navigation -->
     <div class="desktop-nav">
-      <!-- Navigation Items with hover underlines -->
+      <!-- Products dropdown -->
       <div class="nav-item-container products-container">
         <div class="hover-underline"></div>
-        <NuxtLink to="/products/curtains" class="nav-link products">Products</NuxtLink>
+        <CrastinoDropdown
+          :model-value="'Products'"
+          :options="productMenuOptions"
+          :placeholder="'Products'"
+          min-width="auto"
+          @update:model-value="handleMenuSelection"
+          class="navbar-dropdown"
+           dropdownClass="navDropdownMenu"
+        />
       </div>
       
+      <!-- Cases link -->
       <div class="nav-item-container cases-container">
         <div class="hover-underline"></div>
         <NuxtLink to="/cases" class="nav-link cases">Cases</NuxtLink>
       </div>
       
+      <!-- About link -->
       <div class="nav-item-container about-container">
         <div class="hover-underline"></div>
         <NuxtLink to="/about" class="nav-link about">About</NuxtLink>
       </div>
       
+      <!-- Customer Service dropdown -->
       <div class="nav-item-container customer-service-container">
         <div class="hover-underline"></div>
-        <NuxtLink to="/customer-service" class="nav-link customer-service">Customer Service</NuxtLink>
+        <CrastinoDropdown
+          :model-value="'Customer Portal'"
+          :options="customerMenuOptions"
+          :placeholder="'Customer'"
+          min-width="auto"
+          @update:model-value="handleMenuSelection"
+          class="navbar-dropdown"
+           dropdownClass="navDropdownMenu"
+        />
       </div>
       
-      <!-- Auth Section with hover underline -->
+      <!-- Auth Section -->
       <div class="nav-item-container auth-container">
         <div class="hover-underline auth-underline"></div>
         <template v-if="isLoggedIn">
@@ -44,7 +63,7 @@
         </template>
       </div>
       
-      <!-- Cart with hover underline -->
+      <!-- Cart -->
       <div class="nav-item-container cart-container">
         <div class="hover-underline"></div>
         <NuxtLink to="/cart" class="nav-link cart">Cart ({{ cartCount }})</NuxtLink>
@@ -72,17 +91,33 @@
       <!-- Mobile Menu -->
       <div class="mobile-menu" :class="{ 'active': isMobileMenuOpen }">
         <div class="mobile-menu-items">
-          <NuxtLink to="/products/curtains" class="mobile-nav-link" @click="closeMobileMenu">Products</NuxtLink>
+           <div class="mobile-auth-section">
+            <template v-if="isLoggedIn">
+                <div class="mobile-user-menu">
+                  <span class="mobile-user-name">Products</span>
+                  <NuxtLink to="/products/curtains" class="mobile-nav-link mobile-sub-nav-link" @click="closeMobileMenu">Curtains</NuxtLink>
+                  <NuxtLink to="/products/blinds" class="mobile-nav-link mobile-sub-nav-link" @click="closeMobileMenu">Blinds</NuxtLink>
+                  <NuxtLink to="/products/accessories" class="mobile-nav-link mobile-sub-nav-link" @click="closeMobileMenu">Accessories</NuxtLink>
+                </div>
+              </template>
+          </div>
           <NuxtLink to="/cases" class="mobile-nav-link" @click="closeMobileMenu">Cases</NuxtLink>
           <NuxtLink to="/about" class="mobile-nav-link" @click="closeMobileMenu">About</NuxtLink>
-          <NuxtLink to="/customer-service" class="mobile-nav-link" @click="closeMobileMenu">Customer Service</NuxtLink>
           
           <div class="mobile-auth-section">
+           <template v-if="isLoggedIn">
+              <div class="mobile-user-menu">
+                <span class="mobile-user-name">Customer Service</span>
+                <NuxtLink to="/profile" class="mobile-nav-link mobile-sub-nav-link" @click="closeMobileMenu">Profile</NuxtLink>
+                <NuxtLink to="/orders" class="mobile-nav-link mobile-sub-nav-link" @click="closeMobileMenu">Orders</NuxtLink>
+                <NuxtLink to="/table-orders" class="mobile-nav-link mobile-sub-nav-link" @click="closeMobileMenu">Support</NuxtLink>
+              </div>
+            </template>
             <template v-if="isLoggedIn">
               <div class="mobile-user-menu">
                 <span class="mobile-user-name">{{ user.given_name || 'Account' }}</span>
-                <NuxtLink to="/account" class="mobile-nav-link" @click="closeMobileMenu">Profile</NuxtLink>
-                <NuxtLink to="/table-orders" class="mobile-nav-link" @click="closeMobileMenu">Table Orders</NuxtLink>
+                <NuxtLink to="/account" class="mobile-nav-link mobile-sub-nav-link" @click="closeMobileMenu">Profile</NuxtLink>
+                <NuxtLink to="/table-orders" class="mobile-nav-link mobile-sub-nav-link" @click="closeMobileMenu">Table Orders</NuxtLink>
                 <button @click="handleSignOut" class="mobile-nav-button">Sign Out</button>
               </div>
             </template>
@@ -116,16 +151,10 @@
 import { ref, computed, onMounted } from 'vue';
 import CrastinoDropdown from './CrastinoDropdown.vue';
 
-// Cart count - you can replace this with actual cart state
 const cartCount = ref(0);
-
-// Mobile menu state
 const isMobileMenuOpen = ref(false);
-
-// Get Kinde client for authentication
 const kindeClient = useKindeClient();
 
-// Create a safe way to access auth
 const auth = computed(() => {
   try {
     const nuxtApp = useNuxtApp();
@@ -136,66 +165,59 @@ const auth = computed(() => {
   }
 });
 
-// Create a computed property for auth state
-const isLoggedIn = computed(() => {
-  return !!auth.value?.loggedIn;
-});
+const isLoggedIn = computed(() => !!auth.value?.loggedIn);
+const user = computed(() => auth.value?.user || {});
 
-// Create a computed property for user
-const user = computed(() => {
-  return auth.value?.user || {};
-});
+// Dropdown options for Products and Customer Service
+const productMenuOptions = [
+  { label: 'Curtains', value: '/products/curtains' },
+  { label: 'Blinds', value: '/products/blinds' },
+  { label: 'Accessories', value: '/products/accessories' },
+];
 
-// User menu options for the dropdown
+const customerMenuOptions = [
+  { label: 'Profile', value: '/profile' },
+  { label: 'Orders', value: '/orders' },
+  { label: 'Support', value: '/support' },
+];
+
+// User menu options for auth dropdown
 const userMenuOptions = computed(() => [
-  'Profile',
-  'Table Orders',
-  'Sign Out'
+  { label: 'Profile', value: 'Profile' },
+  { label: 'Table Orders', value: 'Table Orders' },
+  { label: 'Sign Out', value: 'Sign Out' }
 ]);
 
-// Truncate user name if too long
 const truncatedUserName = computed(() => {
   const userName = user.value?.given_name || 'Account';
-  if (userName.length > 8) {
-    return userName.substring(0, 8) + '...';
-  }
-  return userName;
+  return userName.length > 8 ? userName.substring(0, 8) + '...' : userName;
 });
 
-// Mobile menu functions
 function toggleMobileMenu() {
   isMobileMenuOpen.value = !isMobileMenuOpen.value;
 }
-
 function closeMobileMenu() {
   isMobileMenuOpen.value = false;
 }
-
 function handleSignOut() {
   closeMobileMenu();
   window.location.href = '/api/logout';
 }
 
-// Handle user menu selection
+// Handle dropdown selection
+function handleMenuSelection(path) {
+  navigateTo(path);
+}
 function handleUserMenuSelection(selectedOption) {
   switch (selectedOption) {
-    case 'Profile':
-      navigateTo('/account');
-      break;
-    case 'Table Orders':
-      navigateTo('/table-orders');
-      break;
-    case 'Sign Out':
-      // Use Kinde logout
-      window.location.href = '/api/logout';
-      break;
+    case 'Profile': navigateTo('/account'); break;
+    case 'Table Orders': navigateTo('/table-orders'); break;
+    case 'Sign Out': window.location.href = '/api/logout'; break;
   }
 }
 
-// Add this function to handle user creation
 async function ensureUserInDatabase(user) {
   if (!user || !user.email) return;
-  
   try {
     await $fetch('/api/users', {
       method: 'POST',
@@ -209,7 +231,6 @@ async function ensureUserInDatabase(user) {
   }
 }
 
-// Call this when component mounts and user is logged in
 onMounted(() => {
   if (isLoggedIn.value && user.value) {
     ensureUserInDatabase(user.value);
@@ -347,7 +368,6 @@ onMounted(() => {
   align-items: center !important;
   justify-content: flex-start !important;
   width: fit-content !important;
-  max-width: 75px !important;
 }
 
 .navbar-dropdown :deep(.top-box:hover) {
@@ -373,7 +393,6 @@ onMounted(() => {
   overflow: hidden !important;
   text-overflow: ellipsis !important;
   white-space: nowrap !important;
-  max-width: 60px !important;
 }
 
 /* Hover Effects */
@@ -423,7 +442,6 @@ onMounted(() => {
   left: 0;
   background-color: #f7f7f5;
   width: 100%;
-  height: 120px;
 }
 
 .language {
@@ -618,7 +636,9 @@ onMounted(() => {
   text-shadow: none !important;
   line-height: 1.2 !important;
 }
-
+.mobile-sub-nav-link {
+  margin : 0 16px !important
+}
 .mobile-nav-link:hover,
 .mobile-nav-link:focus,
 .mobile-nav-link:active,

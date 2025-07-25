@@ -62,8 +62,8 @@ definePageMeta({
 .video-background {
   position: absolute;
   top: 119px;
-  left: calc(50% - 733px);
-  width: 1465px;
+  left: 0;
+  width: 100%;
   height: 824px;
   object-fit: cover;
   z-index: 1;
@@ -73,13 +73,13 @@ definePageMeta({
 .video-overlay {
   position: absolute;
   top: calc(50% - 393px);
-  left: calc(50% - 736px);
+  left: 0;
   background: linear-gradient(
     180deg,
     rgba(61, 57, 53, 0),
     rgba(61, 57, 53, 0.3)
   );
-  width: 1471px;
+  width: 100%;
   height: 828px;
   z-index: 2;
 }
@@ -87,14 +87,14 @@ definePageMeta({
 /* Content Overlay - Second gradient */
 .content-overlay {
   position: absolute;
-  top: 106px;
-  left: calc(50% - 733px);
+  top: 119px;
+  left: 0;
   background: linear-gradient(
     180deg,
     rgba(0, 0, 0, 0.2),
     rgba(102, 102, 102, 0.2)
   );
-  width: 1466px;
+  width: 100%;
   height: 847px;
   z-index: 3;
 }
