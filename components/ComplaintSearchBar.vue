@@ -1,6 +1,6 @@
 <template>
-  <div class="flex flex-col md:flex-row justify-between gap-20 mb-[90px]">
-    <div class="w-full md:w-[40%] lg:w-[30%]">
+  <div class="flex flex-col md:flex-row justify-between gap-4 mb-[90px] flex-wrap">
+    <div class="w-full md:w-[40%] lg:w-[325px]">
       <div class="flex items-center w-full rounded-full">
         <input
           v-model="searchQuery"
@@ -11,7 +11,7 @@
       </div>
     </div>
 
-    <div class="w-full w-full md:w-[325px]  lg:w-[30%] relative">
+    <div class="w-full w-full md:w-[50%]  lg:w-[396px] relative flex">
       <div
         @click="toggleDatePicker"
         class="flex items-center rounded-full border border border-[#C9C7C5] bg-white px-4 py-3 gap-2 text-[#6F6259] w-full text-sm cursor-pointer hover:border-[#B8B0A8] transition-colors h-[50px]"
@@ -95,7 +95,12 @@
           </button>
         </div>
       </div>
+        <FilterIcon
+          class="ml-6 self-center cursor-pointer"
+          :size="12"
+        />
     </div>
+      
   </div>
 </template>
 
@@ -114,6 +119,8 @@ import {
 } from "date-fns";
 
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/vue/20/solid";
+import FilterIcon from "@/assets/icons/FilterIcon";
+
 
 // Reactive state
 const searchQuery = ref("");
@@ -211,3 +218,9 @@ onUnmounted(() => {
   document.removeEventListener("click", handleClickOutside);
 });
 </script>
+<style scoped>
+.text-sm {
+  font-size: 16px !important;
+  line-height: 26px !important;
+  }
+</style>

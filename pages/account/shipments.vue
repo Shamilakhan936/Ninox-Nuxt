@@ -39,7 +39,7 @@ const searchFields = [
 const handleSearch = (formValues) => {
   console.log("Search submitted with values:", formValues);
 };
-const dummyShipments = Array.from({ length: 10 }, () => ({
+const dummyShipments = Array.from({ length: 14 }, () => ({
   document: "VF–2508227",
   date: "27/05/2025",
   order: "V0-2508227",

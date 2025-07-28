@@ -1,5 +1,5 @@
 <template>
-  <GenericTable :columns="columns" :rows="invoices">
+  <GenericTable :columns="columns" :rows="visibleInvoices">
     <template #actions="{ row }">
       <button
         class="btn-secondary flex items-center gap-2 uppercase text-[#6F6259] text-base font-light"
@@ -11,6 +11,8 @@
 
     <template #footer>
       <button
+        v-if="visibleInvoices.length < props.invoices.length"
+        @click="showMore"
         class="bg-[#8A7C59] font-normal uppercase text-sm rounded-full py-4 px-5 text-white"
       >
         Show Next 10 Orders
@@ -20,11 +22,16 @@
 </template>
 
 <script setup>
+import { ref, computed } from "vue";
 import GenericTable from "./GenericTable.vue";
 import ArrowCircleIcon from "~/assets/icons/ArrowCircleIcon.vue";
 
-defineProps({
-  invoices: Array,
+// Assign to variable so we can use props inside script
+const props = defineProps({
+  invoices: {
+    type: Array,
+    default: () => [],
+  },
 });
 
 const columns = [
@@ -34,4 +41,15 @@ const columns = [
   { label: "Total Ex. VAT", key: "total" },
   { label: "Outs. Total", key: "outstanding" },
 ];
+
+// Pagination state
+const itemsToShow = ref(10);
+
+const visibleInvoices = computed(() =>
+  props.invoices ? props.invoices.slice(0, itemsToShow.value) : []
+);
+
+const showMore = () => {
+  itemsToShow.value += 10;
+};
 </script>

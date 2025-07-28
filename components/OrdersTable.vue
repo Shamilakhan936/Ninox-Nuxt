@@ -12,6 +12,7 @@
 
     <template #footer>
       <button
+        v-if="orders.length > 10" 
         class="bg-[#8A7C59] font-normal uppercase text-sm rounded-full py-4 px-5 text-white"
         @click="$emit('load-more')"
       >
@@ -25,8 +26,12 @@
 import GenericTable from "./GenericTable.vue";
 import ArrowCircleIcon from "~/assets/icons/ArrowCircleIcon.vue";
 
-defineProps({
-  orders: Array,
+// Assign defineProps to a variable
+const props = defineProps({
+  orders: {
+    type: Array,
+    default: () => [],
+  },
 });
 
 defineEmits(['view-details', 'load-more']);
@@ -38,4 +43,7 @@ const columns = [
   { label: "total ex. vat", key: "total" },
   { label: "status", key: "status" },
 ];
+
+// Directly use props.orders in the template
+const orders = props.orders;
 </script>

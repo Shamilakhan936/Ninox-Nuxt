@@ -13,9 +13,10 @@
        + Add complaint
       </button>
     </div>
-
+  
     <ComplaintSearchBar/>
 
+    
     <div>
       <h3 class="text-3xl font-light mb-4 text-[#2D1713]">Recent Complaints</h3>
       <ComplaintTable :complaints="dummyComplaints" />
@@ -40,12 +41,12 @@ import ComplaintTable from "~/components/ComplaintTable.vue";
 const handleSearch = (formValues) => {
   console.log("Search submitted with values:", formValues);
 };
-const dummyComplaints = Array.from({ length: 10 }, () => ({
+const dummyComplaints = Array.from({ length: 15 }, (_, i) => ({
   complaint: "VF–2508227",
-  status: "27/05/2025",
-  reported: "Diddo ef.",
-  reference: "314,56",
-  article: "314,56",
-  reason: "314,56",
+  status: i % 2 === 0 ? "Open" : "Closed",
+  reported: i % 2 === 0 ? "Diddo ef." : "Aiddo ef.",
+  reference: `REF-${i}`,
+  article: `Article-${i}`,
+  reason: `Reason-${i}`,
 }));
 </script>

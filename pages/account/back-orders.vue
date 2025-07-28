@@ -19,7 +19,13 @@
 
     <div>
       <h3 class="text-3xl font-light mb-4 text-[#2D1713]">Recent Back Orders</h3>
-      <BackOrdersTable :backOrders="dummyInvoices" />
+      <button
+        @click="showMore"
+        class="bg-[#EBE6DC] font-normal uppercase text-sm rounded-full py-4 px-5 text-[#6F6259]"
+      >
+        download full list
+      </button>
+      <BackOrdersTable :backOrders="dummyBackOrders" />
     </div>
   </div>
 </template>
@@ -52,3 +58,8 @@ const dummyBackOrders = Array.from({ length: 10 }, () => ({
   adjDate: "27/05/2025",
 }));
 </script>
+<style>
+.font-normal {
+  font-weight: 400 !important
+}
+</style>
